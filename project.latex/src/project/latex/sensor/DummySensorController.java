@@ -15,17 +15,19 @@ import project.latex.SensorData;
  * @author Dan
  */
 public class DummySensorController implements SensorController {
-
-    @Override
-    public void readSensorData() {
-        // Do nothing here
-    }
+    
+    private final String sensorName = "Dummy Sensor";
 
     @Override
     public SensorData getCurrentData() {
         HashMap<String, Object> data = new HashMap<>();
         data.put("Value", Math.random());
-        return new SensorData("DummySensor", new Date(), data);
+        return new SensorData(this.sensorName, new Date(), data);
+    }
+
+    @Override
+    public String getSensorName() {
+        return this.sensorName;
     }
     
 }

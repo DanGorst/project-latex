@@ -13,6 +13,7 @@ import project.latex.SensorData;
  * @author Dan
  */
 public interface SensorController {
-    void readSensorData();
+    String getSensorName();
+    
     SensorData getCurrentData();
 }
