@@ -4,12 +4,13 @@
  * and open the template in the editor.
  */
 
-package project.latex;
+package project.latex.balloon;
 
 import project.latex.sensor.SensorController;
 import project.latex.writer.DataWriter;
 import java.util.ArrayList;
 import java.util.List;
+import project.latex.SensorData;
 import project.latex.sensor.DummySensorController;
 import project.latex.writer.ConsoleDataWriter;
 
