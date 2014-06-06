@@ -11,7 +11,9 @@ import project.latex.writer.DataWriter;
 import java.util.ArrayList;
 import java.util.List;
 import project.latex.SensorData;
+import project.latex.sensor.AltimeterSensorController;
 import project.latex.sensor.DummySensorController;
+import project.latex.sensor.GPSSensorController;
 import project.latex.writer.ConsoleDataWriter;
 
 /**
@@ -23,11 +25,14 @@ public class BalloonController {
     private List<SensorController> sensors;
     private List<DataWriter> dataWriters;
     
+    private GPSSensorController gpsController;
+    private AltimeterSensorController altimeterController;
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Project Latex Balloon Controller version 0.1");
+        System.out.println("Project Latex Balloon Controller, version 0.1");
         
         BalloonController balloonController = new BalloonController();
         balloonController.initialise();
@@ -40,6 +45,8 @@ public class BalloonController {
         
         this.dataWriters = new ArrayList<>();
         this.dataWriters.add(new ConsoleDataWriter());
+        
+        // TODO - Initialise the altimeter and GPS controllers here
     }
     
     private void run()  {
