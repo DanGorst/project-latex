@@ -6,14 +6,14 @@
 
 package project.latex.balloon;
 
-import project.latex.sensor.SensorController;
+import project.latex.balloon.sensor.SensorController;
 import project.latex.writer.DataWriter;
 import java.util.ArrayList;
 import java.util.List;
 import project.latex.SensorData;
-import project.latex.sensor.AltimeterSensorController;
-import project.latex.sensor.DummySensorController;
-import project.latex.sensor.GPSSensorController;
+import project.latex.balloon.sensor.AltimeterSensorController;
+import project.latex.balloon.sensor.DummySensorController;
+import project.latex.balloon.sensor.GPSSensorController;
 import project.latex.writer.ConsoleDataWriter;
 
 /**

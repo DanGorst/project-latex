@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package project.latex.sensor;
+package project.latex.balloon.sensor;
 
 import java.util.Date;
 import java.util.HashMap;

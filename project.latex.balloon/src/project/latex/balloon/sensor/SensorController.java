@@ -4,14 +4,16 @@
  * and open the template in the editor.
  */
 
-package project.latex.sensor;
+package project.latex.balloon.sensor;
+
+import project.latex.SensorData;
 
 /**
  *
- * @author dgorst
+ * @author Dan
  */
-public interface GPSSensorController extends SensorController {
-    float getLatitude();
+public interface SensorController {
+    String getSensorName();
     
-    float getLongitude();
+    SensorData getCurrentData();
 }
