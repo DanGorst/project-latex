@@ -12,11 +12,13 @@ package project.latex.ground;
  */
 public class GroundStationController {
     
+    private final BalloonDataModel balloonDataModel = new BalloonDataModel();
+    
     private void run()  {
         System.out.println("Project Latex Ground Station, version 0.1");
         
         while (true)    {
-            // TODO
+            // TODO - Do stuff with the balloon data model
         }
     }
 
