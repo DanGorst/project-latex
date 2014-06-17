@@ -8,6 +8,7 @@ package project.latex;
 
 import com.google.gson.Gson;
 import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 import project.latex.ground.BalloonDataModel;
 
@@ -16,16 +17,22 @@ import project.latex.ground.BalloonDataModel;
  * @author dgorst
  */
 public class BalloonDataModelResource extends ServerResource {
+    private static final BalloonDataModel dataModel = new BalloonDataModel();
     
     @Get
     public String represent() {
-        BalloonDataModel dataModel = new BalloonDataModel();
-        dataModel.setHeight(1234.0f);
-        dataModel.setLatitude(51.45f);
-        dataModel.setLongitude(-2.58f);
-        
         // Write the data model to JSON, and return the JSON string
         Gson gson = new Gson();
-        return gson.toJson(dataModel);
+        return gson.toJson(BalloonDataModelResource.dataModel);
+    }
+    
+    @Put
+    public void store(String jsonString)   {
+        Gson gson = new Gson();
+        BalloonDataModel dataModelIn = gson.fromJson(jsonString, BalloonDataModel.class);
+        
+        BalloonDataModelResource.dataModel.setHeight(dataModelIn.getHeight());
+        BalloonDataModelResource.dataModel.setLatitude(dataModelIn.getLatitude());
+        BalloonDataModelResource.dataModel.setLongitude(dataModelIn.getLongitude());
     }
 }
