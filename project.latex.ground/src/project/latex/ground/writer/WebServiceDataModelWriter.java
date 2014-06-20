@@ -6,11 +6,9 @@
 package project.latex.ground.writer;
 
 import com.google.gson.Gson;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.restlet.data.Status;
+import org.apache.log4j.Logger;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import project.latex.ground.BalloonDataModel;
 
 /**
@@ -20,6 +18,8 @@ import project.latex.ground.BalloonDataModel;
 public class WebServiceDataModelWriter implements DataModelWriter {
 
     private final String serviceUrl;
+    
+    private static final Logger logger = Logger.getRootLogger();
 
     public WebServiceDataModelWriter(String serviceUrl) {
         this.serviceUrl = serviceUrl;
@@ -31,12 +31,15 @@ public class WebServiceDataModelWriter implements DataModelWriter {
 
         // Send the HTTP PUT request
         Gson gson = new Gson();
-        resource.put(gson.toJson(dataModel));
+        try {
+            resource.put(gson.toJson(dataModel));
 
-        if (!resource.getStatus().isSuccess()) {
-            // Unexpected status
-            System.out.println("An unexpected status was returned: "
-                    + resource.getStatus());
+            if (!resource.getStatus().isSuccess()) {
+                // Unexpected status
+                logger.error("An unexpected status was returned: " + resource.getStatus());
+            }
+        } catch (ResourceException e) {
+            logger.error("Failed to send data to " + serviceUrl);
         }
     }
 

@@ -6,6 +6,7 @@
 /project.latex.balloon/dist/
 /project.latex.ground/nbproject/private/
 /project.latex.ground/build/
+/project.latex.ground/*.csv
 /ProjectLatexWebService/nbproject/private/
 /ProjectLatexWebService/dist/
 /ProjectLatexWebService/build/

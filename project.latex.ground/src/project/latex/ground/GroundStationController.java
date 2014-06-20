@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.log4j.BasicConfigurator;
 import project.latex.ground.writer.DataModelWriter;
+import project.latex.ground.writer.FileDataModelWriter;
 import project.latex.ground.writer.WebServiceDataModelWriter;
 
 /**
@@ -25,10 +27,15 @@ public class GroundStationController {
     
     private void initialise()   {
         this.dataWriters.add(new WebServiceDataModelWriter("http://localhost:8080/ProjectLatexWebService/"));
+        this.dataWriters.add(new FileDataModelWriter());
     
         balloonDataModel.setHeight(0.0f);
         balloonDataModel.setLatitude(0.0f);
         balloonDataModel.setLongitude(0.0f);
+        
+        // Adds a console appender to the root appender. This means that any logging we do, including the file logging, is also 
+        // logged on the console
+        BasicConfigurator.configure();
     }
     
     private void run()  {
