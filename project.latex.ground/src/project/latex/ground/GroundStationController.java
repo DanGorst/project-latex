@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.log4j.BasicConfigurator;
+import project.latex.ground.reader.DataModelReader;
+import project.latex.ground.reader.MockDataModelReader;
 import project.latex.ground.writer.DataModelWriter;
 import project.latex.ground.writer.FileDataModelWriter;
 import project.latex.ground.writer.WebServiceDataModelWriter;
@@ -25,6 +27,8 @@ public class GroundStationController {
     
     private final List<DataModelWriter> dataWriters = new ArrayList<>();
     
+    private final DataModelReader dataReader = new MockDataModelReader();
+    
     private void initialise()   {
         this.dataWriters.add(new WebServiceDataModelWriter("http://localhost:8080/ProjectLatexWebService/"));
         this.dataWriters.add(new FileDataModelWriter());
@@ -38,12 +42,17 @@ public class GroundStationController {
         BasicConfigurator.configure();
     }
     
+    private void updateDataModel(BalloonDataModel newData)  {
+        this.balloonDataModel.setHeight(newData.getHeight());
+        this.balloonDataModel.setLatitude(newData.getLatitude());
+        this.balloonDataModel.setLongitude(newData.getLongitude());
+    }
+    
     private void run()  {
         System.out.println("Project Latex Ground Station, version 0.1");
         
         while (true)    {
-            // TODO: temp test code - update the balloon height
-            this.balloonDataModel.setHeight(this.balloonDataModel.getHeight() + 5);
+            updateDataModel(this.dataReader.readDataModel());
             
             for (DataModelWriter writer : this.dataWriters) {
                 writer.writeDataModel(balloonDataModel);
