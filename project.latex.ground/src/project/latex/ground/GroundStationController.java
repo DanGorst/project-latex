@@ -8,9 +8,9 @@ package project.latex.ground;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import project.latex.ground.reader.DataModelReader;
 import project.latex.ground.reader.MockDataModelReader;
 import project.latex.ground.writer.DataModelWriter;
@@ -49,7 +49,7 @@ public class GroundStationController {
     }
     
     private void run()  {
-        System.out.println("Project Latex Ground Station, version 0.1");
+        Logger.getRootLogger().info("Project Latex Ground Station, version 0.1");
         
         while (true)    {
             updateDataModel(this.dataReader.readDataModel());
@@ -61,7 +61,7 @@ public class GroundStationController {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(GroundStationController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GroundStationController.class.getName()).log(Level.ERROR, null, ex);
             }
         }
     }
