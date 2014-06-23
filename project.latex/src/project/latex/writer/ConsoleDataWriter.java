@@ -6,6 +6,10 @@
 
 package project.latex.writer;
 
+import java.io.OutputStreamWriter;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import project.latex.SensorData;
 
 /**
@@ -13,12 +17,21 @@ import project.latex.SensorData;
  * @author Dan
  */
 public class ConsoleDataWriter implements DataWriter {
-
+ 
+    private static final Logger logger = Logger.getLogger(ConsoleDataWriter.class);
+    
+    public ConsoleDataWriter()  {
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+        logger.addAppender(ca);
+    }
+    
     @Override
     public void writeData(SensorData data) {
-        System.out.println(data.getSensorName());
-        System.out.println(data.getDate());
-        System.out.println(data.getData());
+        logger.info(data.getSensorName());
+        logger.info(data.getDate());
+        logger.info(data.getData());
     }
     
 }
