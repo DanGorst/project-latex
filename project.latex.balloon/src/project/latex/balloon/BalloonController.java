@@ -6,8 +6,12 @@
 
 package project.latex.balloon;
 
+import java.io.File;
 import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -19,6 +23,8 @@ import project.latex.balloon.sensor.GPSSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriter;
+import project.latex.writer.FileDataWriter;
+import project.latex.writer.SensorLoggerService;
 
 /**
  *
@@ -28,6 +34,7 @@ public class BalloonController {
 
     private List<SensorController> sensors;
     private List<DataWriter> dataWriters;
+    private SensorLoggerService loggerService;
     
     private GPSSensorController gpsController;
     private AltimeterSensorController altimeterController;
@@ -55,6 +62,25 @@ public class BalloonController {
         
         this.dataWriters = new ArrayList<>();
         this.dataWriters.add(new ConsoleDataWriter());
+        
+        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
+        // flight is then put into that folder
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+        Date date = new Date();
+        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
+        File dataFolder = new File(baseUrl);
+        if (dataFolder.mkdirs()) {
+            loggerService = new SensorLoggerService();
+
+            // We create a different logger for each sensor. The file data writer will then lookup these loggers as needed
+            for (SensorController sensor : this.sensors) {
+                loggerService.setLoggerForSensor(sensor.getSensorName(), baseUrl);
+            }
+            
+            this.dataWriters.add(new FileDataWriter(baseUrl, this.loggerService));
+        } else  {
+            logger.info("Unable to create directory to contain sensor data logs");
+        }
         
         // TODO - Initialise the altimeter and GPS controllers here
     }
