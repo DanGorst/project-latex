@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package project.latex.writer;
+package project.latex.balloon.writer;
 
 import java.io.File;
 import java.util.HashMap;
@@ -13,15 +13,24 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import project.latex.writer.DataWriteFailedException;
 
 /**
  *
  * @author dgorst
  */
-public class SensorLoggerService {
+public class SensorFileLoggerService {
     private final Map<String, Logger> loggers = new HashMap<>();
     
-    public void setLoggerForSensor(String sensorName, String baseUrl)    {
+    public void setLoggerForSensor(String sensorName, String baseUrl) throws DataWriteFailedException    {
+        if (sensorName == null) {
+            throw new DataWriteFailedException("Sensor name is null");
+        }
+        
+        if (baseUrl == null)    {
+            throw new DataWriteFailedException("Base url is null");
+        }
+        
         Logger sensorLogger = Logger.getLogger(sensorName);
         // Each of our sensors will log to their own file
         sensorLogger.addAppender(createFileAppender(baseUrl + File.separator + sensorName + ".csv"));

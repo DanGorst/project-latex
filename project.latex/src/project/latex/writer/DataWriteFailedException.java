@@ -6,12 +6,12 @@
 
 package project.latex.writer;
 
-import project.latex.SensorData;
-
 /**
  *
  * @author Dan
  */
-public interface DataWriter {
-    void writeData(SensorData data) throws DataWriteFailedException;
+public class DataWriteFailedException extends Exception {
+    public DataWriteFailedException(String message) {
+        super(message);
+    }
 }

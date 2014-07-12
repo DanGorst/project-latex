@@ -28,7 +28,7 @@ public class ConsoleDataWriter implements DataWriter {
     }
     
     @Override
-    public void writeData(SensorData data) {
+    public void writeData(SensorData data) throws DataWriteFailedException {
         logger.info(data.getSensorName());
         logger.info(data.getDate());
         logger.info(data.getData());

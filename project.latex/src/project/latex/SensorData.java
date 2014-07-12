@@ -7,7 +7,7 @@
 package project.latex;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -16,9 +16,9 @@ import java.util.HashMap;
 public class SensorData {
     private final String sensorName;
     private final Date date;
-    private final HashMap<String, Object> data;
+    private final Map<String, Object> data;
     
-    public SensorData(String sensorName, Date date, HashMap<String, Object> data)   {
+    public SensorData(String sensorName, Date date, Map<String, Object> data)   {
         this.sensorName = sensorName;
         this.date = date;
         this.data = data;
@@ -32,7 +32,7 @@ public class SensorData {
         return date;
     }
 
-    public HashMap<String, Object> getData() {
+    public Map<String, Object> getData() {
         return data;
     }
 }

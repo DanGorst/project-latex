@@ -23,8 +23,9 @@ import project.latex.balloon.sensor.GPSSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriter;
-import project.latex.writer.FileDataWriter;
-import project.latex.writer.SensorLoggerService;
+import project.latex.balloon.writer.FileDataWriter;
+import project.latex.balloon.writer.SensorFileLoggerService;
+import project.latex.writer.DataWriteFailedException;
 
 /**
  *
@@ -34,7 +35,6 @@ public class BalloonController {
 
     private List<SensorController> sensors;
     private List<DataWriter> dataWriters;
-    private SensorLoggerService loggerService;
     
     private GPSSensorController gpsController;
     private AltimeterSensorController altimeterController;
@@ -70,14 +70,14 @@ public class BalloonController {
         String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
         File dataFolder = new File(baseUrl);
         if (dataFolder.mkdirs()) {
-            loggerService = new SensorLoggerService();
+            SensorFileLoggerService loggerService = new SensorFileLoggerService();
 
             // We create a different logger for each sensor. The file data writer will then lookup these loggers as needed
             for (SensorController sensor : this.sensors) {
                 loggerService.setLoggerForSensor(sensor.getSensorName(), baseUrl);
             }
             
-            this.dataWriters.add(new FileDataWriter(baseUrl, this.loggerService));
+            this.dataWriters.add(new FileDataWriter(loggerService));
         } else  {
             logger.info("Unable to create directory to contain sensor data logs");
         }
@@ -91,7 +91,12 @@ public class BalloonController {
                 SensorData currentSensorData = controller.getCurrentData();
                 
                 for (DataWriter dataWriter : this.dataWriters)  {
-                    dataWriter.writeData(currentSensorData);
+                    try {
+                        dataWriter.writeData(currentSensorData);
+                    }
+                    catch (DataWriteFailedException e)  {
+                        logger.error(e);
+                    }
                 }
             }
         }
