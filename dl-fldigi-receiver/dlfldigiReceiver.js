@@ -11,14 +11,13 @@ function defaultContentTypeMiddleware (req, res, next) {
 app.use(defaultContentTypeMiddleware);
 app.use(bodyParser());
 
-app.get('/', function(req, res){
-  res.send('Request received');
-});
-
 app.all('*', function(req, res) {
-    // TODO: Handle the telemetry information here
-    console.log(req.headers);
-    console.log(req.body);
+    var base64data = req.body.data._raw;
+    var buffer = new Buffer(base64data, 'base64');
+    var decodedDataString = buffer.toString();
+    var telemetryArray = decodedDataString.split(',');
+    console.log(telemetryArray);
+    // TODO: Do something with this data. Send it to a database perhaps?
   res.send('Request received');
 });
 
