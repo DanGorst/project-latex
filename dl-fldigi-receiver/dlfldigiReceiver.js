@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var telemetryKeys = require('./telemetryKeys.json');
+var decoder = require('./telemetryDecoder');
 
 var app = express();
 
@@ -13,24 +14,17 @@ app.use(defaultContentTypeMiddleware);
 app.use(bodyParser());
 
 app.all('*', function(req, res) {
-    var base64data = req.body.data._raw;
-    var buffer = new Buffer(base64data, 'base64');
-    var decodedDataStringWithChecksum = buffer.toString();
-    // Split the string to separate out the checksum at the end
-    var decodedDataString = decodedDataStringWithChecksum.split('*')[0];
-    // The data is comma-separated, so get the individual values
-    var telemetryArray = decodedDataString.split(',');
+    console.log('Handling ' + req.method + ' request');
+    if (req.method === 'PUT')  {
+        var base64data = req.body.data._raw;
+        var keys = telemetryKeys.keys;
     
-    // Now match up the values with the associated keys in the telemetry schema
-    var keys = telemetryKeys.keys;
-    var telemetryInfo = {};
-    for (var i = 0; i < keys.length; ++i) {
-        telemetryInfo[keys[i]] = telemetryArray[i];
+        var telemetryInfo = decoder.decodeTelemetryData(base64data, keys);
+    
+        console.log(telemetryInfo);
+        // TODO: Do something with this data. Send it to a database perhaps?
     }
-    
-    console.log(telemetryInfo);
-    // TODO: Do something with this data. Send it to a database perhaps?
-  res.send('Request received');
+    res.send('Request received');
 });
 
 var server = app.listen(3000, function() {
