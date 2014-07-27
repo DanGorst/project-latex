@@ -7,26 +7,34 @@
 package project.latex.balloon;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import project.latex.SensorData;
 import project.latex.balloon.sensor.AltimeterSensorController;
+import project.latex.balloon.sensor.CameraController;
+import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.GPSSensorController;
 import project.latex.balloon.sensor.SensorController;
-import project.latex.writer.ConsoleDataWriter;
-import project.latex.writer.DataWriter;
 import project.latex.balloon.writer.FileDataWriter;
 import project.latex.balloon.writer.SensorFileLoggerService;
+import project.latex.writer.CameraDataWriter;
+import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriteFailedException;
+import project.latex.writer.DataWriter;
 
 /**
  *
@@ -34,6 +42,8 @@ import project.latex.writer.DataWriteFailedException;
  */
 public class BalloonController {
 
+    private static final Properties properties = new Properties();
+    
     private List<SensorController> sensors;
     private List<DataWriter> dataWriters;
     
@@ -45,10 +55,22 @@ public class BalloonController {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {        
+    public static void main(String[] args) { 
+        loadProperties();
         BalloonController balloonController = new BalloonController();
         balloonController.initialise();
         balloonController.run();
+    }
+    
+    private static void loadProperties()    {
+        try {
+            InputStream input = new FileInputStream("config.properties");
+            properties.load(input);
+        } catch (FileNotFoundException ex) {
+            logger.error("Unable to find properties file", ex);
+        } catch (IOException ex)    {
+            logger.error("Unable to load properties", ex);
+        }
     }
     
     private void initialise()   {
@@ -60,6 +82,7 @@ public class BalloonController {
         
         this.sensors = new ArrayList<>();
         this.sensors.add(new DummySensorController());
+        this.sensors.add(new CameraController(properties.getProperty("cameraDir")));
         
         this.dataWriters = new ArrayList<>();
         this.dataWriters.add(new ConsoleDataWriter());
@@ -90,6 +113,15 @@ public class BalloonController {
         // TODO - Initialise the altimeter and GPS controllers here
     }
     
+    static boolean shouldWriterHandleDataFromSensor(DataWriter writer, SensorController controller)    {
+        if (controller instanceof CameraSensorController)   {
+            return (writer instanceof CameraDataWriter);
+        }
+        else    {
+            return !(writer instanceof CameraDataWriter);
+        }
+    }
+    
     private void run()  {
         while (true)    {
             for (SensorController controller : this.sensors)    {
@@ -97,7 +129,9 @@ public class BalloonController {
                 
                 for (DataWriter dataWriter : this.dataWriters)  {
                     try {
-                        dataWriter.writeData(currentSensorData);
+                        if (shouldWriterHandleDataFromSensor(dataWriter, controller)) {
+                            dataWriter.writeData(currentSensorData);
+                        }
                     }
                     catch (DataWriteFailedException e)  {
                         logger.error(e);
