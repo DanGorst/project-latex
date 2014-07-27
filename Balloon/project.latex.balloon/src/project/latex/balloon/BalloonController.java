@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -74,7 +75,11 @@ public class BalloonController {
 
             // We create a different logger for each sensor. The file data writer will then lookup these loggers as needed
             for (SensorController sensor : this.sensors) {
-                loggerService.setLoggerForSensor(sensor.getSensorName(), baseUrl);
+                try {
+                    loggerService.setLoggerForSensor(sensor.getSensorName(), baseUrl);
+                } catch (DataWriteFailedException ex) {
+                    logger.error("Unable to create logger for sensor.", ex);
+                }
             }
             
             this.dataWriters.add(new FileDataWriter(loggerService));
