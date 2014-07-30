@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -82,7 +81,12 @@ public class BalloonController {
         
         this.sensors = new ArrayList<>();
         this.sensors.add(new DummySensorController());
-        this.sensors.add(new CameraController(properties.getProperty("cameraDir")));
+        try {
+            String imageDirectory = properties.getProperty("cameraDir");
+            this.sensors.add(new CameraController(new File(imageDirectory)));
+        } catch (IllegalArgumentException e)   {
+            logger.error("Unable to create camera controller. No pictures will be saved", e);
+        }
         
         this.dataWriters = new ArrayList<>();
         this.dataWriters.add(new ConsoleDataWriter());

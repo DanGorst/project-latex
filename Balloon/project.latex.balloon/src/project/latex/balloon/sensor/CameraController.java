@@ -7,8 +7,10 @@
 package project.latex.balloon.sensor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import project.latex.SensorData;
 
@@ -18,22 +20,36 @@ import project.latex.SensorData;
  */
 public class CameraController implements CameraSensorController {
 
-    private final String imagesDirectory;
+    private final File imagesDirectory;
+    final static String dataKey = "latestImageFiles";
+    final static String sensorName = "Camera";
     
-    public CameraController(String imagesDirectory)   {
+    public CameraController(File imagesDirectory)   {
+        if (imagesDirectory == null || !(imagesDirectory.isDirectory()))  {
+            throw new IllegalArgumentException("File is not a directory");
+        }
         this.imagesDirectory = imagesDirectory;
     }
     
     @Override
     public String getSensorName() {
-        return "Camera";
+        return sensorName;
+    }
+    
+    private List<String> getFilesInImagesDirectory()    {
+        List<String> files = new ArrayList<>();
+        for (File file : this.imagesDirectory.listFiles())  {
+            if (!file.isDirectory())    {
+                files.add(file.getPath());
+            }
+        }
+        return files;
     }
 
     @Override
     public SensorData getCurrentData() {
-        // TODO: This is placeholder behaviour for now. We should this directory for real instead
         Map<String, Object> data = new HashMap<>();
-        data.put("latestImageFile", this.imagesDirectory + File.separator + "test.jpg");
+        data.put(dataKey, getFilesInImagesDirectory());
         return new SensorData(this.getSensorName(), new Date(), data);
     }
 }
