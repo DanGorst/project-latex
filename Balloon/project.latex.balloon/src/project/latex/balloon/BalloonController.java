@@ -28,6 +28,7 @@ import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.GPSSensorController;
 import project.latex.balloon.sensor.SensorController;
+import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.FileDataWriter;
 import project.latex.balloon.writer.SensorFileLoggerService;
 import project.latex.writer.CameraDataWriter;
@@ -85,7 +86,7 @@ public class BalloonController {
             String imageDirectory = properties.getProperty("cameraDir");
             this.sensors.add(new CameraController(new File(imageDirectory)));
         } catch (IllegalArgumentException e)   {
-            logger.error("Unable to create camera controller. No pictures will be saved", e);
+            logger.error("Unable to create camera controller. No images will be detected from the camera.", e);
         }
         
         this.dataWriters = new ArrayList<>();
@@ -114,6 +115,12 @@ public class BalloonController {
             logger.info("Unable to create directory to contain sensor data logs");
         }
         
+        try {
+            this.dataWriters.add(new CameraFileWriter(dataFolder));
+        } catch (IllegalArgumentException e)    {
+            logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
+        }
+        
         // TODO - Initialise the altimeter and GPS controllers here
     }
     
@@ -138,6 +145,10 @@ public class BalloonController {
                         }
                     }
                     catch (DataWriteFailedException e)  {
+                        logger.error(e);
+                    }
+                    // If we get some kind of unknown exception, let's catch it here rather than just crashing the app
+                    catch (Exception e)   {
                         logger.error(e);
                     }
                 }

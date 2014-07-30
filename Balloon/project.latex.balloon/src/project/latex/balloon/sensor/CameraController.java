@@ -21,7 +21,6 @@ import project.latex.SensorData;
 public class CameraController implements CameraSensorController {
 
     private final File imagesDirectory;
-    final static String dataKey = "latestImageFiles";
     final static String sensorName = "Camera";
     
     public CameraController(File imagesDirectory)   {
@@ -49,7 +48,7 @@ public class CameraController implements CameraSensorController {
     @Override
     public SensorData getCurrentData() {
         Map<String, Object> data = new HashMap<>();
-        data.put(dataKey, getFilesInImagesDirectory());
+        data.put(CameraSensorController.dataKey, getFilesInImagesDirectory());
         return new SensorData(this.getSensorName(), new Date(), data);
     }
 }

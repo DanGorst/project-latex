@@ -11,5 +11,5 @@ package project.latex.balloon.sensor;
  * @author Dan
  */
 public interface CameraSensorController extends SensorController {
-    
+    final static String dataKey = "latestImageFiles";
 }
