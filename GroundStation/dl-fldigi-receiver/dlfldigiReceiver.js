@@ -2,19 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var telemetryKeys = require('../../telemetryKeys.json');
 var decoder = require('./telemetryDecoder');
-var mongoose = require('mongoose');
-var telemetryDb = require('./telemetryDb');
+var http = require('http');
 
 var app = express();
-
-var db = mongoose.connection;
-mongoose.connect(telemetryDb.url);
-
-db.on('error', console.error);
-db.once('open', function() {
-});
-
-var TelemetryDbModel = telemetryDb.telemetryModelClass();
 
 function defaultContentTypeMiddleware (req, res, next) {
   req.headers['content-type'] = req.headers['content-type'] || 'application/json';
@@ -23,6 +13,43 @@ function defaultContentTypeMiddleware (req, res, next) {
 
 app.use(defaultContentTypeMiddleware);
 app.use(bodyParser());
+
+function postTelemetryInfo(telemetryInfo)  {
+  var infoString = JSON.stringify(telemetryInfo);
+  var headers = {
+    'Content-Type': 'application/json',
+    'Content-Length': infoString.length
+  };
+  var options = {
+    host: 'localhost',
+    port: 4000,
+    path: '/upload',
+    method: 'POST',
+    headers: headers
+  };
+
+  var req = http.request(options, function(res) {
+    res.setEncoding('utf-8');
+
+    var responseString = '';
+
+    res.on('data', function(data) {
+      responseString += data;
+    });
+
+    res.on('end', function() {
+      var resultObject = JSON.parse(responseString);
+      console.log(resultObject);
+    });
+  });
+
+  req.on('error', function(e) {
+    console.log(e);
+  });
+
+  req.write(infoString);
+  req.end();
+}
 
 app.all('*', function(req, res) {
     console.log('Handling ' + req.method + ' request');
@@ -43,17 +70,7 @@ app.all('*', function(req, res) {
         date.setSeconds(timeComponents[2]);
         telemetryInfo.time = date;
         
-        // telemetryInfo is the Javascript object containing our new data.
-        // We create a Mongoose model object from it, then save that to 
-        // the database
-        var dbTelemetryInfo = new TelemetryDbModel(telemetryInfo);
-        dbTelemetryInfo.save(function(err, dbTelemetryInfo) {
-          if (err) {
-              return console.error(err);
-          }
-          // We log to the console, just to show what we've saved
-          console.log(dbTelemetryInfo);
-        });
+        postTelemetryInfo(telemetryInfo);
     }
     res.send('Request received');
 });
