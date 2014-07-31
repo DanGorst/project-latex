@@ -9,7 +9,6 @@ package project.latex.balloon.writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
