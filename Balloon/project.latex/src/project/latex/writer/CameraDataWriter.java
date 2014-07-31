@@ -6,10 +6,12 @@
 
 package project.latex.writer;
 
+import java.util.List;
+
 /**
  *
  * @author Dan
  */
-public interface CameraDataWriter extends DataWriter {
-    
+public interface CameraDataWriter {
+    void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException;
 }

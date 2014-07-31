@@ -10,12 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -24,8 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import project.latex.SensorData;
-import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.writer.DataWriteFailedException;
 
 /**
@@ -100,16 +93,16 @@ public class CameraFileWriterTest {
     public void testWriterThrowsIfGivenNullDataObject() throws DataWriteFailedException {
         File baseDirectory = new File(System.getProperty("user.dir"));
         writer = new CameraFileWriter(baseDirectory);
-        writer.writeData(null);
+        writer.writeImageFiles(null);
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void testWriterThrowsIfGivenDataObjectWithNoImages() throws DataWriteFailedException {
+    @Test
+    public void testWriterDoesNothingIfGivenDataObjectWithNoImages() throws DataWriteFailedException {
         File baseDirectory = new File(System.getProperty("user.dir"));
         writer = new CameraFileWriter(baseDirectory);
-        
-        SensorData data = new SensorData("test", new Date(), new HashMap<String, Object>());
-        writer.writeData(data);
+        writer.writeImageFiles(new ArrayList<String>());
+        File[] filesInImagesDir = writer.getSavedImagesDirectory().listFiles();
+        assertEquals(0, filesInImagesDir.length);
     }
     
     @Test
@@ -120,35 +113,10 @@ public class CameraFileWriterTest {
             
             File emptyImage = new File("test.jpg");
             emptyImage.createNewFile();
-            Map<String, Object> data = new HashMap<>();
             List<String> imagePaths = new ArrayList<>();
             imagePaths.add(emptyImage.getPath());
-            data.put(CameraSensorController.dataKey, imagePaths);
-            SensorData sensorData = new SensorData("test", new Date(), data);
             
-            writer.writeData(sensorData);
-            
-            File expectedFile = new File(writer.getSavedImagesDirectory().getPath() + File.separator + "test.jpg");
-            assertTrue(expectedFile.exists());
-            assertFalse(emptyImage.exists());
-        } catch (IOException | DataWriteFailedException ex) {
-            fail(ex.getMessage());
-        }
-    }
-    
-    @Test(expected = ClassCastException.class)
-    public void testWriterThrowsIfGivenInvalidEntry()   {
-        try {
-            File baseDirectory = new File(System.getProperty("user.dir"));
-            writer = new CameraFileWriter(baseDirectory);
-            
-            File emptyImage = new File("test.jpg");
-            emptyImage.createNewFile();
-            Map<String, Object> data = new HashMap<>();
-            data.put(CameraSensorController.dataKey, emptyImage.getPath());
-            SensorData sensorData = new SensorData("test", new Date(), data);
-            
-            writer.writeData(sensorData);
+            writer.writeImageFiles(imagePaths);
             
             File expectedFile = new File(writer.getSavedImagesDirectory().getPath() + File.separator + "test.jpg");
             assertTrue(expectedFile.exists());

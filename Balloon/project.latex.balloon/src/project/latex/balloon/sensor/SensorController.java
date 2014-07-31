@@ -6,14 +6,12 @@
 
 package project.latex.balloon.sensor;
 
-import project.latex.SensorData;
+import java.util.Map;
 
 /**
  *
  * @author Dan
  */
 public interface SensorController {
-    String getSensorName();
-    
-    SensorData getCurrentData();
+    Map<String, Object> getCurrentData();
 }

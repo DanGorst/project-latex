@@ -7,10 +7,10 @@
 package project.latex.writer;
 
 import java.io.OutputStreamWriter;
+import java.util.Map;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import project.latex.SensorData;
 
 /**
  *
@@ -28,10 +28,8 @@ public class ConsoleDataWriter implements DataWriter {
     }
     
     @Override
-    public void writeData(SensorData data) throws DataWriteFailedException {
-        logger.info(data.getSensorName());
-        logger.info(data.getDate());
-        logger.info(data.getData());
+    public void writeData(Map<String, Object> dataModel) throws DataWriteFailedException {
+        logger.info(dataModel);
     }
     
 }

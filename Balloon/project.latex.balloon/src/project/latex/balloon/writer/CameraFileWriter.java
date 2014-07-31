@@ -8,9 +8,6 @@ package project.latex.balloon.writer;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
-import project.latex.SensorData;
-import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.writer.CameraDataWriter;
 import project.latex.writer.DataWriteFailedException;
 
@@ -36,20 +33,13 @@ public class CameraFileWriter implements CameraDataWriter {
     public File getSavedImagesDirectory()  {
         return this.savedImagesDirectory;
     }
-
+    
     @Override
-    public void writeData(SensorData data) throws DataWriteFailedException {
-        if (data == null)   {
-            throw new IllegalArgumentException("Cannot write null data object");
+    public void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException   {
+        if (imageFiles == null) {
+            throw new IllegalArgumentException("Null list of images passed to camera file writer");
         }
-        Map<String, Object> dataMap = data.getData();
-        Object imagesEntry = dataMap.get(CameraSensorController.dataKey);
-        if (imagesEntry == null)    {
-            throw new IllegalArgumentException("Data doesn't contain images");
-        }
-        
-        List<String> imagePaths = (List<String>) imagesEntry;
-        for (String imagePath : imagePaths) {
+        for (String imagePath : imageFiles) {
             File imageFile = new File(imagePath);
             File movedFile = new File(this.savedImagesDirectory.getPath() + File.separator + imageFile.getName());
             if (!imageFile.renameTo(movedFile)) {
@@ -57,5 +47,4 @@ public class CameraFileWriter implements CameraDataWriter {
             }
         }
     }
-    
 }

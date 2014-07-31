@@ -6,12 +6,12 @@
 
 package project.latex.writer;
 
-import project.latex.SensorData;
+import java.util.Map;
 
 /**
  *
  * @author Dan
  */
 public interface DataWriter {
-    void writeData(SensorData data) throws DataWriteFailedException;
+    void writeData(Map<String, Object> dataModel);
 }

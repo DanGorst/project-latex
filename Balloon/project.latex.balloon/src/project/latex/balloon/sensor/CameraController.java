@@ -8,11 +8,7 @@ package project.latex.balloon.sensor;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import project.latex.SensorData;
 
 /**
  *
@@ -34,8 +30,9 @@ public class CameraController implements CameraSensorController {
     public String getSensorName() {
         return sensorName;
     }
-    
-    private List<String> getFilesInImagesDirectory()    {
+
+    @Override
+    public List<String> getImageFileNames() {
         List<String> files = new ArrayList<>();
         for (File file : this.imagesDirectory.listFiles())  {
             if (!file.isDirectory())    {
@@ -43,12 +40,5 @@ public class CameraController implements CameraSensorController {
             }
         }
         return files;
-    }
-
-    @Override
-    public SensorData getCurrentData() {
-        Map<String, Object> data = new HashMap<>();
-        data.put(CameraSensorController.dataKey, getFilesInImagesDirectory());
-        return new SensorData(this.getSensorName(), new Date(), data);
     }
 }

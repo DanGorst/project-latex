@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import project.latex.SensorData;
 
 /**
  *
@@ -80,11 +79,8 @@ public class CameraControllerTest {
         CameraController instance = new CameraController(this.mockImagesDirectory);
         
         when(this.mockImagesDirectory.listFiles()).thenReturn(new File[0]);
-        SensorData actual = instance.getCurrentData();
-        assertEquals(CameraController.sensorName, actual.getSensorName());
-        Map<String, Object> expectedData = new HashMap<>();
-        expectedData.put(CameraController.dataKey, new ArrayList<String>());
-        assertEquals(expectedData, actual.getData());
+        List<String> actual = instance.getImageFileNames();
+        assertEquals(new ArrayList<String>(), actual);
     }
     
     @Test
@@ -99,14 +95,11 @@ public class CameraControllerTest {
         when(image.getPath()).thenReturn(imagePath);
         images[0] = image;
         when(this.mockImagesDirectory.listFiles()).thenReturn(images);
-        SensorData actual = instance.getCurrentData();
-        assertEquals(CameraController.sensorName, actual.getSensorName());
+        List<String> actual = instance.getImageFileNames();
         
-        Map<String, Object> expectedData = new HashMap<>();
         List<String> expectedImages = new ArrayList<>();
         expectedImages.add(imagePath);
-        expectedData.put(CameraController.dataKey, expectedImages);
-        assertEquals(expectedData, actual.getData());
+        assertEquals(expectedImages, actual);
     }
     
     @Test
@@ -128,15 +121,12 @@ public class CameraControllerTest {
         images[1] = image2;
         
         when(this.mockImagesDirectory.listFiles()).thenReturn(images);
-        SensorData actual = instance.getCurrentData();
-        assertEquals(CameraController.sensorName, actual.getSensorName());
+        List<String> actual = instance.getImageFileNames();
         
-        Map<String, Object> expectedData = new HashMap<>();
         List<String> expectedImages = new ArrayList<>();
         expectedImages.add(imagePath);
         expectedImages.add(imagePath2);
-        expectedData.put(CameraController.dataKey, expectedImages);
-        assertEquals(expectedData, actual.getData());
+        assertEquals(expectedImages, actual);
     }
     
     @Test
@@ -158,13 +148,10 @@ public class CameraControllerTest {
         images[1] = testDir;
         
         when(this.mockImagesDirectory.listFiles()).thenReturn(images);
-        SensorData actual = instance.getCurrentData();
-        assertEquals(CameraController.sensorName, actual.getSensorName());
-        
-        Map<String, Object> expectedData = new HashMap<>();
+        List<String> actual = instance.getImageFileNames();
+
         List<String> expectedImages = new ArrayList<>();
         expectedImages.add(imagePath);
-        expectedData.put(CameraController.dataKey, expectedImages);
-        assertEquals(expectedData, actual.getData());
+        assertEquals(expectedImages, actual);
     }
 }

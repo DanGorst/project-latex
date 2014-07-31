@@ -6,8 +6,11 @@
 
 package project.latex.balloon.writer;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -17,7 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
-import project.latex.SensorData;
 import project.latex.writer.DataWriteFailedException;
 
 /**
@@ -27,7 +29,8 @@ import project.latex.writer.DataWriteFailedException;
 public class FileDataWriterTest {
     
     private FileDataWriter writer;
-    private SensorFileLoggerService mockService;
+    private List<String> dataKeys;
+    private DataModelConverter converter;
     
     public FileDataWriterTest() {
     }
@@ -42,46 +45,50 @@ public class FileDataWriterTest {
     
     @Before
     public void setUp() {
-        mockService = mock(SensorFileLoggerService.class);
-        writer = new FileDataWriter(mockService);
+        dataKeys = new ArrayList<>();
+        dataKeys.add("Date");
+        dataKeys.add("Value");
+        converter = new DataModelConverter();
+        writer = new FileDataWriter("", dataKeys, converter);
     }
     
     @After
     public void tearDown() {
+        File savedFile = new File(writer.fileName);
+        if (savedFile.exists()) {
+            savedFile.delete();
+        }
         writer = null;
+        dataKeys = null;
     }
 
     /**
      * Test of writeData method, of class FileDataWriter.
      * @throws project.latex.writer.DataWriteFailedException
      */
-    @Test(expected = DataWriteFailedException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testWriteDataThrowsMeaningfulExceptionIfDataIsNull() throws DataWriteFailedException {
         writer.writeData(null);
-    }
-    
-    @Test(expected = DataWriteFailedException.class)
-    public void testWriteDataThrowsMeaningfulExceptionIfLoggerIsNull() throws DataWriteFailedException  {
-        when(mockService.getLoggerForSensor("Test")).thenReturn(null);
-        SensorData data = new SensorData("Test", new Date(), new HashMap<String, Object>());
-        writer.writeData(data);
     }
     
     @Test
     public void testHeadersAreWrittenOnceBeforeData()   {
         try {
             Logger mockLogger = mock(Logger.class);
-            when(mockService.getLoggerForSensor("Test")).thenReturn(mockLogger);
+         
+            writer = new FileDataWriter("", dataKeys, converter, mockLogger);
+            
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("Value", 5);
-            Date sensorDate = new Date();
-            SensorData data = new SensorData("Test", sensorDate, dataMap);
-            writer.writeData(data);
-            writer.writeData(data);
+            Date modelDate = new Date();
+            dataMap.put("Date", modelDate);
+            
+            writer.writeData(dataMap);
+            writer.writeData(dataMap);
             
             verify(mockLogger).info("Date,Value");
-            verify(mockLogger, times(2)).info(sensorDate.toString() + ",5");
-        } catch (DataWriteFailedException ex) {
+            verify(mockLogger, times(2)).info(modelDate.toString() + ",5");
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }

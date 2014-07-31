@@ -6,10 +6,16 @@
 
 package project.latex.balloon.sensor;
 
+import java.util.List;
+
 /**
  *
  * @author Dan
  */
-public interface CameraSensorController extends SensorController {
+public interface CameraSensorController {
     final static String dataKey = "latestImageFiles";
+    
+    public String getSensorName();
+    
+    List<String> getImageFileNames();
 }
