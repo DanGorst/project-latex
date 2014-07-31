@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package project.latex.ground.writer;
+package project.latex.writer;
 
-import project.latex.ground.BalloonDataModel;
+import java.util.List;
 
 /**
  *
  * @author Dan
  */
-public interface DataModelWriter {
-    public void writeDataModel(BalloonDataModel dataModel);
+public interface CameraDataWriter {
+    void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException;
 }

@@ -6,9 +6,8 @@
 
 package project.latex.balloon.sensor;
 
-import java.util.Date;
 import java.util.HashMap;
-import project.latex.SensorData;
+import java.util.Map;
 
 /**
  *
@@ -16,18 +15,16 @@ import project.latex.SensorData;
  */
 public class DummySensorController implements SensorController {
     
-    private final String sensorName = "Dummy Sensor";
-
-    @Override
-    public SensorData getCurrentData() {
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("Value", Math.random());
-        return new SensorData(this.sensorName, new Date(), data);
-    }
-
-    @Override
-    public String getSensorName() {
-        return this.sensorName;
-    }
+    private final String dataKey;
     
+    public DummySensorController(String dataKey)    {
+        this.dataKey = dataKey;
+    }
+
+    @Override
+    public Map<String, Object> getCurrentData() {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put(this.dataKey, Math.random());
+        return data;
+    }
 }

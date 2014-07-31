@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- Netbeans keeps adding in this automatically, so I've committed it to the repo for now. Ignore it though, 
-it should just be the web.xml file which is used. -->
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
-<Configure class="org.eclipse.jetty.webapp.WebAppContext">
-    <Set name="contextPath">/ProjectLatexWebService</Set>
-</Configure>

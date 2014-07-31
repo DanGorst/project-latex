@@ -6,12 +6,16 @@
 
 package project.latex.balloon.sensor;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  *
  * @author Dan
  */
-public interface SensorController {
-    Map<String, Object> getCurrentData();
+public interface CameraSensorController {
+    final static String dataKey = "latestImageFiles";
+    
+    public String getSensorName();
+    
+    List<String> getImageFileNames();
 }

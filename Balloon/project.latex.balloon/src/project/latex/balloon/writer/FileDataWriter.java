@@ -6,14 +6,13 @@
 
 package project.latex.balloon.writer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import project.latex.SensorData;
-import project.latex.writer.DataWriteFailedException;
+import org.apache.log4j.PatternLayout;
 import project.latex.writer.DataWriter;
 
 /**
@@ -21,47 +20,46 @@ import project.latex.writer.DataWriter;
  * @author dgorst
  */
 public class FileDataWriter implements DataWriter {
-    private final SensorFileLoggerService loggerService;
-    private final Map<Logger, List> headersForLogger;
     
-    public FileDataWriter(SensorFileLoggerService loggerService)   {
-        this.loggerService = loggerService;
-        this.headersForLogger = new HashMap<>();
+    private final Logger logger;
+    private final DataModelConverter converter;
+    final String fileName = "dataModel.csv";
+    private final List<String> dataKeys;
+    
+    public FileDataWriter(String baseUrl, List<String> dataKeys, DataModelConverter converter, Logger logger)   {
+        this.logger = logger;
+        String filePath = fileName;
+        if (baseUrl != null && !baseUrl.isEmpty())  {
+            filePath = baseUrl + File.separator + fileName;
+        }
+        
+        this.logger.addAppender(createFileAppender(filePath));
+        this.converter = converter;
+        this.dataKeys = dataKeys;
+        writeHeaders();
+    }
+    
+    public FileDataWriter(String baseUrl, List<String> dataKeys, DataModelConverter converter)   {
+        this(baseUrl, dataKeys, converter, Logger.getLogger(FileDataWriter.class));
+    }
+    
+    private FileAppender createFileAppender(String fileName)    {
+        FileAppender fileAppender = new FileAppender();
+        fileAppender.setName("FileLogger");
+        fileAppender.setFile(fileName);
+        fileAppender.setLayout(new PatternLayout("%m%n"));
+        fileAppender.setThreshold(Level.INFO);
+        fileAppender.setAppend(true);
+        fileAppender.activateOptions();
+        return fileAppender;
+    }
+    
+    private void writeHeaders() {
+        logger.info(this.converter.convertDataKeysToCsvString(this.dataKeys));
     }
     
     @Override
-    public void writeData(SensorData data) throws DataWriteFailedException {
-        if (data == null)   {
-            throw new DataWriteFailedException("Data is null");
-        }
-        
-        Logger sensorLogger = this.loggerService.getLoggerForSensor(data.getSensorName());
-        if (sensorLogger == null)   {
-            throw new DataWriteFailedException("Could not find logger for sensor with name: " + data.getSensorName());
-        }
-        
-        // If we haven't written the headers for this logger yet, do it now
-        if (!headersForLogger.containsKey(sensorLogger))    {
-            Map<String, Object> dataMap = data.getData();
-            List<String> orderedKeys = new ArrayList<>();
-            for (String key : dataMap.keySet()) {
-                orderedKeys.add(key);
-            }
-            Collections.sort(orderedKeys);
-            StringBuilder headerStringBuilder = new StringBuilder("Date");
-            for (String key : orderedKeys)  {
-                headerStringBuilder.append(",").append(key);
-            }
-            sensorLogger.info(headerStringBuilder.toString());
-            headersForLogger.put(sensorLogger, orderedKeys);
-        }
-        
-        List<String> headers = headersForLogger.get(sensorLogger);
-        StringBuilder dataStringBuilder = new StringBuilder(data.getDate().toString());
-        Map<String, Object> dataMap = data.getData();
-        for (String header : headers)   {
-            dataStringBuilder.append(",").append(dataMap.get(header));
-        }
-        sensorLogger.info(dataStringBuilder.toString());
+    public void writeData(Map<String, Object> data) {
+        logger.info(this.converter.convertDataToCsvString(this.dataKeys, data));
     }
 }

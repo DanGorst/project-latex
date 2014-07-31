@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var telemetryKeys = require('./telemetryKeys.json');
+var telemetryKeys = require('../../telemetryKeys.json');
 var decoder = require('./telemetryDecoder');
 var mongoose = require('mongoose');
 var telemetryDb = require('./telemetryDb');
