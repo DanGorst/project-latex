@@ -53,10 +53,9 @@ function postTelemetryInfo(telemetryInfo)  {
 
 app.all('*', function(req, res) {
     console.log('Handling ' + req.method + ' request');
-    if (req.method === 'PUT')  {
+    if (req.method === 'PUT' || req.method === 'POST')  {
         var base64data = req.body.data._raw;
         var keys = telemetryKeys.keys;
-    
         var telemetryInfo = decoder.decodeTelemetryData(base64data, keys);
         
         // Our data originally has time as a string, but we convert it into a date.

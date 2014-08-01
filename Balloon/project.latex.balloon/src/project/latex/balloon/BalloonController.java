@@ -32,6 +32,7 @@ import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
+import project.latex.balloon.writer.HttpDataWriter;
 import project.latex.writer.CameraDataWriter;
 import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriteFailedException;
@@ -128,6 +129,9 @@ public class BalloonController {
         } else  {
             logger.info("Unable to create directory to contain sensor data logs");
         }
+        // Until we have radio comms working, we use http instead
+        String receiverUrl = properties.getProperty("receiver.url");
+        this.dataWriters.add(new HttpDataWriter(transmittedTelemetryKeys, converter, receiverUrl));
         
         // Now initialise our camera systems
         try {
@@ -149,7 +153,15 @@ public class BalloonController {
         while (true) {
             // Build up a model of the current balloon state from the sensors
             Map<String, Object> data = new HashMap<>();
-            data.put(properties.getProperty("time.key"), new Date());
+            
+            // For now we put the date into the same format as the Icarus test data, 
+            // as this means we don't need to change the receiver to be able to handle both
+            // sets of data
+            DateFormat format = new SimpleDateFormat("HH:mm:ss");
+            data.put(properties.getProperty("time.key"), format.format(new Date()));
+            
+            data.put(properties.getProperty("payloadName.key"), "$$latex");
+            data.put(properties.getProperty("sentenceId.key"), 0);
             for (SensorController controller : this.sensors) {
                 Map<String, Object> sensorData = controller.getCurrentData();
                 for (String key : sensorData.keySet()) {

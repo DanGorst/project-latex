@@ -61,7 +61,8 @@ public class DataModelConverter {
     
     String getValueString(Object value)  {
         if (value == null)  {
-            return "null";
+            // Return a placeholder value which shouldn't cause an error but will be obviously be a placeholder
+            return "99.99";
         }
         return value.toString();
     }
