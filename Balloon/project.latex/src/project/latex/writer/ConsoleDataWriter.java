@@ -28,7 +28,7 @@ public class ConsoleDataWriter implements DataWriter {
     }
     
     @Override
-    public void writeData(Map<String, Object> dataModel) throws DataWriteFailedException {
+    public void writeData(Map<String, Object> dataModel) {
         logger.info(dataModel);
     }
     
