@@ -180,11 +180,13 @@ public class BalloonController {
             }
 
             // Find any new camera images and write them out
-            List<String> imageFiles = this.cameraSensor.getImageFileNames();
-            try {
-                this.cameraWriter.writeImageFiles(imageFiles);
-            } catch (DataWriteFailedException ex) {
-                logger.error("Failed to write image files", ex);
+            if (this.cameraSensor != null) {
+                List<String> imageFiles = this.cameraSensor.getImageFileNames();
+                try {
+                    this.cameraWriter.writeImageFiles(imageFiles);
+                } catch (DataWriteFailedException ex) {
+                    logger.error("Failed to write image files", ex);
+                }
             }
             
             try {
