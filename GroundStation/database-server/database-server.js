@@ -27,8 +27,12 @@ app.get('/latest', function(req, res) {
             if (err) {
                 res.send(err);
             }
-            // TODO: Handle case where we don't have any data
-            res.send(data[0]);
+            if (data.length === 0)  {
+                res.send({});
+            }
+            else {
+                res.send(data[0]);
+            }
         });
 });
 
