@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var telemetryDb = require('./telemetryDb');
+var cors = require('cors');
 
 var app = express();
 
@@ -15,6 +16,7 @@ db.once('open', function() {
 var TelemetryDbModel = telemetryDb.telemetryModelClass();
 
 app.use(bodyParser());
+app.use(cors());
 
 app.get('/latest', function(req, res) {
     TelemetryDbModel
