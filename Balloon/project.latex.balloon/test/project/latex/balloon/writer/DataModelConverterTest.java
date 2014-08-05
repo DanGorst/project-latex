@@ -127,6 +127,6 @@ public class DataModelConverterTest {
         data.put("X", 0.34);
         data.put("Y", 1.23);
         String actual = converter.convertDataToCsvString(dataKeys, data);
-        assertEquals("null,null", actual);
+        assertEquals("99.99,99.99", actual);
     }
 }

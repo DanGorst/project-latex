@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import project.latex.balloon.TestFileDeleteHelper;
 import project.latex.writer.DataWriteFailedException;
 
 /**
@@ -46,24 +47,13 @@ public class CameraFileWriterTest {
         this.mockImagesDirectory = mock(File.class);
     }
     
-    void delete(File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
-                delete(c);
-            }
-        }
-        if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
-        }
-    }
-    
     @After
     public void tearDown() throws IOException {
         this.mockImagesDirectory = null;
         if (this.writer != null) {
             File imagesFolder = this.writer.getSavedImagesDirectory();
             if (imagesFolder.exists()) {
-                delete(imagesFolder);
+                TestFileDeleteHelper.delete(imagesFolder);
             }
             this.writer = null;
         }
