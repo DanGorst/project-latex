@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
@@ -18,6 +20,15 @@ var TelemetryDbModel = telemetryDb.telemetryModelClass();
 app.use(bodyParser());
 app.use(cors());
 
+function getLatestDataToReturn(data)    {
+    if (data.length === 0)  {
+        return {};
+    }
+    else {
+        return data[0];
+    }
+}
+
 app.get('/latest', function(req, res) {
     TelemetryDbModel
         .find()
@@ -27,12 +38,7 @@ app.get('/latest', function(req, res) {
             if (err) {
                 res.send(err);
             }
-            if (data.length === 0)  {
-                res.send({});
-            }
-            else {
-                res.send(data[0]);
-            }
+            res.send(getLatestDataToReturn(data));
         });
 });
 
@@ -49,28 +55,30 @@ app.get('/altitude', function(req, res) {
         });
 });
 
+function saveTelemetryInfo(req, res) {
+    var dbTelemetryInfo = new TelemetryDbModel(req.body);
+    dbTelemetryInfo.save(function(err, dbTelemetryInfo) {
+      if (err) {
+          res.send(err);
+      }
+      res.send(dbTelemetryInfo);
+    });
+}
+
 app.put('/upload', function(req, res) {
     console.log('Handling PUT');
-    var dbTelemetryInfo = new TelemetryDbModel(req.body);
-        dbTelemetryInfo.save(function(err, dbTelemetryInfo) {
-          if (err) {
-              res.send(err);
-          }
-          res.send(dbTelemetryInfo);
-        });
+    saveTelemetryInfo(req, res);
 });
 
 app.post('/upload', function(req, res) {
     console.log('Handling POST');
-    var dbTelemetryInfo = new TelemetryDbModel(req.body);
-        dbTelemetryInfo.save(function(err, dbTelemetryInfo) {
-          if (err) {
-              res.send(err);
-          }
-          res.send(dbTelemetryInfo);
-        });
+    saveTelemetryInfo(req, res);
 });
 
 var server = app.listen(4000, function() {
     console.log('Listening on port %d', server.address().port);
 });
+
+module.exports = {
+    getLatestDataToReturn: getLatestDataToReturn
+}
