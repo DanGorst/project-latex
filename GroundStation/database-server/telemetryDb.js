@@ -3,7 +3,7 @@
 var mongoose = require('mongoose');
 
 module.exports = {
-    url: 'mongodb://localhost/telemetryDb',
+    url: 'mongodb://user:latex1@ds053109.mongolab.com:53109/project-latex',
     telemetrySchema: function() {
         return new mongoose.Schema({
             payload_name: String, 
