@@ -23,7 +23,7 @@ angular.module('projectLatexApp.controllers', [])
       }
       
       function queryDatabaseServer()    {
-        $http.get('http://localhost:4000/latest')
+        $http.get('http://project-latex-database-server.herokuapp.com/latest')
         .success(function(data) {
             if (jQuery.isEmptyObject(data))    {
                 showNoData();

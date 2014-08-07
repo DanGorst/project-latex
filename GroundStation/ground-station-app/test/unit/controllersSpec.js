@@ -19,7 +19,7 @@ describe('controllers', function(){
     }));
     
     it('should display the no data labels when query to server fails', function() {
-        $httpBackend.expectGET('http://localhost:4000/latest').respond({});
+        $httpBackend.expectGET('http://project-latex-database-server.herokuapp.com/latest').respond({});
         
         $httpBackend.flush();
         
@@ -33,7 +33,7 @@ describe('controllers', function(){
     });
     
     it('should display data when it is available', function() {
-        $httpBackend.expectGET('http://localhost:4000/latest').respond({
+        $httpBackend.expectGET('http://project-latex-database-server.herokuapp.com/latest').respond({
             payload_name:"$$latex",
             time:"12:19:03",
             altitude:12345,
