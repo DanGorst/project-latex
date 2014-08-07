@@ -20,15 +20,6 @@ var TelemetryDbModel = telemetryDb.telemetryModelClass();
 app.use(bodyParser());
 app.use(cors());
 
-function getLatestDataToReturn(data)    {
-    if (data.length === 0)  {
-        return {};
-    }
-    else {
-        return data[0];
-    }
-}
-
 app.get('/latest', function(req, res) {
     TelemetryDbModel
         .find()
@@ -38,7 +29,7 @@ app.get('/latest', function(req, res) {
             if (err) {
                 res.send(err);
             }
-            res.send(getLatestDataToReturn(data));
+            res.send(telemetryDb.getLatestDataToReturn(data));
         });
 });
 
@@ -78,7 +69,3 @@ app.post('/upload', function(req, res) {
 var server = app.listen(4000, function() {
     console.log('Listening on port %d', server.address().port);
 });
-
-module.exports = {
-    getLatestDataToReturn: getLatestDataToReturn
-}

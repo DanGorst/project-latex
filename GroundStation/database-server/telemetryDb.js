@@ -20,5 +20,13 @@ module.exports = {
     },
     telemetryModelClass: function() {
         return mongoose.model('TelemetryInfo', this.telemetrySchema());
+    },
+    getLatestDataToReturn: function(data)    {
+        if (data.length === 0)  {
+            return {};
+        }
+        else {
+            return data[0];
+        }
     }
 };
