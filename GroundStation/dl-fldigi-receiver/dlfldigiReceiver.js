@@ -21,8 +21,7 @@ function postTelemetryInfo(telemetryInfo)  {
     'Content-Length': infoString.length
   };
   var options = {
-    host: 'localhost',
-    port: 4000,
+    host: 'project-latex-database-server.herokuapp.com',
     path: '/upload',
     method: 'POST',
     headers: headers
