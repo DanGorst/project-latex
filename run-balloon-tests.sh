@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd Balloon/project.latex.balloon
+cd project.latex.balloon
 ant test

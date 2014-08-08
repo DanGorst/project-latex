@@ -65,7 +65,7 @@ public class BalloonController {
     public static void main(String[] args) { 
         try {
             Properties properties = loadProperties("config.properties");
-            BalloonController balloonController = createBalloonController("../../telemetryKeys.json", properties);
+            BalloonController balloonController = createBalloonController("../telemetryKeys.json", properties);
             balloonController.run(new DefaultControllerRunner());
         } catch (IOException ex) {
             logger.error(ex);
