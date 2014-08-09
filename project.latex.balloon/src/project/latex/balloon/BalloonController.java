@@ -64,8 +64,16 @@ public class BalloonController {
      */
     public static void main(String[] args) { 
         try {
+            ConsoleAppender ca = new ConsoleAppender();
+            ca.setWriter(new OutputStreamWriter(System.out));
+            ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+            logger.addAppender(ca);
+            logger.info("Project Latex Balloon Controller, version 0.1");
+        
             Properties properties = loadProperties("config.properties");
+            logger.info("Properties loaded");
             BalloonController balloonController = createBalloonController("../telemetryKeys.json", properties);
+            logger.info("Balloon created");
             balloonController.run(new DefaultControllerRunner());
         } catch (IOException ex) {
             logger.error(ex);
@@ -109,12 +117,6 @@ public class BalloonController {
     }
     
     static BalloonController createBalloonController(String telemetryKeysFilePath, Properties properties) throws IOException   {
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        logger.addAppender(ca);
-        logger.info("Project Latex Balloon Controller, version 0.1");
-        
         List<String> transmittedDataKeys = loadTransmittedDataKeys(telemetryKeysFilePath);
         DataModelConverter converter = new DataModelConverter();
         
