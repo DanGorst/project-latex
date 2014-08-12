@@ -11,7 +11,6 @@ import com.pi4j.io.serial.SerialPortException;
 
 import java.util.HashMap;
 import org.apache.log4j.Logger;
-import project.latex.balloon.BalloonController;
 
 /**
  *
@@ -21,11 +20,17 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
 
     private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
     private Serial serial;
+    private String latitudeKey;
+    private String longitudeKey;
+    private String altitudeKey;
     private double latitude;
     private double longitude;
     private double altitude;
 
-    public UbloxGPSSensorController() {
+    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
+        this.latitudeKey = latitudeKey;
+        this.longitudeKey = longitudeKey;
+        this.altitudeKey = altitudeKey;
         serial = SerialFactory.createInstance();
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
@@ -37,6 +42,7 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
 
     @Override
     public HashMap<String, Object> getCurrentData() {
+ 
         HashMap<String, Object> data = new HashMap<>();
         // What we read from the serial port is an NMEA sentence, see:
         // http://www.gpsinformation.org/dale/nmea.htm#GSA
@@ -45,23 +51,22 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         do {
             currentNmeaSentence = serialReadLine().split(",", -1);
         } // GPGGA sentences hold the data that we are interested in.
-        while (currentNmeaSentence[0].equals("$GPGGA") == false);
+        while (!currentNmeaSentence[0].substring(2).equals("GPGGA"));
 
         // Extract latitude, longitude, altitude and timestamp data from 
         // the GPGGA sentence and parse lat/long from Nmea to decimal format.
-        latitude = Double.parseDouble(currentNmeaSentence[2]) / 100;
-        if (currentNmeaSentence[3].equals("S")) {
-            latitude *= -1;
+        try {
+            latitude = Double.parseDouble(currentNmeaSentence[2]);
+            longitude = Double.parseDouble(currentNmeaSentence[4]);
+            altitude = Double.parseDouble(currentNmeaSentence[9]);
+        } catch (NumberFormatException ex) {
+            logger.error("Error converting String to double.");
         }
-        longitude = Double.parseDouble(currentNmeaSentence[4]) / 100;
-        if (currentNmeaSentence[5].equals("W")) {
-            longitude *= -1;
-        }
-        altitude = Double.parseDouble(currentNmeaSentence[9]);
 
-        data.put("Latitude", this.latitude);
-        data.put("Longitude", this.longitude);
-        data.put("Altitude", this.altitude);
+        data.put(latitudeKey, this.latitude);
+        data.put(longitudeKey, this.longitude);
+        data.put(altitudeKey, this.altitude);
+ 
         return data;
     }
 
@@ -88,6 +93,12 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         }
 
         return sentence;
+    }
+    
+    public double NmeaToDecimal(double position, String bearing) {
+        double decimal = 0;
+        //TODO
+        return decimal;
     }
 
     public void close() {
