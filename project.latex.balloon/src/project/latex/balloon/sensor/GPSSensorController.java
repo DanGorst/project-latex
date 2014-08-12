@@ -11,7 +11,7 @@ package project.latex.balloon.sensor;
  * @author dgorst
  */
 public interface GPSSensorController extends SensorController {
-    float getLatitude();
+    double getLatitude();
     
-    float getLongitude();
+    double getLongitude();
 }

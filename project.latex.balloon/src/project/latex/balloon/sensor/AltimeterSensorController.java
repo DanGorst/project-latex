@@ -11,5 +11,5 @@ package project.latex.balloon.sensor;
  * @author dgorst
  */
 public interface AltimeterSensorController {
-    float getHeight();
+    double getHeight();
 }
