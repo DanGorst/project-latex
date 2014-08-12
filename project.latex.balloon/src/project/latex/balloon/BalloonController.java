@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,9 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.DummySensorController;
@@ -64,10 +62,8 @@ public class BalloonController {
      */
     public static void main(String[] args) { 
         try {
-            ConsoleAppender ca = new ConsoleAppender();
-            ca.setWriter(new OutputStreamWriter(System.out));
-            ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-            logger.addAppender(ca);
+            PropertyConfigurator.configure("logger.properties");
+            
             logger.info("Project Latex Balloon Controller, version 0.1");
         
             Properties properties = loadProperties("config.properties");

@@ -42,6 +42,8 @@ public class HttpDataWriter implements DataWriter {
     private final List<String> dataKeys;
     private final String receiverUrl;
     
+    private static final Logger logger = Logger.getLogger(HttpDataWriter.class);
+    
     public HttpDataWriter(List<String> dataKeys, DataModelConverter converter, String receiverUrl) {
         this.converter = converter;
         this.dataKeys = dataKeys;
@@ -118,7 +120,6 @@ public class HttpDataWriter implements DataWriter {
         try {
             sendPostRequest(csvString);
         } catch (IOException ex) {
-            Logger logger = Logger.getLogger(HttpDataWriter.class);
             logger.error(ex);
         }
     }

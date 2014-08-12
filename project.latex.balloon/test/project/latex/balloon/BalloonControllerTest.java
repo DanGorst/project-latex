@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -42,6 +43,7 @@ public class BalloonControllerTest {
     
     @BeforeClass
     public static void setUpClass() {
+        PropertyConfigurator.configure("logger.properties");
     }
     
     @AfterClass
