@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 public class UbloxGPSSensorController implements GPSSensorController, AltimeterSensorController {
 
     private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
-    private Serial serial;
+    private final Serial serial;
     private String latitudeKey;
     private String longitudeKey;
     private String altitudeKey;
@@ -30,22 +30,44 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
     private double altitude;
     private double speedInMPH;
 
-    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
+    /* Constructor where we inject all the dependencies. Useful for testing if we want to mock out dependencies. */
+    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey, Serial serial) {
         this.latitudeKey = latitudeKey;
         this.longitudeKey = longitudeKey;
         this.altitudeKey = altitudeKey;
-        serial = SerialFactory.createInstance();
+        this.serial = serial;
+    }
+
+    /* Constructor where we default to using the SerialFactory to give us the Serial instance. 
+     This means callers on the sensor don't need to depend on the pi4j library. */
+    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
+        this(latitudeKey, longitudeKey, altitudeKey, SerialFactory.createInstance());
     }
 
     @Override
     public HashMap<String, Object> getCurrentData() {
-
         HashMap<String, Object> data = new HashMap<>();
 
-        if (readSensorValues() == true) {
-            data.put(latitudeKey, this.latitude);
-            data.put(longitudeKey, this.longitude);
-            data.put(altitudeKey, this.altitude);
+        try {
+            serial.open(Serial.DEFAULT_COM_PORT, 9600);
+            // readSensorValues() attempts to update the latitude, longitude, altitude,
+            // speed, time and date fields and returns true if it succeeded.
+            if (readSensorValues() == true) {
+                data.put(latitudeKey, this.latitude);
+                data.put(longitudeKey, this.longitude);
+                data.put(altitudeKey, this.altitude);
+            }
+
+        } catch (UnsatisfiedLinkError error) {
+            logger.error(error);
+        } catch (SerialPortException ex) {
+            logger.error("Failed to open serial port.");
+        } finally {
+            try {
+                serial.close();
+            } catch (IllegalStateException ex) {
+                logger.error("Failed to close serial port.");
+            }
         }
 
         return data;
@@ -73,7 +95,6 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         latitude = parseNmeaCoordinateToDecimal(currentNmeaSentence[2], currentNmeaSentence[3]);
         longitude = parseNmeaCoordinateToDecimal(currentNmeaSentence[4], currentNmeaSentence[5]);
         altitude = Double.parseDouble(currentNmeaSentence[9]);
-       
 
         // Get a GPRMC NMEA sentence:
         currentNmeaSentence = getNmeaSentence("GPRMC").split(",", -1);
@@ -94,7 +115,7 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
                 + currentNmeaSentence[1].substring(4, 6);
         date = currentNmeaSentence[7];
         speedInMPH = Double.parseDouble(currentNmeaSentence[5]) * 1.1508;
-        
+
         return true;
     }
 
@@ -103,8 +124,6 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         char currentChar = 0;
         String sentence = "";
 
-        try {
-            serial.open(Serial.DEFAULT_COM_PORT, 9600);
             try {
                 // Check that the serial port read buffer is receiving data.
                 try {
@@ -139,18 +158,10 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
                 logger.error("Failed read serial port.");
                 return "error";
             }
-        } catch (SerialPortException ex) {
-            logger.error("Failed to open serial port.");
-            return "error";
-        } finally {
-            try {
-                serial.close();
-            } catch (IllegalStateException ex) {
-                logger.error("Failed to close serial port.");
-            }
+            return sentence;
         }
-        return sentence;
-    }
+
+    
 
     public double parseNmeaCoordinateToDecimal(String nmeaCoordinate, String bearing) {
         double decimalCoordinate;
