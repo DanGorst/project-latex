@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 public class UbloxGPSSensorController implements GPSSensorController, AltimeterSensorController {
 
     private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
-    private Serial serial;
+    private final Serial serial;
     private String latitudeKey;
     private String longitudeKey;
     private String altitudeKey;
@@ -27,23 +27,44 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
     private double longitude;
     private double altitude;
 
-    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
+    /* Constructor where we inject all the dependencies. Useful for testing if we want to mock out dependencies. */
+    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey, Serial serial) {
         this.latitudeKey = latitudeKey;
         this.longitudeKey = longitudeKey;
         this.altitudeKey = altitudeKey;
-        serial = SerialFactory.createInstance();
+        this.serial = serial;
     }
-    
+
+    /* Constructor where we default to using the SerialFactory to give us the Serial instance. 
+     This means callers on the sensor don't need to depend on the pi4j library. */
+    public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
+        this(latitudeKey, longitudeKey, altitudeKey, SerialFactory.createInstance());
+    }
+
     @Override
     public HashMap<String, Object> getCurrentData() {
-
         HashMap<String, Object> data = new HashMap<>();
 
-        readSensorValues();
+        try {
+            serial.open(Serial.DEFAULT_COM_PORT, 9600);
+            
+            readSensorValues();
 
-        data.put(latitudeKey, this.latitude);
-        data.put(longitudeKey, this.longitude);
-        data.put(altitudeKey, this.altitude);
+            data.put(latitudeKey, this.latitude);
+            data.put(longitudeKey, this.longitude);
+            data.put(altitudeKey, this.altitude);
+
+        } catch (UnsatisfiedLinkError error) {
+            logger.error(error);
+        } catch (SerialPortException ex) {
+            logger.error("Failed to open serial port.");
+        } finally {
+            try {
+                serial.close();
+            } catch (IllegalStateException ex) {
+                logger.error("Failed to close serial port.");
+            }
+        }
 
         return data;
     }
@@ -76,30 +97,19 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         char currentChar;
 
         try {
-            serial.open(Serial.DEFAULT_COM_PORT, 9600);
-            try {
-                // Find the start of a new line and move to its first character.
-                while (serial.read() != Character.LINE_SEPARATOR) {
-                    serial.read();
-                }
-                currentChar = serial.read();
+            // Find the start of a new line and move to its first character.
+            while (serial.read() != Character.LINE_SEPARATOR) {
+                serial.read();
+            }
+            currentChar = serial.read();
 
-                // Create a String of all characters until the end of the line.
-                while (currentChar != Character.LINE_SEPARATOR) {
-                    sentence += currentChar;
-                    currentChar = serial.read();
-                }
-            } catch (IllegalStateException ex) {
-                logger.error("Failed to write to serial port.");
+            // Create a String of all characters until the end of the line.
+            while (currentChar != Character.LINE_SEPARATOR) {
+                sentence += currentChar;
+                currentChar = serial.read();
             }
-        } catch (SerialPortException ex) {
-            logger.error("Failed to open serial port.");
-        } finally {
-            try {
-                serial.close();
-            } catch (IllegalStateException ex) {
-                logger.error("Failed to close serial port.");
-            }
+        } catch (IllegalStateException ex) {
+            logger.error("Failed to write to serial port.");
         }
 
         return sentence;
@@ -156,7 +166,7 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
 
         return decimalCoordinate;
     }
-    
+
     @Override
     public double getLatitude() {
         readSensorValues();
