@@ -23,9 +23,12 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
     private String latitudeKey;
     private String longitudeKey;
     private String altitudeKey;
+    private String time;
+    private String date;
     private double latitude;
     private double longitude;
     private double altitude;
+    private double speedInMPH;
 
     public UbloxGPSSensorController(String latitudeKey, String longitudeKey, String altitudeKey) {
         this.latitudeKey = latitudeKey;
@@ -33,67 +36,112 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
         this.altitudeKey = altitudeKey;
         serial = SerialFactory.createInstance();
     }
-    
+
     @Override
     public HashMap<String, Object> getCurrentData() {
 
         HashMap<String, Object> data = new HashMap<>();
 
-        readSensorValues();
-
-        data.put(latitudeKey, this.latitude);
-        data.put(longitudeKey, this.longitude);
-        data.put(altitudeKey, this.altitude);
+        if (readSensorValues() == true) {
+            data.put(latitudeKey, this.latitude);
+            data.put(longitudeKey, this.longitude);
+            data.put(altitudeKey, this.altitude);
+        }
 
         return data;
     }
 
-    private void readSensorValues() {
+    private boolean readSensorValues() {
         // What we read from the serial port is an NMEA sentence, see:
         // http://www.gpsinformation.org/dale/nmea.htm#GSA
         String[] currentNmeaSentence;
 
-        // Keep reading the serial port until we get a GPGGA sentence.
-        do {
-            currentNmeaSentence = serialReadLine().split(",", -1);
-        } while (!currentNmeaSentence[0].substring(2).equals("GPGGA"));
+        // Get a GPGGA NMEA sentence:
+        currentNmeaSentence = getNmeaSentence("GPGGA").split(",", -1);
+        if (currentNmeaSentence.equals("error")) {
+            return false;
+        }
 
-        // Extract latitude, longitude, altitude and timestamp data from 
+        // Make sure we have a GPS fix.
+        if (Integer.parseInt(currentNmeaSentence[6]) == 0) {
+            logger.info("No GPS fix");
+            return false;
+        }
+
+        // Extract latitude, longitude, altitude and speed data from 
         // the GPGGA sentence and parse lat/long from NMEA to decimal format.
         latitude = parseNmeaCoordinateToDecimal(currentNmeaSentence[2], currentNmeaSentence[3]);
         longitude = parseNmeaCoordinateToDecimal(currentNmeaSentence[4], currentNmeaSentence[5]);
-        try {
-            altitude = Double.parseDouble(currentNmeaSentence[9]);
-        } catch (NumberFormatException ex) {
-            logger.error("Failed to parse altitude to double");
+        altitude = Double.parseDouble(currentNmeaSentence[9]);
+       
+
+        // Get a GPRMC NMEA sentence:
+        currentNmeaSentence = getNmeaSentence("GPRMC").split(",", -1);
+        if (currentNmeaSentence.equals("error")) {
+            return false;
         }
+
+        // Make sure we have a GPS fix.
+        if (currentNmeaSentence[2].equals("V")) {
+            logger.info("No GPS fix");
+            return false;
+        }
+
+        // Extract date, time and speed data from the
+        // the GPRMC sentence and convert to correct fommats.
+        time = currentNmeaSentence[1].substring(0, 2) + ":"
+                + currentNmeaSentence[1].substring(2, 4) + ":"
+                + currentNmeaSentence[1].substring(4, 6);
+        date = currentNmeaSentence[7];
+        speedInMPH = Double.parseDouble(currentNmeaSentence[5]) * 1.1508;
+        
+        return true;
     }
 
-    // pi4j Serial object has no readLine method, so we write one.
-    public String serialReadLine() {
+    public String getNmeaSentence(String GPXXX) {
 
+        char currentChar = 0;
         String sentence = "";
-        char currentChar;
 
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
             try {
-                // Find the start of a new line and move to its first character.
-                while (serial.read() != Character.LINE_SEPARATOR) {
-                    serial.read();
+                // Check that the serial port read buffer is receiving data.
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
                 }
-                currentChar = serial.read();
+                if (serial.availableBytes() == 0) {
+                    logger.error("No serial data available to read, check hardware connections.");
+                    return "error";
+                }
 
-                // Create a String of all characters until the end of the line.
-                while (currentChar != Character.LINE_SEPARATOR) {
-                    sentence += currentChar;
+                while (true) {
+                    sentence = "";
+                    // Find the start of a new line and move to its first character.
+                    while (currentChar != Character.LINE_SEPARATOR) {
+                        currentChar = serial.read();
+                    }
                     currentChar = serial.read();
+                    // Create a String of all characters until the end of the line.
+                    while (currentChar != Character.LINE_SEPARATOR) {
+                        sentence += currentChar;
+                        currentChar = serial.read();
+                    }
+                    // If NMEA sentence is of the specified type we can break
+                    // the loop. Otherwise, read the next sentence.
+                    if (sentence.substring(2, 7).equals(GPXXX)) {
+                        break;
+                    }
                 }
             } catch (IllegalStateException ex) {
-                logger.error("Failed to write to serial port.");
+                logger.error("Failed read serial port.");
+                return "error";
             }
         } catch (SerialPortException ex) {
             logger.error("Failed to open serial port.");
+            return "error";
         } finally {
             try {
                 serial.close();
@@ -101,7 +149,6 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
                 logger.error("Failed to close serial port.");
             }
         }
-
         return sentence;
     }
 
@@ -156,7 +203,7 @@ public class UbloxGPSSensorController implements GPSSensorController, AltimeterS
 
         return decimalCoordinate;
     }
-    
+
     @Override
     public double getLatitude() {
         readSensorValues();
