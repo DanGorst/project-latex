@@ -6,10 +6,12 @@
 
 package project.latex.balloon.sensor;
 
+import project.latex.balloon.sensor.gps.SensorReadFailedException;
+
 /**
  *
  * @author dgorst
  */
 public interface AltimeterSensorController {
-    double getHeight();
+    double getHeight() throws SensorReadFailedException;
 }

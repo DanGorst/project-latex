@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
-import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.SensorController;
-import project.latex.balloon.sensor.UbloxGPSSensorController;
+import project.latex.balloon.sensor.gps.SensorReadFailedException;
+import project.latex.balloon.sensor.gps.UbloxGPSSensorController;
 import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
@@ -119,7 +119,11 @@ public class BalloonController {
         // Initialise our sensors and data writers
         List<SensorController> sensors = new ArrayList<>();
         //sensors.add(new DummySensorController(properties.getProperty("altitude.key")));
-        sensors.add(new UbloxGPSSensorController(properties.getProperty("latitude.key"), properties.getProperty("longitude.key"), properties.getProperty("altitude.key")));
+        sensors.add(new UbloxGPSSensorController(properties.getProperty("time.key"), 
+                properties.getProperty("latitude.key"),
+                properties.getProperty("longitude.key"), 
+                properties.getProperty("altitude.key"),
+                properties.getProperty("speed.key")));
 
         List<DataWriter> dataWriters = new ArrayList<>();
         dataWriters.add(new ConsoleDataWriter());
@@ -232,33 +236,37 @@ public class BalloonController {
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, 0);
             for (SensorController controller : this.sensors) {
-                Map<String, Object> sensorData = controller.getCurrentData();
-                for (String key : sensorData.keySet()) {
-                    data.put(key, sensorData.get(key));
-                }
-            }
-
-            // Write the model
-            for (DataWriter dataWriter : this.dataWriters) {
                 try {
-                    dataWriter.writeData(data);
-                } // If we get some kind of exception, let's catch it here rather than just crashing the app
-                catch (Exception e) {
-                    logger.error(e);
+                    Map<String, Object> sensorData = controller.getCurrentData();
+                    for (String key : sensorData.keySet()) {
+                        data.put(key, sensorData.get(key));
+                    }
+                } catch (SensorReadFailedException ex) {
+                    logger.error(ex);
                 }
-            }
 
-            // Find any new camera images and write them out
-            if (this.cameraSensor != null) {
-                List<String> imageFiles = this.cameraSensor.getImageFileNames();
-                try {
-                    this.cameraWriter.writeImageFiles(imageFiles);
-                } catch (DataWriteFailedException ex) {
-                    logger.error("Failed to write image files", ex);
+                // Write the model
+                for (DataWriter dataWriter : this.dataWriters) {
+                    try {
+                        dataWriter.writeData(data);
+                    } // If we get some kind of exception, let's catch it here rather than just crashing the app
+                    catch (Exception e) {
+                        logger.error(e);
+                    }
                 }
-            }
 
-            runner.controllerFinishedRunLoop(data);
+                // Find any new camera images and write them out
+                if (this.cameraSensor != null) {
+                    List<String> imageFiles = this.cameraSensor.getImageFileNames();
+                    try {
+                        this.cameraWriter.writeImageFiles(imageFiles);
+                    } catch (DataWriteFailedException ex) {
+                        logger.error("Failed to write image files", ex);
+                    }
+                }
+
+                runner.controllerFinishedRunLoop(data);
+            }
         }
     }
 }

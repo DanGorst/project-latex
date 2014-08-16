@@ -7,11 +7,12 @@
 package project.latex.balloon.sensor;
 
 import java.util.Map;
+import project.latex.balloon.sensor.gps.SensorReadFailedException;
 
 /**
  *
  * @author Dan
  */
 public interface SensorController {
-    Map<String, Object> getCurrentData();
+    Map<String, Object> getCurrentData() throws SensorReadFailedException;
 }

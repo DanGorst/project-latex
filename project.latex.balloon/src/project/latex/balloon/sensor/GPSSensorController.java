@@ -6,12 +6,14 @@
 
 package project.latex.balloon.sensor;
 
+import project.latex.balloon.sensor.gps.SensorReadFailedException;
+
 /**
  *
  * @author dgorst
  */
 public interface GPSSensorController extends SensorController {
-    double getLatitude();
+    double getLatitude() throws SensorReadFailedException;
     
-    double getLongitude();
+    double getLongitude() throws SensorReadFailedException;
 }
