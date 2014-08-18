@@ -14,13 +14,13 @@ import project.latex.balloon.sensor.SensorController;
  *
  * @author will
  */
-public class UbloxGPSSensorController implements SensorController {
+public class GPSSensorController implements SensorController {
 
-    private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
-    private UbloxGPSSensor gps;
+    private static final Logger logger = Logger.getLogger(GPSSensorController.class);
+    private GPSSensor gps;
     private ArrayList<String> keys = new ArrayList<String>();
     
-    public UbloxGPSSensorController(UbloxGPSSensor gps, String... keys) {
+    public GPSSensorController(GPSSensor gps, String... keys) {
         for (String key : keys) {
             this.keys.add(key);
         }
@@ -31,16 +31,20 @@ public class UbloxGPSSensorController implements SensorController {
     public HashMap<String, Object> getCurrentData() throws SensorReadFailedException {
         HashMap<String, Object> requestedData = new HashMap<>();
         HashMap<String, Object> allData = new HashMap<>();
-
-        // Get and parse a GPGGA sentence containing time, latitude, longitude, altitude.
-        allData.putAll(NMEASentenceParser.parse(gps.getNMEASentence("GPGGA")));
-        // Get and parse a GPRMC sentence containing date and speed.
-        allData.putAll(NMEASentenceParser.parse(gps.getNMEASentence("GPRMC")));
-
-        for (String key : keys) {
-            requestedData.put(key,allData.get(key));
+        
+        // Get and parse all data from all supported sentence types 
+        for (String sentence : gps.getSupportedNmeaSentences()) {
+            allData.putAll(NMEASentenceParser.parse(gps.getNmeaSentence(sentence)));
         }
 
+        for (String key : keys) {
+            if (allData.get(key) == null) {
+                logger.error("Invalid key: " + key + " was given");
+            } else {
+                requestedData.put(key,allData.get(key));
+            }
+        }
+        
         return requestedData;
     }
 }

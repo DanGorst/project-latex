@@ -45,7 +45,7 @@ public class UbloxGPSSensorTest {
     public void testGetNMEASentence() throws Exception {
         System.out.println("getNMEASentence");
         String GPXXX = "";
-        UbloxGPSSensor instance = new UbloxGPSSensor();
+        GPSSensor instance = new GPSSensor();
         String expResult = "";
         String result = instance.getNMEASentence(GPXXX);
         assertEquals(expResult, result);

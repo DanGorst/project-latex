@@ -5,36 +5,46 @@
  */
 package project.latex.balloon.sensor.gps;
 
-import project.latex.balloon.sensor.gps.UbloxGPSSensorController;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.pi4j.io.serial.SerialPortException;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author will
  */
-public class UbloxGPSSensor {
+public class GPSSensor {
 
-    private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
-    private final Serial serial;
+    private static final Logger logger = Logger.getLogger(GPSSensorController.class);
+    private Serial serial;
+    private HashSet<String> supportedNmeaSentences = new HashSet<String>();
 
-    public UbloxGPSSensor() {
+    public GPSSensor(String... supportedNmeaSentences) {
+        for (String sentence : supportedNmeaSentences) {
+            this.supportedNmeaSentences.add(sentence);
+        }
         this.serial = SerialFactory.createInstance();
     }
 
     // Constructor where we inject the dependencies
-    public UbloxGPSSensor(Serial serial) {
-        this();
+    public GPSSensor(Serial serial, String... supportedNmeaSentences) {
+        this(supportedNmeaSentences);
+        this.serial = serial;
     }
 
-    public String getNMEASentence(String GPXXX) throws SensorReadFailedException {
+    public String getNmeaSentence(String GPXXX) throws SensorReadFailedException {
         // What we read from the serial port is an NMEA sentence, see:
         // http://www.gpsinformation.org/dale/nmea.htm#GSA
         char currentChar = 0;
         String sentence = "";
 
+        if (!supportedNmeaSentences.contains(GPXXX)) {
+            logger.error("GPS module was not initialised as supporting" 
+                    + GPXXX + "sentences");
+        }
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
             // Check that the serial port read buffer is receiving data.
@@ -47,8 +57,9 @@ public class UbloxGPSSensor {
                 throw new SensorReadFailedException("No serial data available to"
                         + " read, check hardware connections.");
             }
-
-            while (true) {
+            
+            // Find GPXXX sentence
+            for (int i = 0; i < 20; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
                 while (currentChar != Character.LINE_SEPARATOR) {
@@ -65,6 +76,13 @@ public class UbloxGPSSensor {
                 if (sentence.substring(2, 7).equals(GPXXX)) {
                     break;
                 }
+            }
+            
+            // If after 20 iterations, specified sentence type is not found then 
+            // the GPS module must not support GPXXX sentence type.
+            if (sentence.equals("")) {
+                throw new SensorReadFailedException("Sensor hardware does not support " 
+                        + GPXXX + " sentences");
             }
 
         } catch (UnsatisfiedLinkError error) {
@@ -84,5 +102,9 @@ public class UbloxGPSSensor {
         }
 
         return sentence;
+    }
+
+    public HashSet<String> getSupportedNmeaSentences() {
+        return supportedNmeaSentences;
     }
 }

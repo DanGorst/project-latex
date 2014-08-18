@@ -45,7 +45,7 @@ public class UbloxGPSSensorControllerTest {
     @Test
     public void testGetCurrentData() throws Exception {
         System.out.println("getCurrentData");
-        UbloxGPSSensorController instance = null;
+        GPSSensorController instance = null;
         HashMap<String, Object> expResult = null;
         HashMap<String, Object> result = instance.getCurrentData();
         assertEquals(expResult, result);
@@ -59,7 +59,7 @@ public class UbloxGPSSensorControllerTest {
     @Test
     public void testGetLatitude() throws Exception {
         System.out.println("getLatitude");
-        UbloxGPSSensorController instance = null;
+        GPSSensorController instance = null;
         double expResult = 0.0;
         double result = instance.getLatitude();
         assertEquals(expResult, result, 0.0);
@@ -73,7 +73,7 @@ public class UbloxGPSSensorControllerTest {
     @Test
     public void testGetLongitude() throws Exception {
         System.out.println("getLongitude");
-        UbloxGPSSensorController instance = null;
+        GPSSensorController instance = null;
         double expResult = 0.0;
         double result = instance.getLongitude();
         assertEquals(expResult, result, 0.0);
@@ -87,7 +87,7 @@ public class UbloxGPSSensorControllerTest {
     @Test
     public void testGetHeight() throws Exception {
         System.out.println("getHeight");
-        UbloxGPSSensorController instance = null;
+        GPSSensorController instance = null;
         double expResult = 0.0;
         double result = instance.getHeight();
         assertEquals(expResult, result, 0.0);

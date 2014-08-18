@@ -25,8 +25,8 @@ import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.gps.SensorReadFailedException;
-import project.latex.balloon.sensor.gps.UbloxGPSSensor;
-import project.latex.balloon.sensor.gps.UbloxGPSSensorController;
+import project.latex.balloon.sensor.gps.GPSSensor;
+import project.latex.balloon.sensor.gps.GPSSensorController;
 import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
@@ -119,9 +119,9 @@ public class BalloonController {
 
         // Initialise our sensors and data writers
         List<SensorController> sensors = new ArrayList<>();
-        // sensors.add(new DummySensorController(properties.getProperty("altitude.key")));
-        sensors.add(new UbloxGPSSensorController(
-                new UbloxGPSSensor(),
+
+        GPSSensor ublox = new GPSSensor("GPGGA","GPRMC");
+        sensors.add(new GPSSensorController(ublox,
                 properties.getProperty("time.key"), 
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"), 
