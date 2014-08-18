@@ -42,14 +42,14 @@ public abstract class NMEASentenceParser {
         String time = GPGGATokens[1].substring(0, 2) + ":"
                 + GPGGATokens[1].substring(2, 4) + ":"
                 + GPGGATokens[1].substring(4, 6) + ":";
-        GPGGAData.put("Time", time);
+        GPGGAData.put("time", time);
         // Parse latitude, longitude, altitude.
         double latitude = latitudeToDecimal(GPGGATokens[2], GPGGATokens[3]);
         double longitude = longitudeToDecimal(GPGGATokens[4], GPGGATokens[5]);
         double altitude = Double.parseDouble(GPGGATokens[9]);
-        GPGGAData.put("Latitude", latitude);
-        GPGGAData.put("Longitude", longitude);
-        GPGGAData.put("Altitude", altitude);
+        GPGGAData.put("latitude", latitude);
+        GPGGAData.put("longitude", longitude);
+        GPGGAData.put("altitude", altitude);
         return GPGGAData;
     }
 
@@ -60,10 +60,10 @@ public abstract class NMEASentenceParser {
             throw new SensorReadFailedException("No GPS Fix");
         }
         // Parse date.
-        GPRMCData.put("Date", GPRMCTokens[9]);
-        // Parse speed from knots to MPH
+        GPRMCData.put("date", GPRMCTokens[9]);
+        // Parse speed as mph
         double speed = Double.parseDouble(GPRMCTokens[7])*1.15078;
-        GPRMCData.put("Speed", speed);
+        GPRMCData.put("speed", speed);
         return GPRMCData;
     }
 

@@ -5,12 +5,12 @@
  */
 package project.latex.balloon.sensor;
 
-import com.pi4j.io.serial.Serial;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import static org.mockito.Mockito.mock;
+import project.latex.balloon.sensor.gps.NMEASentenceParser;
 
 /**
  *

@@ -5,94 +5,42 @@
  */
 package project.latex.balloon.sensor.gps;
 
-import com.pi4j.io.serial.Serial;
-import com.pi4j.io.serial.SerialFactory;
-import com.pi4j.io.serial.SerialPortException;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
-import project.latex.balloon.sensor.AltimeterSensorController;
-import project.latex.balloon.sensor.GPSSensorController;
+import project.latex.balloon.sensor.SensorController;
 
 /**
  *
  * @author will
  */
-public class UbloxGPSSensorController implements GPSSensorController, AltimeterSensorController {
+public class UbloxGPSSensorController implements SensorController {
 
     private static final Logger logger = Logger.getLogger(UbloxGPSSensorController.class);
     private UbloxGPSSensor gps;
+    private ArrayList<String> keys = new ArrayList<String>();
     
-    private String timeKey;
-    private String dateKey;
-    private String latitudeKey;
-    private String longitudeKey;
-    private String altitudeKey;
-    private String speedKey;
-    
-    private String time;
-    private String date;
-    private double latitude;
-    private double longitude;
-    private double altitude;
-    private double speedInMPH;
-
-
-    public UbloxGPSSensorController(String timeKey, String latitudeKey, String longitudeKey, String altitudeKey, String speedKey) {
-        this.timeKey = timeKey;
-        this.latitudeKey = latitudeKey;
-        this.longitudeKey = longitudeKey;
-        this.altitudeKey = altitudeKey;
-        this.speedKey = speedKey;
-        gps = new UbloxGPSSensor();
+    public UbloxGPSSensorController(UbloxGPSSensor gps, String... keys) {
+        for (String key : keys) {
+            this.keys.add(key);
+        }
+        this.gps = gps;
     }
 
     @Override
     public HashMap<String, Object> getCurrentData() throws SensorReadFailedException {
-        HashMap<String, Object> data = new HashMap<>();
-
-        updateSensorValues();
-        data.put(latitudeKey, this.latitude);
-        data.put(longitudeKey, this.longitude);
-        data.put(altitudeKey, this.altitude);
-        data.put(timeKey, this.time);
-        data.put(speedKey, this.speedInMPH);
-
-        return data;
-    }
-
-    private void updateSensorValues() throws SensorReadFailedException {
-        HashMap<String, Object> GPGGAData = new HashMap<>();
-        HashMap<String, Object> GPRMCData = new HashMap<>();
+        HashMap<String, Object> requestedData = new HashMap<>();
+        HashMap<String, Object> allData = new HashMap<>();
 
         // Get and parse a GPGGA sentence containing time, latitude, longitude, altitude.
-        GPGGAData = NMEASentenceParser.parse(gps.getNMEASentence("GPGGA"));
+        allData.putAll(NMEASentenceParser.parse(gps.getNMEASentence("GPGGA")));
         // Get and parse a GPRMC sentence containing date and speed.
-        GPRMCData = NMEASentenceParser.parse(gps.getNMEASentence("GPRMC"));
+        allData.putAll(NMEASentenceParser.parse(gps.getNMEASentence("GPRMC")));
 
-        this.time = (String) GPGGAData.get("Time");
-        this.latitude = (Double) GPGGAData.get("Latitude");
-        this.longitude = (Double) GPGGAData.get("Longitude");
-        this.altitude = (Double) GPGGAData.get("Altitude");
-        this.date = (String) GPRMCData.get("Date");
-        this.speedInMPH = (double) GPRMCData.get("Speed");
-    }
+        for (String key : keys) {
+            requestedData.put(key,allData.get(key));
+        }
 
-    @Override
-    public double getLatitude() throws SensorReadFailedException {
-        updateSensorValues();
-        return latitude;
-    }
-
-    @Override
-    public double getLongitude() throws SensorReadFailedException {
-        updateSensorValues();
-        return longitude;
-    }
-
-    @Override
-    public double getHeight() throws SensorReadFailedException {
-        updateSensorValues();
-        return altitude;
+        return requestedData;
     }
 }
