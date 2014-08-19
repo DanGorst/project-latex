@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package project.latex.balloon.sensor.gps;
 
 import java.util.HashMap;
@@ -19,22 +18,22 @@ import static org.junit.Assert.*;
  * @author will
  */
 public class NMEASentenceParserTest {
-    
+
     public NMEASentenceParserTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -43,72 +42,66 @@ public class NMEASentenceParserTest {
      * Test of parse method, of class NMEASentenceParser.
      */
     @Test
-    public void testParse() throws Exception {
-        System.out.println("parse");
-        String NMEASentence = "";
-        HashMap<String, Object> expResult = null;
-        HashMap<String, Object> result = NMEASentenceParser.parse(NMEASentence);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testParseUnsupportedSentence() throws Exception {
+        String NMEASentence = "abcde,093509.00,5055.09099,N,00218.84655,W,1,04,6.50,101.6,M,48.2,M,,*4A";
+        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        assert (result.isEmpty());
     }
 
-    /**
-     * Test of parseGPGGA method, of class NMEASentenceParser.
-     */
     @Test
-    public void testParseGPGGA() throws Exception {
-        System.out.println("parseGPGGA");
-        String[] GPGGATokens = null;
-        HashMap<String, Object> expResult = null;
-        HashMap<String, Object> result = NMEASentenceParser.parseGPGGA(GPGGATokens);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testParseCompleteGpggaSentence() throws Exception {
+        String NMEASentence = "$GPGGA,093509.00,5055.09099,N,00218.84655,W,1,04,6.50,101.6,M,48.2,M,,*4A";
+        String expectedTime = "09:35:09";
+        String expectedLat = "50.918";
+        String expectedLong = "-2.314";
+        String expectedAlt = "101.6";
+
+        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        String time = result.get("time");
+        String latitude = result.get("latitude");
+        String longitude = result.get("longitude");
+        String altitude = result.get("altitude");
+
+        assertEquals(expectedTime, time);
+        assertEquals(Double.parseDouble(expectedLat), Double.parseDouble(latitude), 0.001);
+        assertEquals(Double.parseDouble(expectedLong), Double.parseDouble(longitude), 0.001);
+        assertEquals(Double.parseDouble(expectedAlt), Double.parseDouble(altitude), 0.1);
     }
 
-    /**
-     * Test of parseGPRMC method, of class NMEASentenceParser.
-     */
     @Test
-    public void testParseGPRMC() throws Exception {
-        System.out.println("parseGPRMC");
-        String[] GPRMCTokens = null;
-        HashMap<String, Object> expResult = null;
-        HashMap<String, Object> result = NMEASentenceParser.parseGPRMC(GPRMCTokens);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testParseIncompleteGpggaSentence() throws Exception {
+        String NMEASentence = "$GPGGA,,,,,,,,,,,,,,";
+        String expectedTime = "N/A";
+        String expectedLat = "N/A";
+        String expectedLong = "N/A";
+        String expectedAlt = "N/A";
+
+        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        String time = result.get("time");
+        String latitude = result.get("latitude");
+        String longitude = result.get("longitude");
+        String altitude = result.get("altitude");
+
+        assertEquals(expectedTime, time);
+        assertEquals(expectedLat, latitude);
+        assertEquals(expectedLong, longitude);
+        assertEquals(expectedAlt, altitude);
     }
 
-    /**
-     * Test of latitudeToDecimal method, of class NMEASentenceParser.
-     */
     @Test
-    public void testLatitudeToDecimal() {
-        System.out.println("latitudeToDecimal");
-        String latitude = "";
-        String bearing = "";
-        double expResult = 0.0;
-        double result = NMEASentenceParser.latitudeToDecimal(latitude, bearing);
-        assertEquals(expResult, result, 0.0);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    public void testParseCompleteGprmcSentence() throws Exception {
+        String NMEASentence = "$GPRMC,093510.00,A,5055.09108,N,00218.84580,W,0.669,085.5,190814,,,A*6F";
+        String expectedDate = "190814";
+        String expectedSpeed = "1.238";
+        String expectedCourseOverGround = "085.5";
 
-    /**
-     * Test of longitudeToDecimal method, of class NMEASentenceParser.
-     */
-    @Test
-    public void testLongitudeToDecimal() {
-        System.out.println("longitudeToDecimal");
-        String longitude = "";
-        String bearing = "";
-        double expResult = 0.0;
-        double result = NMEASentenceParser.longitudeToDecimal(longitude, bearing);
-        assertEquals(expResult, result, 0.0);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        String date = result.get("date");
+        String speed = result.get("speed");
+        String courseOverGround = result.get("course over ground");
+
+        assertEquals(expectedDate, date);
+        assertEquals(Double.parseDouble(expectedSpeed), Double.parseDouble(speed), 0.001);
+        assertEquals(Double.parseDouble(expectedCourseOverGround), Double.parseDouble(courseOverGround), 0.1);
     }
-    
 }

@@ -32,6 +32,8 @@ public class NMEASentenceParser {
             case "GPRMC":
                 nmeaData = parseGprmc(nmeaTokens);
                 break;
+            default:
+                logger.error("Unsupported sentence type: " + nmeaTokens[0].substring(1));
         }
         return nmeaData;
 
