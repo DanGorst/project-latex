@@ -17,9 +17,9 @@ import static org.junit.Assert.*;
  *
  * @author will
  */
-public class UbloxGPSSensorTest {
+public class GPSSensorTest {
     
-    public UbloxGPSSensorTest() {
+    public GPSSensorTest() {
     }
     
     @BeforeClass
@@ -47,7 +47,7 @@ public class UbloxGPSSensorTest {
         String GPXXX = "";
         GPSSensor instance = new GPSSensor();
         String expResult = "";
-        String result = instance.getNMEASentence(GPXXX);
+        String result = instance.getNmeaSentence(GPXXX);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

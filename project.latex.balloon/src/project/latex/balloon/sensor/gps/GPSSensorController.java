@@ -32,14 +32,16 @@ public class GPSSensorController implements SensorController {
         HashMap<String, Object> requestedData = new HashMap<>();
         HashMap<String, Object> allData = new HashMap<>();
         
-        // Get and parse all data from all supported sentence types 
+        // Get and parse all data from all supported sentence types. 
         for (String sentence : gps.getSupportedNmeaSentences()) {
             allData.putAll(NMEASentenceParser.parse(gps.getNmeaSentence(sentence)));
         }
-
+        
+        // Match this controllers keys to the keys in allData and collect together 
+        // the data corrsponding to matching keys.
         for (String key : keys) {
             if (allData.get(key) == null) {
-                logger.error("Invalid key: " + key + " was given");
+                logger.error("Invalid key: " + key);
             } else {
                 requestedData.put(key,allData.get(key));
             }

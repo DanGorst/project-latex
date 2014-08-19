@@ -62,10 +62,9 @@ public class GPSSensor {
             for (int i = 0; i < 20; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
-                while (currentChar != Character.LINE_SEPARATOR) {
+                while (currentChar != '$') {
                     currentChar = serial.read();
                 }
-                currentChar = serial.read();
                 // Create a String of all characters until the end of the line.
                 while (currentChar != Character.LINE_SEPARATOR) {
                     sentence += currentChar;
@@ -73,7 +72,7 @@ public class GPSSensor {
                 }
                 // If NMEA sentence is of the specified type we can break
                 // the loop. Otherwise, read the next sentence.
-                if (sentence.substring(2, 7).equals(GPXXX)) {
+                if (sentence.substring(1, 6).equals(GPXXX)) {
                     break;
                 }
             }
