@@ -1,0 +1,8 @@
+body {
+  font-family: Helvetica, sans-serif;
+}
+
+#main {
+  max-width: 80%;
+  margin: auto auto; 
+}
