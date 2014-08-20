@@ -42,9 +42,10 @@ public class GPSSensor {
         String sentence = "";
 
         if (!supportedNmeaSentences.contains(GPXXX)) {
-            logger.error("GPS module was not initialised as supporting" 
-                    + GPXXX + "sentences");
+            throw new SensorReadFailedException("GPS module was not initialised "
+                    + "as supporting " + GPXXX + " sentences");
         }
+        
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
             // Check that the serial port read buffer is receiving data.
@@ -57,7 +58,7 @@ public class GPSSensor {
                 throw new SensorReadFailedException("No serial data available to"
                         + " read, check hardware connections.");
             }
-            
+
             // Find GPXXX sentence
             for (int i = 0; i < 20; i++) {
                 sentence = "";
@@ -76,11 +77,11 @@ public class GPSSensor {
                     break;
                 }
             }
-            
-            // If after 20 iterations, specified sentence type is not found then 
+
+            // If after 20 iterations, the specified sentence type is not found then 
             // the GPS module must not support GPXXX sentence type.
             if (sentence.equals("")) {
-                throw new SensorReadFailedException("Sensor hardware does not support " 
+                throw new SensorReadFailedException("Sensor hardware does not support "
                         + GPXXX + " sentences");
             }
 
