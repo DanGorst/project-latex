@@ -57,12 +57,35 @@ public class GPSSensorTest {
     }
 
     @Test(expected = SensorReadFailedException.class)
-    public void testThrowsIfArgUnsupprtedByHardware() throws Exception {
+    public void testThrowsIfNo$InSerialOutput() throws Exception {
+        // Mock dependencies.
+        Serial serial = mock(Serial.class);
+        when(serial.read()).thenReturn('1');
+        when(serial.availableBytes()).thenReturn(1);
+        GPSSensor mGps = new GPSSensor(serial,"GPGGA");
+        mGps.getNmeaSentence("GPGGA");
+        
+    }
+    
+    @Test(expected = SensorReadFailedException.class)
+    public void testThrowsIfOnlyOne$InSerialOutput() throws Exception {
+        // Mock dependencies.
+        Serial serial = mock(Serial.class);
+        when(serial.read()).thenReturn('$').thenReturn('1');
+        when(serial.availableBytes()).thenReturn(1);
+        GPSSensor mGps = new GPSSensor(serial,"GPGGA");
+        mGps.getNmeaSentence("GPGGA");
+        
+    }
+    
+    @Test(expected = SensorReadFailedException.class)
+    public void testThrowsIfGPSHardwareDoesntSupportSentence() throws Exception {
         // Mock dependencies.
         Serial serial = mock(Serial.class);
         when(serial.read()).thenReturn('1').thenReturn('2').thenReturn('$')
                 .thenReturn('G').thenReturn('P').thenReturn('R')
-                .thenReturn('M').thenReturn('C').thenReturn('$');
+                .thenReturn('M').thenReturn('C').thenReturn('$')
+                .thenReturn('1');
         when(serial.availableBytes()).thenReturn(1);
         GPSSensor mGps = new GPSSensor(serial,"GPGGA");
         mGps.getNmeaSentence("GPGGA");
@@ -107,8 +130,7 @@ public class GPSSensorTest {
         GPSSensor mGps = new GPSSensor(serial,"GPRMC");
         String expected = "$GPRMC";
         String result = mGps.getNmeaSentence("GPRMC");
-        assert(expected.equals(result));
-        
+        assert(expected.equals(result));   
     }
 
 }

@@ -63,20 +63,26 @@ public class GPSSensor {
             for (int i = 0; i < 20; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
-                for (int j = 0; j < 200; j++) {
+                for (int j = 0; true; j++) {
+                    currentChar = serial.read();
                     if (currentChar == '$') {
                         sentence += currentChar;
                         break;
+                    } else if (j==200) {
+                        throw new SensorReadFailedException("Incompatible sensor hardware.");
                     }
-
                 }
                 // Create a String of all characters until the end of the line.
-                for (int k = 0; k < 200; k++) {
+                for (int j = 0; true; j++) {
                     currentChar = serial.read();
                     if (currentChar == '$') {
                         break;
                     }
                     sentence += currentChar;
+                    if (j==200) {
+                        throw new SensorReadFailedException("Incompatible sensor hardware.");
+                    }
+                    
                 }
                 // If NMEA sentence is of the specified type we can break
                 // the loop. Otherwise, read the next sentence.
