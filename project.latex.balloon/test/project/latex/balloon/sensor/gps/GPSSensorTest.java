@@ -88,6 +88,7 @@ public class GPSSensorTest {
         String expected = "$GPRMC";
         System.out.println(expected);
         String result = mGps.getNmeaSentence("GPRMC");
+        System.out.println(result);
         assert(expected.equals(result));
         
     }
