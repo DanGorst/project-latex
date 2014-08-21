@@ -68,20 +68,19 @@ public class GPSSensor {
                         sentence += currentChar;
                         break;
                     }
-                    currentChar = serial.read();
-                    
+
                 }
                 // Create a String of all characters until the end of the line.
                 for (int k = 0; k < 200; k++) {
                     currentChar = serial.read();
-                    sentence += currentChar;
                     if (currentChar == '$') {
                         break;
                     }
+                    sentence += currentChar;
                 }
                 // If NMEA sentence is of the specified type we can break
                 // the loop. Otherwise, read the next sentence.
-                if (sentence.substring(1, 6).equals(GPXXX)) {
+                if (sentence.length() >= 6 && sentence.substring(1, 6).equals(GPXXX)) {
                     break;
                 }
             }
