@@ -64,18 +64,18 @@ public class GPSSensor {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
                 for (int j = 0; j < 200; j++) {
-                    currentChar = serial.read();
                     if (currentChar == '$') {
                         sentence += currentChar;
                         break;
                     }
+                    currentChar = serial.read();
                     
                 }
                 // Create a String of all characters until the end of the line.
                 for (int k = 0; k < 200; k++) {
                     currentChar = serial.read();
                     sentence += currentChar;
-                    if (currentChar == Character.LINE_SEPARATOR) {
+                    if (currentChar == '$') {
                         break;
                     }
                 }

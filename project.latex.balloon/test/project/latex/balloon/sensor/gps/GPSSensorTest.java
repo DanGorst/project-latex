@@ -81,8 +81,8 @@ public class GPSSensorTest {
     public void testShouldGetSentenceIfSupported() throws Exception {
         // Mock dependencies.
         Serial serial = mock(Serial.class);
-        when(serial.read()).thenReturn('$').thenReturn('G').thenReturn('P')
-                .thenReturn('R').thenReturn('M').thenReturn('C').thenReturn('\n');
+        when(serial.read()).thenReturn('1').thenReturn('2').thenReturn('$').thenReturn('G').thenReturn('P')
+                .thenReturn('R').thenReturn('M').thenReturn('C').thenReturn('$');
         when(serial.availableBytes()).thenReturn(1);
         
         GPSSensor mGps = new GPSSensor(serial,"GPRMC");
