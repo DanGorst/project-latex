@@ -84,7 +84,7 @@ public class GPSSensorTest {
         when(serial.read()).thenReturn('$').thenReturn('G').thenReturn('P')
                 .thenReturn('R').thenReturn('M').thenReturn('C').thenReturn('\n');
         
-        GPSSensor mGps = new GPSSensor("GPRMC");
+        GPSSensor mGps = new GPSSensor(serial,"GPRMC");
         String expected = "$GPRMC";
         System.out.println(expected);
         String result = mGps.getNmeaSentence("GPRMC");
