@@ -6,6 +6,7 @@
 package project.latex.balloon.sensor.gps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 import project.latex.balloon.sensor.SensorController;
@@ -17,13 +18,11 @@ import project.latex.balloon.sensor.SensorController;
 public class GPSSensorController implements SensorController {
 
     private static final Logger logger = Logger.getLogger(GPSSensorController.class);
-    private GPSSensor gps;
-    private ArrayList<String> keys = new ArrayList<String>();
+    private final GPSSensor gps;
+    private final ArrayList<String> keys = new ArrayList<>();
     
     public GPSSensorController(GPSSensor gps, String... keys) {
-        for (String key : keys) {
-            this.keys.add(key);
-        }
+        this.keys.addAll(Arrays.asList(keys));
         this.gps = gps;
     }
 

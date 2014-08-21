@@ -10,9 +10,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.anyString;
@@ -37,6 +34,7 @@ public class GPSSensorControllerTest {
 
     /**
      * Test of getCurrentData method, of class GPSSensorController.
+     * @throws java.lang.Exception
      */
 
     @Test
@@ -50,7 +48,7 @@ public class GPSSensorControllerTest {
 
         // Mock an instance of GPSSensor.
         GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<String>();
+        HashSet<String> supportedNmeaSentences = new HashSet<>();
         supportedNmeaSentences.add("GPGGA");
         supportedNmeaSentences.add("GPRMC");
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
@@ -88,7 +86,7 @@ public class GPSSensorControllerTest {
 
         // Mock an instance of GPSSensor.
         GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<String>();
+        HashSet<String> supportedNmeaSentences = new HashSet<>();
         supportedNmeaSentences.add("GPGGA");
         supportedNmeaSentences.add("GPRMC");
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
@@ -123,7 +121,7 @@ public class GPSSensorControllerTest {
 
         // Mock an instance of GPSSensor.
         GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<String>();
+        HashSet<String> supportedNmeaSentences = new HashSet<>();
         supportedNmeaSentences.add("GPGGA");
         supportedNmeaSentences.add("GPRMC");
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
@@ -155,7 +153,7 @@ public class GPSSensorControllerTest {
 
         // Mock an instance of GPSSensor.
         GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<String>();
+        HashSet<String> supportedNmeaSentences = new HashSet<>();
         supportedNmeaSentences.add("GPGGA");
         supportedNmeaSentences.add("GPRMC");
         when(ublox.getNmeaSentence(anyString())).thenReturn("");

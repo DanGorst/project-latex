@@ -45,7 +45,7 @@ public class GPSSensor {
             throw new SensorReadFailedException("GPS module was not initialised "
                     + "as supporting " + GPXXX + " sentences");
         }
-        
+
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
             // Check that the serial port read buffer is receiving data.
@@ -63,13 +63,21 @@ public class GPSSensor {
             for (int i = 0; i < 20; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
-                while (currentChar != '$') {
+                for (int j = 0; j < 200; j++) {
                     currentChar = serial.read();
+                    if (currentChar == '$') {
+                        sentence += currentChar;
+                        break;
+                    }
+                    
                 }
                 // Create a String of all characters until the end of the line.
-                while (currentChar != Character.LINE_SEPARATOR) {
-                    sentence += currentChar;
+                for (int k = 0; k < 200; k++) {
                     currentChar = serial.read();
+                    sentence += currentChar;
+                    if (currentChar == Character.LINE_SEPARATOR) {
+                        break;
+                    }
                 }
                 // If NMEA sentence is of the specified type we can break
                 // the loop. Otherwise, read the next sentence.
