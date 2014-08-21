@@ -83,6 +83,7 @@ public class GPSSensorTest {
         Serial serial = mock(Serial.class);
         when(serial.read()).thenReturn('$').thenReturn('G').thenReturn('P')
                 .thenReturn('R').thenReturn('M').thenReturn('C').thenReturn('\n');
+        when(serial.availableBytes()).thenReturn(1);
         
         GPSSensor mGps = new GPSSensor(serial,"GPRMC");
         String expected = "$GPRMC";
