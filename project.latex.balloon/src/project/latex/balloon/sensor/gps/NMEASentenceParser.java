@@ -87,32 +87,32 @@ public class NMEASentenceParser {
             speed = String.valueOf(Double.parseDouble(speed)*1.852);
         }
 
-        // Get course over ground as a clockwise angle relative to North.
-        String courseOverGround = getStringValueIfAvailable("Course over ground", gprmcTokens[8]);
+        // Get heading as a clockwise angle relative to North.
+        String heading = getStringValueIfAvailable("Heading", gprmcTokens[8]);
 
         gprmcData.put("date", date);
         gprmcData.put("speed", speed);
-        gprmcData.put("course over ground", courseOverGround);
+        gprmcData.put("heading", heading);
         return gprmcData;
     }
 
-    private static String latitudeToDecimal(String latitude, String bearing) {
+    private static String latitudeToDecimal(String latitude, String heading) {
         double degrees = Double.parseDouble(latitude.substring(0, 2));
         double minutes = Double.parseDouble(latitude.substring(2));
         
         double decimalLatitude = degrees + (minutes / 60);
-        if (bearing.equals("S")) {
+        if (heading.equals("S")) {
             decimalLatitude *= -1;
         }
         return String.valueOf(decimalLatitude);
     }
 
-    private static String longitudeToDecimal(String longitude, String bearing) {
+    private static String longitudeToDecimal(String longitude, String heading) {
         double degrees = Double.parseDouble(longitude.substring(0, 3));
         double minutes = Double.parseDouble(longitude.substring(3));
         
         double decimalLongitude = degrees + (minutes / 60);
-        if (bearing.equals("W")) {
+        if (heading.equals("W")) {
             decimalLongitude *= -1;
         }
         return String.valueOf(decimalLongitude);

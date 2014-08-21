@@ -117,16 +117,16 @@ public class NMEASentenceParserTest {
         String NMEASentence = "$GPRMC,093510.00,A,5055.09108,N,00218.84580,W,0.669,085.5,190814,,,A*6F";
         String expectedDate = "190814";
         String expectedSpeed = "1.238";
-        String expectedCourseOverGround = "085.5";
+        String expectedHeading = "085.5";
 
         HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
         String date = result.get("date");
         String speed = result.get("speed");
-        String courseOverGround = result.get("course over ground");
+        String heading = result.get("heading");
 
         assertEquals(expectedDate, date);
         assertEquals(Double.parseDouble(expectedSpeed), Double.parseDouble(speed), 0.001);
-        assertEquals(Double.parseDouble(expectedCourseOverGround), Double.parseDouble(courseOverGround), 0.1);
+        assertEquals(Double.parseDouble(expectedHeading), Double.parseDouble(heading), 0.1);
     }
 
     @Test
@@ -134,15 +134,15 @@ public class NMEASentenceParserTest {
         String NMEASentence = "$GPRMC,,,,,,,,,,,,";
         String expectedDate = "N/A";
         String expectedSpeed = "N/A";
-        String expectedCourseOverGround = "N/A";
+        String expectedHeading = "N/A";
 
         HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
         String date = result.get("date");
         String speed = result.get("speed");
-        String courseOverGround = result.get("course over ground");
+        String heading = result.get("heading");
 
         assertEquals(expectedDate, date);
         assertEquals(expectedSpeed, speed);
-        assertEquals(expectedCourseOverGround, courseOverGround);
+        assertEquals(expectedHeading, heading);
     }
 }

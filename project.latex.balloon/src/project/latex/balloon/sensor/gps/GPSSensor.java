@@ -60,7 +60,7 @@ public class GPSSensor {
             }
 
             // Find GPXXX sentence
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; true; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
                 for (int j = 0; true; j++) {
@@ -85,17 +85,15 @@ public class GPSSensor {
                     
                 }
                 // If NMEA sentence is of the specified type we can break
-                // the loop. Otherwise, read the next sentence.
+                // the loop.
                 if (sentence.length() >= 6 && sentence.substring(1, 6).equals(GPXXX)) {
                     break;
-                }
-            }
-
-            // If after 20 iterations, the specified sentence type is not found then 
-            // the GPS module must not support GPXXX sentence type.
-            if (sentence.equals("")) {
-                throw new SensorReadFailedException("Sensor hardware does not support "
+                } else if (i == 20) {
+                    // If after 20 iterations, the specified sentence type is not found then 
+                    // the GPS module must not support GPXXX sentence type.
+                    throw new SensorReadFailedException("Sensor hardware does not support "
                         + GPXXX + " sentences");
+                }   
             }
 
         } catch (UnsatisfiedLinkError error) {

@@ -126,6 +126,7 @@ public class BalloonController {
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"), 
                 properties.getProperty("altitude.key"),
+                properties.getProperty("heading.key"),
                 properties.getProperty("speed.key")));
 
         List<DataWriter> dataWriters = new ArrayList<>();
