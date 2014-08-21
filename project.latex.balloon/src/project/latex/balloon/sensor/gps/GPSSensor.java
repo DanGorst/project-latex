@@ -50,7 +50,7 @@ public class GPSSensor {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
             // Check that the serial port read buffer is receiving data.
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1500);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
