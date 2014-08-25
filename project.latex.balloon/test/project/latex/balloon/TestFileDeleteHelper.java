@@ -22,7 +22,7 @@ public class TestFileDeleteHelper {
             }
         }
         if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
+            throw new IOException("Failed to delete file: " + f);
         }
     }
 }

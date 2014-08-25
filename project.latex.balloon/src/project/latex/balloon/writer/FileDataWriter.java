@@ -26,11 +26,11 @@ public class FileDataWriter implements DataWriter {
     final String fileName = "dataModel.csv";
     private final List<String> dataKeys;
     
-    public FileDataWriter(String baseUrl, List<String> dataKeys, DataModelConverter converter, Logger logger)   {
+    public FileDataWriter(File dataFolder, List<String> dataKeys, DataModelConverter converter, Logger logger)   {
         this.logger = logger;
         String filePath = fileName;
-        if (baseUrl != null && !baseUrl.isEmpty())  {
-            filePath = baseUrl + File.separator + fileName;
+        if (dataFolder != null)  {
+            filePath = dataFolder.getPath() + File.separator + fileName;
         }
         
         this.logger.addAppender(createFileAppender(filePath));
@@ -39,8 +39,8 @@ public class FileDataWriter implements DataWriter {
         writeHeaders();
     }
     
-    public FileDataWriter(String baseUrl, List<String> dataKeys, DataModelConverter converter)   {
-        this(baseUrl, dataKeys, converter, Logger.getLogger(FileDataWriter.class));
+    public FileDataWriter(File dataFolder, List<String> dataKeys, DataModelConverter converter)   {
+        this(dataFolder, dataKeys, converter, Logger.getLogger(FileDataWriter.class));
     }
     
     private FileAppender createFileAppender(String fileName)    {

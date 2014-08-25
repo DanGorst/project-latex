@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package project.latex.balloon;
 
 import com.google.gson.stream.JsonReader;
@@ -44,33 +43,45 @@ import project.latex.writer.DataWriter;
 public class BalloonController {
 
     private static final Logger logger = Logger.getLogger(BalloonController.class);
-    
+
     private final List<String> transmittedTelemetryKeys;
     private final DataModelConverter converter;
     private final String payloadName = "$$latex";
-    
+
     // Sensors to determine the current state of the balloon
     private final List<SensorController> sensors;
     private final List<DataWriter> dataWriters;
-    
+
     // Camera
     private final CameraSensorController cameraSensor;
     private final CameraDataWriter cameraWriter;
-    
+
     private final Properties properties;
-    
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) { 
+    public static void main(String[] args) {
         try {
             PropertyConfigurator.configure("logger.properties");
-            
+
             logger.info("Project Latex Balloon Controller, version 0.1");
-        
+
             Properties properties = loadProperties("config.properties");
             logger.info("Properties loaded");
-            BalloonController balloonController = createBalloonController("../telemetryKeys.json", properties);
+
+            List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
+            DataModelConverter converter = new DataModelConverter();
+            
+            List<SensorController> sensors = createSensorControllers(properties);
+            
+            File dataFolder = createDataFolder();
+            List<DataWriter> dataWriters = createDataWriters(properties, 
+                    transmittedDataKeys, converter, dataFolder);
+
+            BalloonController balloonController = createBalloonController(transmittedDataKeys,
+                    converter, properties, sensors, dataWriters, dataFolder);
+
             logger.info("Balloon created");
             balloonController.run(new DefaultControllerRunner());
         } catch (IOException ex) {
@@ -78,34 +89,47 @@ public class BalloonController {
         }
     }
     
+    static File createDataFolder() throws IOException {
+        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
+        // flight is then put into that folder
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+        Date date = new Date();
+        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
+        File dataFolder = new File(baseUrl);
+        if (!dataFolder.mkdirs()) {
+            throw new IOException("Unable to create directory to contain sensor data logs");
+        }
+        return dataFolder;
+    }
+
     private static Properties loadProperties(String propertiesFilePath) throws IOException {
         Properties properties = new Properties();
         InputStream input = new FileInputStream(propertiesFilePath);
         properties.load(input);
         return properties;
     }
-    
-    static List<String> loadTransmittedDataKeys(String filePath) throws IOException   {
-        if (filePath == null)   {
+
+    static List<String> loadTransmittedDataKeys(String filePath) throws IOException {
+        if (filePath == null) {
             throw new IllegalArgumentException("Cannot load keys from null file");
         }
-        
+
         JsonReader reader = null;
         try {
             List<String> dataKeys = new ArrayList<>();
             reader = new JsonReader(new FileReader(filePath));
             reader.beginObject();
-            while (reader.hasNext())    {
+            while (reader.hasNext()) {
                 String name = reader.nextName();
                 reader.beginArray();
-                while (reader.hasNext())    {
+                while (reader.hasNext()) {
                     dataKeys.add(reader.nextString());
                 }
                 reader.endArray();
             }
             reader.endObject();
             reader.close();
-            
+
             return dataKeys;
         } finally {
             if (reader != null) {
@@ -113,30 +137,21 @@ public class BalloonController {
             }
         }
     }
-    
-    static BalloonController createBalloonController(String telemetryKeysFilePath, Properties properties) throws IOException   {
-        List<String> transmittedDataKeys = loadTransmittedDataKeys(telemetryKeysFilePath);
-        DataModelConverter converter = new DataModelConverter();
-        
-        // Initialise our sensors and data writers
+
+    static List<SensorController> createSensorControllers(Properties properties) {
         List<SensorController> sensors = new ArrayList<>();
         sensors.add(new DummySensorController(properties.getProperty("altitude.key")));
-        
+
+        return sensors;
+    }
+
+    static List<DataWriter> createDataWriters(Properties properties,
+            List<String> transmittedDataKeys,
+            DataModelConverter converter,
+            File dataFolder) {
         List<DataWriter> dataWriters = new ArrayList<>();
         dataWriters.add(new ConsoleDataWriter());
-        
-        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
-        // flight is then put into that folder
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
-        Date date = new Date();
-        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
-        File dataFolder = new File(baseUrl);
-        if (dataFolder.mkdirs()) {
-            dataWriters.add(new FileDataWriter(baseUrl, transmittedDataKeys, converter));
-        } else  {
-            logger.info("Unable to create directory to contain sensor data logs");
-        }
-        // Until we have radio comms working, we use http instead
+        dataWriters.add(new FileDataWriter(dataFolder, transmittedDataKeys, converter));
 
         try {
             dataWriters.add(new SerialDataWriter(transmittedDataKeys, converter));
@@ -149,37 +164,51 @@ public class BalloonController {
             logger.error("Using HTTP data writer instead");
             dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
         }
-        
-        // Now initialise our camera systems
-        CameraSensorController cameraSensor = null;
-        try {
-            String imageDirectory = properties.getProperty("cameraDir");
-            cameraSensor = new CameraController(new File(imageDirectory));   
-        } catch (IllegalArgumentException e)   {
-            logger.error("Unable to create camera controller. No images will be detected from the camera.", e);
-        }
-        
-        CameraDataWriter cameraWriter = null;
-        try {
-            cameraWriter = new CameraFileWriter(dataFolder);
-        } catch (IllegalArgumentException e)    {
-            logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
-        }
-        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
+
+        return dataWriters;
     }
     
     private static HttpDataWriter createHttpDataWriter(Properties properties, DataModelConverter converter, List<String> transmittedDataKeys) {
         String receiverUrl = properties.getProperty("receiver.url");
         return new HttpDataWriter(transmittedDataKeys, converter, receiverUrl);
     }
-    
-    public BalloonController(List<String> transmittedTelemetryKeys, 
+
+    static BalloonController createBalloonController(List<String> transmittedDataKeys,
+            DataModelConverter converter,
+            Properties properties,
+            List<SensorController> sensors,
+            List<DataWriter> dataWriters,
+            File dataFolder) throws IOException {
+
+        if (transmittedDataKeys == null || transmittedDataKeys.isEmpty())   {
+            throw new IllegalArgumentException("Cannot transmit data with no keys");
+        }
+        
+        // Now initialise our camera systems
+        CameraSensorController cameraSensor = null;
+        try {
+            String imageDirectory = properties.getProperty("cameraDir");
+            cameraSensor = new CameraController(new File(imageDirectory));
+        } catch (IllegalArgumentException e) {
+            logger.error("Unable to create camera controller. No images will be detected from the camera.", e);
+        }
+
+        CameraDataWriter cameraWriter = null;
+        try {
+            cameraWriter = new CameraFileWriter(dataFolder);
+        } catch (IllegalArgumentException e) {
+            logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
+        }
+        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
+    }
+
+    public BalloonController(List<String> transmittedTelemetryKeys,
             DataModelConverter converter,
             List<SensorController> sensors,
             List<DataWriter> dataWriters,
             CameraSensorController cameraSensor,
             CameraDataWriter cameraWriter,
-            Properties properties)  {
+            Properties properties) {
         this.transmittedTelemetryKeys = transmittedTelemetryKeys;
         this.converter = converter;
         this.sensors = sensors;
@@ -216,14 +245,14 @@ public class BalloonController {
     public CameraDataWriter getCameraWriter() {
         return cameraWriter;
     }
-    
+
     void run(ControllerRunner runner) {
         if (runner == null) {
             throw new IllegalArgumentException("Cannot run with null ControllerRunner");
         }
-        
+
         String timeKey = properties.getProperty("time.key");
-        if (timeKey == null)    {
+        if (timeKey == null) {
             throw new IllegalArgumentException("Null time key specified");
         }
         String payloadNameKey = properties.getProperty("payloadName.key");
@@ -231,20 +260,20 @@ public class BalloonController {
             throw new IllegalArgumentException("Null payload name key specified");
         }
         String sentenceIdKey = properties.getProperty("sentenceId.key");
-        if (sentenceIdKey == null)  {
+        if (sentenceIdKey == null) {
             throw new IllegalArgumentException("Null sentence id key specified");
         }
-        
+
         while (runner.shouldKeepRunning()) {
             // Build up a model of the current balloon state from the sensors
             Map<String, Object> data = new HashMap<>();
-            
+
             // For now we put the date into the same format as the Icarus test data, 
             // as this means we don't need to change the receiver to be able to handle both
             // sets of data
             DateFormat format = new SimpleDateFormat("HH:mm:ss");
             data.put(timeKey, format.format(new Date()));
-            
+
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, 0);
             for (SensorController controller : this.sensors) {
@@ -273,7 +302,7 @@ public class BalloonController {
                     logger.error("Failed to write image files", ex);
                 }
             }
-            
+
             runner.controllerFinishedRunLoop(data);
         }
     }

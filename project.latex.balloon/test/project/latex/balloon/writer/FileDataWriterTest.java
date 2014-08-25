@@ -6,7 +6,7 @@
 
 package project.latex.balloon.writer;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,15 +49,11 @@ public class FileDataWriterTest {
         dataKeys.add("Date");
         dataKeys.add("Value");
         converter = new DataModelConverter();
-        writer = new FileDataWriter("", dataKeys, converter);
+        writer = new FileDataWriter(null, dataKeys, converter);
     }
     
     @After
-    public void tearDown() {
-        File savedFile = new File(writer.fileName);
-        if (savedFile.exists()) {
-            savedFile.delete();
-        }
+    public void tearDown() throws IOException {
         writer = null;
         dataKeys = null;
     }
@@ -75,8 +71,7 @@ public class FileDataWriterTest {
     public void testHeadersAreWrittenOnceBeforeData()   {
         try {
             Logger mockLogger = mock(Logger.class);
-         
-            writer = new FileDataWriter("", dataKeys, converter, mockLogger);
+            writer = new FileDataWriter(null, dataKeys, converter, mockLogger);
             
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("Value", 5);
