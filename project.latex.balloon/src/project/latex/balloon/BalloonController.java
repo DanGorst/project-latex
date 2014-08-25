@@ -7,6 +7,7 @@
 package project.latex.balloon;
 
 import com.google.gson.stream.JsonReader;
+import com.pi4j.io.serial.SerialPortException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -30,6 +31,7 @@ import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
 import project.latex.balloon.writer.HttpDataWriter;
+import project.latex.balloon.writer.SerialDataWriter;
 import project.latex.writer.CameraDataWriter;
 import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriteFailedException;
@@ -135,8 +137,18 @@ public class BalloonController {
             logger.info("Unable to create directory to contain sensor data logs");
         }
         // Until we have radio comms working, we use http instead
-        String receiverUrl = properties.getProperty("receiver.url");
-        dataWriters.add(new HttpDataWriter(transmittedDataKeys, converter, receiverUrl));
+
+        try {
+            dataWriters.add(new SerialDataWriter(transmittedDataKeys, converter));
+        } catch (SerialPortException ex) {
+            logger.error(" ==>> SERIAL SETUP FAILED : " + ex.getMessage());
+            logger.error("Using HTTP data writer instead");
+            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
+        } catch (UnsatisfiedLinkError err) {
+            logger.error(err);
+            logger.error("Using HTTP data writer instead");
+            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
+        }
         
         // Now initialise our camera systems
         CameraSensorController cameraSensor = null;
@@ -154,6 +166,11 @@ public class BalloonController {
             logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
         }
         return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
+    }
+    
+    private static HttpDataWriter createHttpDataWriter(Properties properties, DataModelConverter converter, List<String> transmittedDataKeys) {
+        String receiverUrl = properties.getProperty("receiver.url");
+        return new HttpDataWriter(transmittedDataKeys, converter, receiverUrl);
     }
     
     public BalloonController(List<String> transmittedTelemetryKeys, 
