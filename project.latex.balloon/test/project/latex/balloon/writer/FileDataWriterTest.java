@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -31,6 +32,8 @@ public class FileDataWriterTest {
     private FileDataWriter writer;
     private List<String> dataKeys;
     private DataModelConverter converter;
+    private Logger mockLogger;
+    private FileAppender mockAppender;
     
     public FileDataWriterTest() {
     }
@@ -49,7 +52,9 @@ public class FileDataWriterTest {
         dataKeys.add("Date");
         dataKeys.add("Value");
         converter = new DataModelConverter();
-        writer = new FileDataWriter(null, dataKeys, converter);
+        mockLogger = mock(Logger.class);
+        mockAppender = mock(FileAppender.class);
+        writer = new FileDataWriter(dataKeys, converter, mockLogger, mockAppender);
     }
     
     @After
@@ -70,9 +75,6 @@ public class FileDataWriterTest {
     @Test
     public void testHeadersAreWrittenOnceBeforeData()   {
         try {
-            Logger mockLogger = mock(Logger.class);
-            writer = new FileDataWriter(null, dataKeys, converter, mockLogger);
-            
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("Value", 5);
             Date modelDate = new Date();

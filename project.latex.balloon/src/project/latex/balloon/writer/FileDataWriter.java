@@ -23,30 +23,30 @@ public class FileDataWriter implements DataWriter {
     
     private final Logger logger;
     private final DataModelConverter converter;
-    final String fileName = "dataModel.csv";
+    final static String fileName = "dataModel.csv";
     private final List<String> dataKeys;
     
-    public FileDataWriter(File dataFolder, List<String> dataKeys, DataModelConverter converter, Logger logger)   {
+    public FileDataWriter(List<String> dataKeys, DataModelConverter converter, Logger logger, FileAppender fileAppender)   {
         this.logger = logger;
-        String filePath = fileName;
-        if (dataFolder != null)  {
-            filePath = dataFolder.getPath() + File.separator + fileName;
-        }
-        
-        this.logger.addAppender(createFileAppender(filePath));
+        this.logger.addAppender(fileAppender);
         this.converter = converter;
         this.dataKeys = dataKeys;
         writeHeaders();
     }
     
     public FileDataWriter(File dataFolder, List<String> dataKeys, DataModelConverter converter)   {
-        this(dataFolder, dataKeys, converter, Logger.getLogger(FileDataWriter.class));
+        this(dataKeys, converter, Logger.getLogger(FileDataWriter.class), createFileAppender(dataFolder));
     }
     
-    private FileAppender createFileAppender(String fileName)    {
+    private static FileAppender createFileAppender(File dataFolder)    {
+        String filePath = fileName;
+        if (dataFolder != null)  {
+            filePath = dataFolder.getPath() + File.separator + fileName;
+        }
+        
         FileAppender fileAppender = new FileAppender();
         fileAppender.setName("FileLogger");
-        fileAppender.setFile(fileName);
+        fileAppender.setFile(filePath);
         fileAppender.setLayout(new PatternLayout("%m%n"));
         fileAppender.setThreshold(Level.INFO);
         fileAppender.setAppend(true);
