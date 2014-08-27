@@ -9,7 +9,6 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialDataEvent;
 import com.pi4j.io.serial.SerialDataListener;
 import com.pi4j.io.serial.SerialFactory;
-import com.pi4j.io.serial.SerialPortException;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
