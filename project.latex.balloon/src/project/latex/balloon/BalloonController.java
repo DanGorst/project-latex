@@ -6,7 +6,6 @@
 package project.latex.balloon;
 
 import com.google.gson.stream.JsonReader;
-import com.pi4j.io.serial.SerialPortException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -22,17 +21,10 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
-import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.SensorController;
-import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
-import project.latex.balloon.writer.FileDataWriter;
-import project.latex.balloon.writer.HttpDataWriter;
-import project.latex.balloon.writer.SerialDataWriter;
 import project.latex.writer.CameraDataWriter;
-import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriteFailedException;
 import project.latex.writer.DataWriter;
 
@@ -71,16 +63,10 @@ public class BalloonController {
             logger.info("Properties loaded");
 
             List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
-            DataModelConverter converter = new DataModelConverter();
-            
-            List<SensorController> sensors = createSensorControllers(properties);
-            
             File dataFolder = createDataFolder();
-            List<DataWriter> dataWriters = createDataWriters(properties, 
-                    transmittedDataKeys, converter, dataFolder);
 
-            BalloonController balloonController = createBalloonController(transmittedDataKeys,
-                    converter, properties, sensors, dataWriters, dataFolder);
+            BalloonController balloonController = BalloonControllerFactory.createBalloonController(properties, 
+                    transmittedDataKeys, dataFolder);
 
             logger.info("Balloon created");
             balloonController.run(new DefaultControllerRunner());
@@ -136,70 +122,6 @@ public class BalloonController {
                 reader.close();
             }
         }
-    }
-
-    static List<SensorController> createSensorControllers(Properties properties) {
-        List<SensorController> sensors = new ArrayList<>();
-        sensors.add(new DummySensorController(properties.getProperty("altitude.key")));
-
-        return sensors;
-    }
-
-    static List<DataWriter> createDataWriters(Properties properties,
-            List<String> transmittedDataKeys,
-            DataModelConverter converter,
-            File dataFolder) {
-        List<DataWriter> dataWriters = new ArrayList<>();
-        dataWriters.add(new ConsoleDataWriter());
-        dataWriters.add(new FileDataWriter(dataFolder, transmittedDataKeys, converter));
-
-        try {
-            dataWriters.add(new SerialDataWriter(transmittedDataKeys, converter));
-        } catch (SerialPortException ex) {
-            logger.error(" ==>> SERIAL SETUP FAILED : " + ex.getMessage());
-            logger.error("Using HTTP data writer instead");
-            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
-        } catch (UnsatisfiedLinkError err) {
-            logger.error(err);
-            logger.error("Using HTTP data writer instead");
-            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
-        }
-
-        return dataWriters;
-    }
-    
-    private static HttpDataWriter createHttpDataWriter(Properties properties, DataModelConverter converter, List<String> transmittedDataKeys) {
-        String receiverUrl = properties.getProperty("receiver.url");
-        return new HttpDataWriter(transmittedDataKeys, converter, receiverUrl);
-    }
-
-    static BalloonController createBalloonController(List<String> transmittedDataKeys,
-            DataModelConverter converter,
-            Properties properties,
-            List<SensorController> sensors,
-            List<DataWriter> dataWriters,
-            File dataFolder) throws IOException {
-
-        if (transmittedDataKeys == null || transmittedDataKeys.isEmpty())   {
-            throw new IllegalArgumentException("Cannot transmit data with no keys");
-        }
-        
-        // Now initialise our camera systems
-        CameraSensorController cameraSensor = null;
-        try {
-            String imageDirectory = properties.getProperty("cameraDir");
-            cameraSensor = new CameraController(new File(imageDirectory));
-        } catch (IllegalArgumentException e) {
-            logger.error("Unable to create camera controller. No images will be detected from the camera.", e);
-        }
-
-        CameraDataWriter cameraWriter = null;
-        try {
-            cameraWriter = new CameraFileWriter(dataFolder);
-        } catch (IllegalArgumentException e) {
-            logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
-        }
-        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
     }
 
     public BalloonController(List<String> transmittedTelemetryKeys,

@@ -26,7 +26,6 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static project.latex.balloon.BalloonController.createDataFolder;
 import static project.latex.balloon.BalloonController.loadTransmittedDataKeys;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.writer.DataModelConverter;
@@ -81,7 +80,7 @@ public class BalloonControllerTest {
         List<String> transmittedDataKeys = loadTransmittedDataKeys("test/testKeys.json");
         List<SensorController> sensors = new ArrayList<>();
         sensors.add(this.mockSensorController);
-        BalloonController controller = BalloonController.createBalloonController(transmittedDataKeys, 
+        BalloonController controller = BalloonControllerFactory.createBalloonController(transmittedDataKeys, 
                 new DataModelConverter(), this.properties, sensors, 
                 new ArrayList<DataWriter>(), testDataDir);
         return controller;
@@ -109,41 +108,6 @@ public class BalloonControllerTest {
         expected.add("second");
         expected.add("last");
         assertEquals(expected, actual);
-    }
-
-    /**
-     * Test of createBalloonController method, of class BalloonController.
-     * @throws java.lang.Exception
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateBalloonControllerThrowsWithNullKeys() throws Exception {
-        BalloonController.createBalloonController(null, new DataModelConverter(), this.properties, 
-                new ArrayList<SensorController>(), new ArrayList<DataWriter>(), testDataDir);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateBalloonControllerThrowsWithEmptyKeysArray() throws IOException  {
-        BalloonController.createBalloonController(new ArrayList<String>(), new DataModelConverter(), 
-                this.properties, new ArrayList<SensorController>(), new ArrayList<DataWriter>(), 
-                testDataDir);
-    }
-    
-    @Test
-    public void testCreateBalloonControllerSucceedsWithValidKeysFilePath() throws IOException  {
-        BalloonController controller = createDefaultController();
-        assertNotNull(controller);
-        assertNotNull(controller.getCameraSensor());
-        assertNotNull(controller.getCameraWriter());
-        assertNotNull(controller.getConverter());
-        assertNotNull(controller.getDataWriters());
-        assertNotNull(controller.getSensors());
-        assertEquals("$$latex", controller.getPayloadName());
-        
-        List<String> expectedKeys = new ArrayList<>();
-        expectedKeys.add("first");
-        expectedKeys.add("second");
-        expectedKeys.add("last");
-        assertEquals(expectedKeys, controller.getTransmittedTelemetryKeys());
     }
     
     @Test(expected = IllegalArgumentException.class)

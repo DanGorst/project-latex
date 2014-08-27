@@ -7,6 +7,7 @@
 package project.latex.balloon.writer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.FileAppender;
@@ -25,10 +26,12 @@ public class FileDataWriter implements DataWriter {
     private final DataModelConverter converter;
     final static String fileName = "dataModel.csv";
     private final List<String> dataKeys;
+    private FileAppender fileAppender;
     
     public FileDataWriter(List<String> dataKeys, DataModelConverter converter, Logger logger, FileAppender fileAppender)   {
         this.logger = logger;
-        this.logger.addAppender(fileAppender);
+        this.fileAppender = fileAppender;
+        this.logger.addAppender(this.fileAppender);
         this.converter = converter;
         this.dataKeys = dataKeys;
         writeHeaders();
@@ -61,5 +64,14 @@ public class FileDataWriter implements DataWriter {
     @Override
     public void writeData(Map<String, Object> data) {
         logger.info(this.converter.convertDataToCsvString(this.dataKeys, data));
+    }
+
+    public void closeAndDeleteFile() throws IOException {
+        String filePath = fileAppender.getFile();
+        fileAppender.close();
+        File file = new File(filePath);
+        if (!file.delete()) {
+            throw new IOException("Unable to delete file: " + filePath);
+        }
     }
 }
