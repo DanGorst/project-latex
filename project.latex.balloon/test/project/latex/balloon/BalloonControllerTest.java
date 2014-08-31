@@ -158,6 +158,7 @@ public class BalloonControllerTest {
     @Test
     public void testRunSucceedsIfValidPropertiesArePassed() throws IOException, SensorReadFailedException {
         this.properties.setProperty("time.key", "time");
+        this.properties.setProperty("date.key", "date");
         this.properties.setProperty("payloadName.key", "payload_name");
         this.properties.setProperty("sentenceId.key", "sentence_id");
         this.properties.setProperty("altitude.key", "altitude");
