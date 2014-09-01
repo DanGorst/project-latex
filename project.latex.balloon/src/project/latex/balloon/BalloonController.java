@@ -24,7 +24,7 @@ import org.apache.log4j.PropertyConfigurator;
 import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
-import project.latex.balloon.sensor.gps.SensorReadFailedException;
+import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.sensor.gps.GPSSensor;
 import project.latex.balloon.sensor.gps.GPSSensorController;
 import project.latex.balloon.writer.CameraFileWriter;
@@ -120,14 +120,15 @@ public class BalloonController {
         // Initialise our sensors and data writers
         List<SensorController> sensors = new ArrayList<>();
 
-        GPSSensor ublox = new GPSSensor("GPGGA","GPRMC");
+        GPSSensor ublox = new GPSSensor("GPGGA", "GPRMC");
         sensors.add(new GPSSensorController(ublox,
-                properties.getProperty("time.key"), 
+                properties.getProperty("time.key"),
                 properties.getProperty("latitude.key"),
-                properties.getProperty("longitude.key"), 
+                properties.getProperty("longitude.key"),
                 properties.getProperty("altitude.key"),
                 properties.getProperty("heading.key"),
-                properties.getProperty("speed.key")));
+                properties.getProperty("speed.key"),
+                properties.getProperty("date.key")));
 
         List<DataWriter> dataWriters = new ArrayList<>();
         dataWriters.add(new ConsoleDataWriter());
@@ -219,7 +220,7 @@ public class BalloonController {
             throw new IllegalArgumentException("Null time key specified");
         }
         String dateKey = properties.getProperty("date.key");
-        if (dateKey == null)    {
+        if (dateKey == null) {
             throw new IllegalArgumentException("Null date key specified");
         }
         String payloadNameKey = properties.getProperty("payloadName.key");
@@ -248,6 +249,8 @@ public class BalloonController {
 
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, 0);
+            
+            // Get readings from each of our sensors.
             for (SensorController controller : this.sensors) {
                 try {
                     Map<String, Object> sensorData = controller.getCurrentData();
@@ -257,29 +260,29 @@ public class BalloonController {
                 } catch (SensorReadFailedException ex) {
                     logger.error(ex);
                 }
-
-                // Write the model
-                for (DataWriter dataWriter : this.dataWriters) {
-                    try {
-                        dataWriter.writeData(data);
-                    } // If we get some kind of exception, let's catch it here rather than just crashing the app
-                    catch (Exception e) {
-                        logger.error(e);
-                    }
-                }
-
-                // Find any new camera images and write them out
-                if (this.cameraSensor != null) {
-                    List<String> imageFiles = this.cameraSensor.getImageFileNames();
-                    try {
-                        this.cameraWriter.writeImageFiles(imageFiles);
-                    } catch (DataWriteFailedException ex) {
-                        logger.error("Failed to write image files", ex);
-                    }
-                }
-
-                runner.controllerFinishedRunLoop(data);
             }
+
+            // Write the model
+            for (DataWriter dataWriter : this.dataWriters) {
+                try {
+                    dataWriter.writeData(data);
+                } // If we get some kind of exception, let's catch it here rather than just crashing the app
+                catch (Exception e) {
+                    logger.error(e);
+                }
+            }
+
+            // Find any new camera images and write them out
+            if (this.cameraSensor != null) {
+                List<String> imageFiles = this.cameraSensor.getImageFileNames();
+                try {
+                    this.cameraWriter.writeImageFiles(imageFiles);
+                } catch (DataWriteFailedException ex) {
+                    logger.error("Failed to write image files", ex);
+                }
+            }
+
+            runner.controllerFinishedRunLoop(data);            
         }
     }
 }

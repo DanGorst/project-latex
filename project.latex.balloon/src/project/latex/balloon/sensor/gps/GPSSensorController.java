@@ -5,6 +5,7 @@
  */
 package project.latex.balloon.sensor.gps;
 
+import project.latex.balloon.sensor.SensorReadFailedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

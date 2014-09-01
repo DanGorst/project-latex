@@ -5,6 +5,7 @@
  */
 package project.latex.balloon.sensor.gps;
 
+import project.latex.balloon.sensor.SensorReadFailedException;
 import java.util.HashMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -32,7 +33,7 @@ public class NMEASentenceParserTest {
     public void testShouldReturnEmptyHashMapForUnsupportedSentence() throws Exception {
         String NMEASentence = "abcde,093509.00,5055.09099,N,00218.84655,W,1,04,6.50,101.6,M,48.2,M,,*4A";
         HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
-        assert (result.isEmpty());
+        assertTrue(result.isEmpty());
     }
 
     @Test

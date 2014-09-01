@@ -7,7 +7,6 @@
 package project.latex.balloon.sensor;
 
 import java.util.Map;
-import project.latex.balloon.sensor.gps.SensorReadFailedException;
 
 /**
  *

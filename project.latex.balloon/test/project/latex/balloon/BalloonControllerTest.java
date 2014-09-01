@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import project.latex.balloon.sensor.SensorController;
-import project.latex.balloon.sensor.gps.SensorReadFailedException;
+import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.writer.DataWriter;
 
 /**

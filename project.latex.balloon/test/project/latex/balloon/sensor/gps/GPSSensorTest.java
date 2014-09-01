@@ -5,12 +5,10 @@
  */
 package project.latex.balloon.sensor.gps;
 
+import project.latex.balloon.sensor.SensorReadFailedException;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialPortException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -111,7 +109,7 @@ public class GPSSensorTest {
         GPSSensor mGps = new GPSSensor(serial,"GPRMC");
         String expected = "$GPRMC";
         String result = mGps.getNmeaSentence("GPRMC");
-        assert(expected.equals(result));   
+        assertTrue(expected.equals(result));   
     }
 
 }

@@ -5,11 +5,11 @@
  */
 package project.latex.balloon.sensor.gps;
 
+import project.latex.balloon.sensor.SensorReadFailedException;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.pi4j.io.serial.SerialPortException;
 import java.util.HashSet;
-import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class GPSSensor {
 
-    private static final Logger logger = Logger.getLogger(GPSSensorController.class);
+    private static final Logger logger = Logger.getLogger(GPSSensor.class);
     private Serial serial;
     private HashSet<String> supportedNmeaSentences = new HashSet<String>();
 
@@ -48,7 +48,7 @@ public class GPSSensor {
 
         try {
             serial.open(Serial.DEFAULT_COM_PORT, 9600);
-            // Check that the serial port read buffer is receiving data.
+            // Make sure that the serial port read buffer is receiving data.
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException ex) {
@@ -59,7 +59,7 @@ public class GPSSensor {
                         + " read, check hardware connections.");
             }
 
-            // Find GPXXX sentence
+            // Get a GPXXX sentence
             for (int i = 0; true; i++) {
                 sentence = "";
                 // Find the start of a new line and move to its first character.
@@ -68,19 +68,19 @@ public class GPSSensor {
                     if (currentChar == '$') {
                         sentence += currentChar;
                         break;
-                    } else if (j==200) {
-                        throw new SensorReadFailedException("Incompatible sensor hardware.");
+                    } else if (j==250) {
+                        throw new SensorReadFailedException("Cannot read incompatible sensor hardware.");
                     }
                 }
-                // Create a String of all characters until the end of the line.
+                // Build a String of all characters in the
                 for (int j = 0; true; j++) {
                     currentChar = serial.read();
                     if (currentChar == '$') {
                         break;
                     }
                     sentence += currentChar;
-                    if (j==200) {
-                        throw new SensorReadFailedException("Incompatible sensor hardware.");
+                    if (j==250) {
+                        throw new SensorReadFailedException("Cannot read incompatible sensor hardware.");
                     }
                     
                 }
@@ -88,14 +88,13 @@ public class GPSSensor {
                 // the loop.
                 if (sentence.length() >= 6 && sentence.substring(1, 6).equals(GPXXX)) {
                     break;
-                } else if (i == 20) {
-                    // If after 20 iterations, the specified sentence type is not found then 
-                    // the GPS module must not support GPXXX sentence type.
-                    throw new SensorReadFailedException("Sensor hardware does not support "
+                } else if (i == 30) {
+                    // If after 30 iterations, the specified sentence type is not found then 
+                    // the GPS module must not support GPXXX sentence type or there is no GPS fix.
+                    throw new SensorReadFailedException("No GPS fix or sensor hardware does not support "
                         + GPXXX + " sentences");
                 }   
             }
-
         } catch (UnsatisfiedLinkError error) {
             throw new SensorReadFailedException("Unsatisfied link error");
         } catch (SerialPortException ex) {

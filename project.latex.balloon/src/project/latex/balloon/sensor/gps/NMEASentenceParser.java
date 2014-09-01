@@ -9,12 +9,13 @@ package project.latex.balloon.sensor.gps;
  *
  * @author will
  */
+import project.latex.balloon.sensor.SensorReadFailedException;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 public class NMEASentenceParser {
 
-    private static final Logger logger = Logger.getLogger(GPSSensorController.class);
+    private static final Logger logger = Logger.getLogger(NMEASentenceParser.class);
 
     private NMEASentenceParser() {
     }

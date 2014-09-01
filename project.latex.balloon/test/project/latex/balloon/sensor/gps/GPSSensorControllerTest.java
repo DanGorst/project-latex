@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.anyString;
@@ -66,12 +67,12 @@ public class GPSSensorControllerTest {
                 properties.getProperty("speed.key"));
         
         HashMap<String, Object> result = mController.getCurrentData();
-        assert(!result.isEmpty());
-        assert(result.get("time").equals("1"));
-        assert(result.get("latitude").equals("2"));
-        assert(result.get("longitude").equals("3"));
-        assert(result.get("altitude").equals("4"));
-        assert(result.get("speed").equals("5"));            
+        assertTrue(!result.isEmpty());
+        assertTrue(result.get("time").equals("1"));
+        assertTrue(result.get("latitude").equals("2"));
+        assertTrue(result.get("longitude").equals("3"));
+        assertTrue(result.get("altitude").equals("4"));
+        assertTrue(result.get("speed").equals("5"));            
     }
     
     
@@ -103,16 +104,16 @@ public class GPSSensorControllerTest {
                 properties.getProperty("altitude.key"));
         
         HashMap<String, Object> result = mController.getCurrentData();
-        assert(!result.isEmpty());
-        assert(result.get("time").equals("1"));
+        assertTrue(!result.isEmpty());
+        assertTrue(result.get("time").equals("1"));
         result.remove("time");
-        assert(result.get("latitude").equals("2"));
+        assertTrue(result.get("latitude").equals("2"));
         result.remove("latitude");
-        assert(result.get("longitude").equals("3"));
+        assertTrue(result.get("longitude").equals("3"));
         result.remove("longitude");
-        assert(result.get("altitude").equals("4"));
+        assertTrue(result.get("altitude").equals("4"));
         result.remove("altitude");
-        assert(result.isEmpty());        
+        assertTrue(result.isEmpty());        
     }
     
     @Test
@@ -139,7 +140,7 @@ public class GPSSensorControllerTest {
                 properties.getProperty("speed.key"));
         
         HashMap<String, Object> result = mController.getCurrentData();
-        assert(result.isEmpty());           
+        assertTrue(result.isEmpty());           
     }
     
     @Test
@@ -166,6 +167,6 @@ public class GPSSensorControllerTest {
         GPSSensorController mController = new GPSSensorController(ublox);
         
         HashMap<String, Object> result = mController.getCurrentData();
-        assert(result.isEmpty());         
+        assertTrue(result.isEmpty());         
     }
 }
