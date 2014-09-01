@@ -8,8 +8,11 @@ package project.latex.balloon.sensor;
 
 /**
  *
- * @author dgorst
+ * @author will
  */
-public interface AltimeterSensorController {
-    float getHeight();
+public class SensorReadFailedException extends Exception {
+    
+    public SensorReadFailedException(String message) {
+        super(message);
+    }   
 }

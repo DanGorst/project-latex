@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import project.latex.balloon.sensor.SensorController;
+import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.writer.DataWriter;
 
 /**
@@ -155,8 +156,9 @@ public class BalloonControllerTest {
     }
     
     @Test
-    public void testRunSucceedsIfValidPropertiesArePassed() throws IOException {
+    public void testRunSucceedsIfValidPropertiesArePassed() throws IOException, SensorReadFailedException {
         this.properties.setProperty("time.key", "time");
+        this.properties.setProperty("date.key", "date");
         this.properties.setProperty("payloadName.key", "payload_name");
         this.properties.setProperty("sentenceId.key", "sentence_id");
         this.properties.setProperty("altitude.key", "altitude");
