@@ -13,5 +13,5 @@ import java.util.Map;
  * @author Dan
  */
 public interface SensorController {
-    Map<String, Object> getCurrentData();
+    Map<String, Object> getCurrentData() throws SensorReadFailedException;
 }

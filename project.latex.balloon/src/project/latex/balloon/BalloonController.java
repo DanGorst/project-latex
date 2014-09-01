@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
+import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.writer.CameraDataWriter;
 import project.latex.writer.DataWriteFailedException;
@@ -74,7 +75,6 @@ public class BalloonController {
             logger.error(ex);
         }
     }
-    
     static File createDataFolder() throws IOException {
         // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
         // flight is then put into that folder
@@ -177,6 +177,10 @@ public class BalloonController {
         if (timeKey == null) {
             throw new IllegalArgumentException("Null time key specified");
         }
+        String dateKey = properties.getProperty("date.key");
+        if (dateKey == null) {
+            throw new IllegalArgumentException("Null date key specified");
+        }
         String payloadNameKey = properties.getProperty("payloadName.key");
         if (payloadNameKey == null) {
             throw new IllegalArgumentException("Null payload name key specified");
@@ -190,18 +194,29 @@ public class BalloonController {
             // Build up a model of the current balloon state from the sensors
             Map<String, Object> data = new HashMap<>();
 
-            // For now we put the date into the same format as the Icarus test data, 
+            // Add entries for date and time. If the GPS module is running, that will 
+            // override these values when we read data from it.
+            // For now we put the date into the same timeFormat as the Icarus test data, 
             // as this means we don't need to change the receiver to be able to handle both
             // sets of data
-            DateFormat format = new SimpleDateFormat("HH:mm:ss");
-            data.put(timeKey, format.format(new Date()));
+            Date now = new Date();
+            DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            data.put(timeKey, timeFormat.format(now));
+            DateFormat dateFormat = new SimpleDateFormat("ddMMYY");
+            data.put(dateKey, dateFormat.format(now));
 
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, 0);
+            
+            // Get readings from each of our sensors.
             for (SensorController controller : this.sensors) {
-                Map<String, Object> sensorData = controller.getCurrentData();
-                for (String key : sensorData.keySet()) {
-                    data.put(key, sensorData.get(key));
+                try {
+                    Map<String, Object> sensorData = controller.getCurrentData();
+                    for (String key : sensorData.keySet()) {
+                        data.put(key, sensorData.get(key));
+                    }
+                } catch (SensorReadFailedException ex) {
+                    logger.error(ex);
                 }
             }
 
@@ -225,7 +240,7 @@ public class BalloonController {
                 }
             }
 
-            runner.controllerFinishedRunLoop(data);
+            runner.controllerFinishedRunLoop(data);            
         }
     }
 }

@@ -18,6 +18,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.SensorController;
+import project.latex.balloon.sensor.gps.GPSSensorController;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
 import project.latex.balloon.writer.HttpDataWriter;
@@ -62,8 +63,9 @@ public class BalloonControllerFactoryTest {
     @Test
     public void testCreateSensorControllers() {
         List<SensorController> result = BalloonControllerFactory.createSensorControllers(properties);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertTrue(result.get(0) instanceof DummySensorController);
+        assertTrue(result.get(1) instanceof GPSSensorController);
     }
 
     /**
