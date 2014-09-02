@@ -21,6 +21,8 @@ import project.latex.writer.DataWriter;
 public class SerialDataWriter implements DataWriter {
 
     private static final Logger logger = Logger.getLogger(SerialDataWriter.class);
+    
+    public static final int BAUD_RATE = 9600;
 
     private final DataModelConverter converter;
     private final List<String> dataKeys;
@@ -32,7 +34,7 @@ public class SerialDataWriter implements DataWriter {
         this.serial = serial;
         
         // open the default serial port provided on the GPIO header
-        serial.open(Serial.DEFAULT_COM_PORT, 38400);
+        serial.open(Serial.DEFAULT_COM_PORT, BAUD_RATE);
 
         // Add a serial data listener to allow us to echo out any data written
         serial.addListener(new SerialDataListener() {

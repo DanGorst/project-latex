@@ -46,7 +46,7 @@ public class SerialDataWriterTest {
 
     @Test(expected = UnsatisfiedLinkError.class)
     public void testConstructorThrowsIfSerialPortCantOpen()    {
-        doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, 38400);
+        doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, SerialDataWriter.BAUD_RATE);
         writer = new SerialDataWriter(dataKeys, new DataModelConverter(), mockSerial);
     }
     
