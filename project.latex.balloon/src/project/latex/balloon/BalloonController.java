@@ -21,18 +21,11 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
-import project.latex.balloon.sensor.gps.GPSSensor;
-import project.latex.balloon.sensor.gps.GPSSensorController;
-import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
-import project.latex.balloon.writer.FileDataWriter;
-import project.latex.balloon.writer.HttpDataWriter;
 import project.latex.writer.CameraDataWriter;
-import project.latex.writer.ConsoleDataWriter;
 import project.latex.writer.DataWriteFailedException;
 import project.latex.writer.DataWriter;
 
@@ -69,12 +62,30 @@ public class BalloonController {
 
             Properties properties = loadProperties("config.properties");
             logger.info("Properties loaded");
-            BalloonController balloonController = createBalloonController("../telemetryKeys.json", properties);
+
+            List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
+            File dataFolder = createDataFolder();
+
+            BalloonController balloonController = BalloonControllerFactory.createBalloonController(properties, 
+                    transmittedDataKeys, dataFolder);
+
             logger.info("Balloon created");
             balloonController.run(new DefaultControllerRunner());
         } catch (IOException ex) {
             logger.error(ex);
         }
+    }
+    static File createDataFolder() throws IOException {
+        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
+        // flight is then put into that folder
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+        Date date = new Date();
+        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
+        File dataFolder = new File(baseUrl);
+        if (!dataFolder.mkdirs()) {
+            throw new IOException("Unable to create directory to contain sensor data logs");
+        }
+        return dataFolder;
     }
 
     private static Properties loadProperties(String propertiesFilePath) throws IOException {
@@ -111,59 +122,6 @@ public class BalloonController {
                 reader.close();
             }
         }
-    }
-
-    static BalloonController createBalloonController(String telemetryKeysFilePath, Properties properties) throws IOException {
-        List<String> transmittedDataKeys = loadTransmittedDataKeys(telemetryKeysFilePath);
-        DataModelConverter converter = new DataModelConverter();
-
-        // Initialise our sensors and data writers
-        List<SensorController> sensors = new ArrayList<>();
-
-        GPSSensor ublox = new GPSSensor("GPGGA", "GPRMC");
-        sensors.add(new GPSSensorController(ublox,
-                properties.getProperty("time.key"),
-                properties.getProperty("latitude.key"),
-                properties.getProperty("longitude.key"),
-                properties.getProperty("altitude.key"),
-                properties.getProperty("heading.key"),
-                properties.getProperty("speed.key"),
-                properties.getProperty("date.key")));
-
-        List<DataWriter> dataWriters = new ArrayList<>();
-        dataWriters.add(new ConsoleDataWriter());
-
-        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
-        // flight is then put into that folder
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
-        Date date = new Date();
-        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
-        File dataFolder = new File(baseUrl);
-        if (dataFolder.mkdirs()) {
-            dataWriters.add(new FileDataWriter(baseUrl, transmittedDataKeys, converter));
-        } else {
-            logger.info("Unable to create directory to contain sensor data logs");
-        }
-        // Until we have radio comms working, we use http instead
-        String receiverUrl = properties.getProperty("receiver.url");
-        dataWriters.add(new HttpDataWriter(transmittedDataKeys, converter, receiverUrl));
-
-        // Now initialise our camera systems
-        CameraSensorController cameraSensor = null;
-        try {
-            String imageDirectory = properties.getProperty("cameraDir");
-            cameraSensor = new CameraController(new File(imageDirectory));
-        } catch (IllegalArgumentException e) {
-            logger.error("Unable to create camera controller. No images will be detected from the camera.", e);
-        }
-
-        CameraDataWriter cameraWriter = null;
-        try {
-            cameraWriter = new CameraFileWriter(dataFolder);
-        } catch (IllegalArgumentException e) {
-            logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
-        }
-        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
     }
 
     public BalloonController(List<String> transmittedTelemetryKeys,

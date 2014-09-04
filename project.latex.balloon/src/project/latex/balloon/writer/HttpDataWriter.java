@@ -104,7 +104,7 @@ public class HttpDataWriter implements DataWriter {
         };
         
         String responseString = httpclient.execute(httppost, responseHandler);
-        System.out.println(responseString);
+        logger.info(responseString);
     }
     
     @Override
