@@ -22,7 +22,7 @@ public class SerialDataWriter implements DataWriter {
 
     private static final Logger logger = Logger.getLogger(SerialDataWriter.class);
     
-    public static final int BAUD_RATE = 9600;
+    public static final int BAUD_RATE = 50;
 
     private final DataModelConverter converter;
     private final List<String> dataKeys;
