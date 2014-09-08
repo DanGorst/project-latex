@@ -57,17 +57,18 @@ public class BalloonControllerFactory {
         List<DataWriter> dataWriters = new ArrayList<>();
         dataWriters.add(new FileDataWriter(dataFolder, transmittedDataKeys, converter));
 
-        try {
-            dataWriters.add(new SerialDataWriter(transmittedDataKeys, converter));
-        } catch (SerialPortException ex) {
-            logger.error(" ==>> SERIAL SETUP FAILED : " + ex.getMessage());
-            logger.error("Using HTTP data writer instead");
-            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
-        } catch (UnsatisfiedLinkError err) {
-            logger.error(err);
-            logger.error("Using HTTP data writer instead");
-            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
-        }
+//        try {
+//            dataWriters.add(new SerialDataWriter(transmittedDataKeys, converter));
+//        } catch (SerialPortException ex) {
+//            logger.error(" ==>> SERIAL SETUP FAILED : " + ex.getMessage());
+//            logger.error("Using HTTP data writer instead");
+//            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
+//        } catch (UnsatisfiedLinkError err) {
+//            logger.error(err);
+//            logger.error("Using HTTP data writer instead");
+//            dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
+//        }
+        dataWriters.add(createHttpDataWriter(properties, converter, transmittedDataKeys));
 
         return dataWriters;
     }

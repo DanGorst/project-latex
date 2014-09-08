@@ -36,13 +36,13 @@ public class SerialDataWriter implements DataWriter {
         // open the default serial port provided on the GPIO header
         serial.open(Serial.DEFAULT_COM_PORT, BAUD_RATE);
 
-        // Add a serial data listener to allow us to echo out any data written
-        serial.addListener(new SerialDataListener() {
-            @Override
-            public void dataReceived(SerialDataEvent event) {
-                logger.info(event.getData());
-            }
-        });
+//        // Add a serial data listener to allow us to echo out any data written
+//        serial.addListener(new SerialDataListener() {
+//            @Override
+//            public void dataReceived(SerialDataEvent event) {
+//                logger.info(event.getData());
+//            }
+//        });
     }
     
     public SerialDataWriter(List<String> dataKeys, DataModelConverter converter) {
