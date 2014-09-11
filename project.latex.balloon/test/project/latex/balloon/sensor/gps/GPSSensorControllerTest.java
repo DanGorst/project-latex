@@ -23,7 +23,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * @author will
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({NMEASentenceParser.class})
+@PrepareForTest({PolledSentenceParser.class})
 public class GPSSensorControllerTest {
     private final Properties properties;
             
@@ -55,8 +55,8 @@ public class GPSSensorControllerTest {
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
         when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
         // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
         // Inject mocked dependencies into the class to be tested.
         GPSSensorController mController = new GPSSensorController(ublox,
@@ -93,8 +93,8 @@ public class GPSSensorControllerTest {
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
         when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
         // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
         // Inject mocked dependencies into the class to be tested.
         GPSSensorController mController = new GPSSensorController(ublox,
@@ -128,8 +128,8 @@ public class GPSSensorControllerTest {
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
         when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
         // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
         // Inject mocked dependencies into the class to be tested.
         GPSSensorController mController = new GPSSensorController(ublox,
@@ -160,8 +160,8 @@ public class GPSSensorControllerTest {
         when(ublox.getNmeaSentence(anyString())).thenReturn("");
         when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
         // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
         // Inject mocked dependencies into the class to be tested.
         GPSSensorController mController = new GPSSensorController(ublox);

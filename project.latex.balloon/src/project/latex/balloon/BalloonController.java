@@ -25,7 +25,7 @@ import project.latex.balloon.sensor.CameraController;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
-import project.latex.balloon.sensor.gps.GPSSensor;
+import project.latex.balloon.sensor.gps.UBloxGPSSensor;
 import project.latex.balloon.sensor.gps.GPSSensorController;
 import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataModelConverter;
@@ -119,16 +119,20 @@ public class BalloonController {
 
         // Initialise our sensors and data writers
         List<SensorController> sensors = new ArrayList<>();
-
-        GPSSensor ublox = new GPSSensor("GPGGA", "GPRMC");
-        sensors.add(new GPSSensorController(ublox,
+        UBloxGPSSensor ublox;
+        
+        try {
+            ublox = new UBloxGPSSensor();
+            sensors.add(new GPSSensorController(ublox,
                 properties.getProperty("time.key"),
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"),
                 properties.getProperty("altitude.key"),
                 properties.getProperty("heading.key"),
-                properties.getProperty("speed.key"),
-                properties.getProperty("date.key")));
+                properties.getProperty("speed.key")));
+        } catch (SensorReadFailedException ex) {
+            logger.error(ex);
+        }
 
         List<DataWriter> dataWriters = new ArrayList<>();
         dataWriters.add(new ConsoleDataWriter());
@@ -249,7 +253,7 @@ public class BalloonController {
 
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, 0);
-            
+
             // Get readings from each of our sensors.
             for (SensorController controller : this.sensors) {
                 try {
@@ -282,7 +286,7 @@ public class BalloonController {
                 }
             }
 
-            runner.controllerFinishedRunLoop(data);            
+            runner.controllerFinishedRunLoop(data);
         }
     }
 }

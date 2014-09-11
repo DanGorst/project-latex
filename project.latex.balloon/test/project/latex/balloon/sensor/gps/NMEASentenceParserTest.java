@@ -19,20 +19,20 @@ public class NMEASentenceParserTest {
     @Test (expected = SensorReadFailedException.class)
     public void testShouldThrowIfZeroFixQualityInGppgaSentence() throws Exception {
         String NMEASentence = "$GPGGA,093509.00,5055.09099,N,00218.84655,W,0,04,6.50,101.6,M,48.2,M,,*4A";
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
     }
     
     @Test (expected = SensorReadFailedException.class)
     public void testShouldThrowIfStatusVoidInGprmcSentence() throws Exception {
         String NMEASentence = "$GPRMC,093510.00,V,5055.09108,N,00218.84580,W,0.669,085.5,190814,,,A*6F";
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
     }
     
 
     @Test
     public void testShouldReturnEmptyHashMapForUnsupportedSentence() throws Exception {
         String NMEASentence = "abcde,093509.00,5055.09099,N,00218.84655,W,1,04,6.50,101.6,M,48.2,M,,*4A";
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         assertTrue(result.isEmpty());
     }
 
@@ -44,7 +44,7 @@ public class NMEASentenceParserTest {
         String expectedLong = "2.314";
         String expectedAlt = "101.6";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String time = result.get("time");
         String latitude = result.get("latitude");
         String longitude = result.get("longitude");
@@ -64,7 +64,7 @@ public class NMEASentenceParserTest {
         String expectedLong = "N/A";
         String expectedAlt = "N/A";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String time = result.get("time");
         String latitude = result.get("latitude");
         String longitude = result.get("longitude");
@@ -84,7 +84,7 @@ public class NMEASentenceParserTest {
         String expectedLong = "2.314";
         String expectedAlt = "101.6";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String time = result.get("time");
         String latitude = result.get("latitude");
         String longitude = result.get("longitude");
@@ -102,7 +102,7 @@ public class NMEASentenceParserTest {
         String expectedLong = "-2.314";
         String expectedAlt = "101.6";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String time = result.get("time");
         String latitude = result.get("latitude");
         String longitude = result.get("longitude");
@@ -120,7 +120,7 @@ public class NMEASentenceParserTest {
         String expectedSpeed = "1.238";
         String expectedHeading = "085.5";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String date = result.get("date");
         String speed = result.get("speed");
         String heading = result.get("heading");
@@ -137,7 +137,7 @@ public class NMEASentenceParserTest {
         String expectedSpeed = "N/A";
         String expectedHeading = "N/A";
 
-        HashMap<String, String> result = NMEASentenceParser.parse(NMEASentence);
+        HashMap<String, String> result = PolledSentenceParser.parse(NMEASentence);
         String date = result.get("date");
         String speed = result.get("speed");
         String heading = result.get("heading");
