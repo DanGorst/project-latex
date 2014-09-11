@@ -24,21 +24,20 @@ public class PolledSentenceParser {
         HashMap<String, String> polledData = new HashMap<>();
         String[] polledTokens = polledSentence.split(",", -1);
 
-        // Do the checksum for the given data.
-        try {
-            String expectedChecksum = calculateChecksum(polledSentence);
-            int checksumToken = polledTokens.length - 1;
-            String receivedChecksum = polledTokens[checksumToken].substring(2, 4);
+        if (polledTokens[0].equals("$PUBX") && polledTokens.length == 21) {
+            // Do the checksum for the given data.
+            try {
+                String expectedChecksum = calculateChecksum(polledSentence);
+                String receivedChecksum = polledTokens[20].substring(2, 4);
 
-            if (!receivedChecksum.equals(expectedChecksum)) {
-                throw new SensorReadFailedException("Invalid checksum for GPS data.");
+                if (!receivedChecksum.equals(expectedChecksum)) {
+                    throw new SensorReadFailedException("Invalid checksum for GPS data.");
+                }
+            } catch (StringIndexOutOfBoundsException ex) {
+                throw new SensorReadFailedException("Invalid checksum format, "
+                        + "cannot do checksum" + ex);
             }
-        } catch (StringIndexOutOfBoundsException ex) {
-            throw new SensorReadFailedException("Invalid checksum format, "
-                    + "cannot do checksum" + ex);
-        }
 
-        if (polledTokens[0].equals("$PUBX")) {
             polledData = parseTokens(polledTokens);
         } else {
             throw new SensorReadFailedException("Invalid polled sentence,"
@@ -75,8 +74,9 @@ public class PolledSentenceParser {
         HashMap<String, String> parsedData = new HashMap<>();
 
         // Check that we hava a GPS fix.
-        if (polledTokens[3].equals("")) {
-            throw new SensorReadFailedException("No GPS Fix");
+        if (polledTokens[8].equals("NF")) {
+            logger.info("No GPS Fix");
+            return parsedData;
         }
 
         // Get time as "HH:MM:SS".

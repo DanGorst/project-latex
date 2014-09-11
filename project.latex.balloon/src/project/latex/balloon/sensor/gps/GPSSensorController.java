@@ -39,7 +39,7 @@ public class GPSSensorController implements SensorController {
         // the data corrsponding to matching keys.
         for (String key : keys) {
             if (allData.get(key) == null) {
-                logger.error("Invalid key: " + key);
+                logger.info("Data not available for key: " + key);
             } else {
                 requestedData.put(key, allData.get(key));
             }
