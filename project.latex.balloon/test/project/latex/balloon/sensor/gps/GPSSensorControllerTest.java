@@ -23,7 +23,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * @author will
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({NMEASentenceParser.class})
+@PrepareForTest({PolledSentenceParser.class})
 public class GPSSensorControllerTest {
     private final Properties properties;
             
@@ -47,26 +47,20 @@ public class GPSSensorControllerTest {
         parsedSentence.put("altitude", "4");
         parsedSentence.put("speed", "5");  
 
-        // Mock an instance of GPSSensor.
-        GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<>();
-        supportedNmeaSentences.add("GPGGA");
-        supportedNmeaSentences.add("GPRMC");
-        when(ublox.getNmeaSentence(anyString())).thenReturn("");
-        when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
-        // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        UBloxGPSSensor ublox = mock(UBloxGPSSensor.class);
+        when(ublox.getPolledSentence()).thenReturn("");
+
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        // Inject mocked dependencies into the class to be tested.
-        GPSSensorController mController = new GPSSensorController(ublox,
+        GPSSensorController controller = new GPSSensorController(ublox,
                 properties.getProperty("time.key"),
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"),
                 properties.getProperty("altitude.key"),
                 properties.getProperty("speed.key"));
         
-        HashMap<String, Object> result = mController.getCurrentData();
+        HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(!result.isEmpty());
         assertTrue(result.get("time").equals("1"));
         assertTrue(result.get("latitude").equals("2"));
@@ -77,7 +71,7 @@ public class GPSSensorControllerTest {
     
     
      @Test
-    public void testShouldReturnKeysOnlyForParsedSentenceDataThatExists() throws Exception {
+    public void testShouldReturnOnlyKeysCorrespodingToParsedSentenceData() throws Exception {
         HashMap<String, String> parsedSentence = new HashMap<>();
         parsedSentence.put("time", "1");
         parsedSentence.put("latitude", "2");
@@ -85,25 +79,20 @@ public class GPSSensorControllerTest {
         parsedSentence.put("altitude", "4");
         parsedSentence.put("speed", "5");  
 
-        // Mock an instance of GPSSensor.
-        GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<>();
-        supportedNmeaSentences.add("GPGGA");
-        supportedNmeaSentences.add("GPRMC");
-        when(ublox.getNmeaSentence(anyString())).thenReturn("");
-        when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
-        // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+
+        UBloxGPSSensor ublox = mock(UBloxGPSSensor.class);
+        when(ublox.getPolledSentence()).thenReturn("");
+
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        // Inject mocked dependencies into the class to be tested.
-        GPSSensorController mController = new GPSSensorController(ublox,
+        GPSSensorController controller = new GPSSensorController(ublox,
                 properties.getProperty("time.key"),
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"),
                 properties.getProperty("altitude.key"));
         
-        HashMap<String, Object> result = mController.getCurrentData();
+        HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(!result.isEmpty());
         assertTrue(result.get("time").equals("1"));
         result.remove("time");
@@ -120,26 +109,20 @@ public class GPSSensorControllerTest {
     public void testShouldReturnNoKeysWhenNoDataInParsedSentence() throws Exception {
         HashMap<String, String> parsedSentence = new HashMap<>();
 
-        // Mock an instance of GPSSensor.
-        GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<>();
-        supportedNmeaSentences.add("GPGGA");
-        supportedNmeaSentences.add("GPRMC");
-        when(ublox.getNmeaSentence(anyString())).thenReturn("");
-        when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
-        // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+        UBloxGPSSensor ublox = mock(UBloxGPSSensor.class);
+        when(ublox.getPolledSentence()).thenReturn("");
+
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        // Inject mocked dependencies into the class to be tested.
-        GPSSensorController mController = new GPSSensorController(ublox,
+        GPSSensorController controller = new GPSSensorController(ublox,
                 properties.getProperty("time.key"),
                 properties.getProperty("latitude.key"),
                 properties.getProperty("longitude.key"),
                 properties.getProperty("altitude.key"),
                 properties.getProperty("speed.key"));
         
-        HashMap<String, Object> result = mController.getCurrentData();
+        HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(result.isEmpty());           
     }
     
@@ -152,21 +135,16 @@ public class GPSSensorControllerTest {
         parsedSentence.put("altitude", "4");
         parsedSentence.put("speed", "5");  
 
-        // Mock an instance of GPSSensor.
-        GPSSensor ublox = mock(GPSSensor.class);
-        HashSet<String> supportedNmeaSentences = new HashSet<>();
-        supportedNmeaSentences.add("GPGGA");
-        supportedNmeaSentences.add("GPRMC");
-        when(ublox.getNmeaSentence(anyString())).thenReturn("");
-        when(ublox.getSupportedNmeaSentences()).thenReturn(supportedNmeaSentences);
-        // Mock static class NMEASentenceParser.
-        mockStatic(NMEASentenceParser.class);
-        when(NMEASentenceParser.parse(anyString())).thenReturn(parsedSentence);
+
+        UBloxGPSSensor ublox = mock(UBloxGPSSensor.class);
+        when(ublox.getPolledSentence()).thenReturn("");
+
+        mockStatic(PolledSentenceParser.class);
+        when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        // Inject mocked dependencies into the class to be tested.
-        GPSSensorController mController = new GPSSensorController(ublox);
+        GPSSensorController controller = new GPSSensorController(ublox);    
+        HashMap<String, Object> result = controller.getCurrentData();
         
-        HashMap<String, Object> result = mController.getCurrentData();
         assertTrue(result.isEmpty());         
     }
 }

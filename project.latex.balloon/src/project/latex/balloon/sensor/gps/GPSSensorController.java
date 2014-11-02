@@ -19,10 +19,10 @@ import project.latex.balloon.sensor.SensorController;
 public class GPSSensorController implements SensorController {
 
     private static final Logger logger = Logger.getLogger(GPSSensorController.class);
-    private final GPSSensor gps;
+    private final UBloxGPSSensor gps;
     private final ArrayList<String> keys = new ArrayList<>();
-    
-    public GPSSensorController(GPSSensor gps, String... keys) {
+
+    public GPSSensorController(UBloxGPSSensor gps, String... keys) {
         this.keys.addAll(Arrays.asList(keys));
         this.gps = gps;
     }
@@ -30,23 +30,21 @@ public class GPSSensorController implements SensorController {
     @Override
     public HashMap<String, Object> getCurrentData() throws SensorReadFailedException {
         HashMap<String, Object> requestedData = new HashMap<>();
-        HashMap<String, Object> allData = new HashMap<>();
-        
+        HashMap<String, String> allData = new HashMap<>();
+
         // Get and parse all data from all supported sentence types. 
-        for (String sentence : gps.getSupportedNmeaSentences()) {
-            allData.putAll(NMEASentenceParser.parse(gps.getNmeaSentence(sentence)));
-        }
-        
+        allData = PolledSentenceParser.parse(gps.getPolledSentence());
+
         // Match this controllers keys to the keys in allData and collect together 
         // the data corrsponding to matching keys.
         for (String key : keys) {
             if (allData.get(key) == null) {
-                logger.error("Invalid key: " + key);
+                logger.info("Data not available for key: " + key);
             } else {
-                requestedData.put(key,allData.get(key));
+                requestedData.put(key, allData.get(key));
             }
         }
-        
+
         return requestedData;
     }
 }
