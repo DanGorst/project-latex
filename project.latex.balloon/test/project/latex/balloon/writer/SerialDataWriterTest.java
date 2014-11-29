@@ -59,7 +59,7 @@ public class SerialDataWriterTest {
         dataModel.put("Test", "DataString");
         dataModel.put("Test2", "HelloWorld");
         writer.writeData(dataModel);
-        verify(mockSerial).writeln("DataString,HelloWorld*2F");
+        verify(mockSerial).writeln("DataString,HelloWorld*5774081a");
     }
     
     @Test
@@ -68,7 +68,7 @@ public class SerialDataWriterTest {
         dataModel.put("Invalid", "DataString");
         dataModel.put("Invalid2", "HelloWorld");
         writer.writeData(dataModel);
-        verify(mockSerial).writeln("99.99,99.99*2F");
+        verify(mockSerial).writeln("99.99,99.99*deb0251");
     }
     
     @Test(expected = IllegalArgumentException.class)

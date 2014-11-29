@@ -65,6 +65,7 @@ public class FileDataWriterTest {
 
     /**
      * Test of writeData method, of class FileDataWriter.
+     *
      * @throws project.latex.writer.DataWriteFailedException
      */
     @Test(expected = IllegalArgumentException.class)
@@ -73,7 +74,7 @@ public class FileDataWriterTest {
     }
     
     @Test
-    public void testHeadersAreWrittenOnceBeforeData()   {
+    public void testHeadersAreWrittenOnceBeforeData() {
         try {
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("Value", 5);
@@ -84,7 +85,10 @@ public class FileDataWriterTest {
             writer.writeData(dataMap);
             
             verify(mockLogger).info("Date,Value");
-            verify(mockLogger, times(2)).info(modelDate.toString() + ",5");
+            String expectedDataString = modelDate.toString() + ",5";
+            
+            verify(mockLogger, times(2)).info(expectedDataString + "*" 
+                    + ChecksumGenerator.generateChecksum(expectedDataString));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

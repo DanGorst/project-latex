@@ -56,8 +56,6 @@ public class SerialDataWriter implements DataWriter {
         }
 
         String csvString = this.converter.convertDataToCsvString(dataKeys, dataModel);
-        // Add a placeholder string to represent the checksum which is normally transmitted
-        csvString += "*2F";
         serial.writeln(csvString);
     }
 }

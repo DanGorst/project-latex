@@ -83,7 +83,7 @@ public class DataModelConverterTest {
         data.put("First", 1.23);
         
         DataModelConverter instance = new DataModelConverter();
-        String expResult = "1.23,0.34";
+        String expResult = "1.23,0.34*88201b6";
         String result = instance.convertDataToCsvString(dataKeys, data);
         assertEquals(expResult, result);
     }
@@ -127,6 +127,6 @@ public class DataModelConverterTest {
         data.put("X", 0.34);
         data.put("Y", 1.23);
         String actual = converter.convertDataToCsvString(dataKeys, data);
-        assertEquals("99.99,99.99", actual);
+        assertEquals("99.99,99.99*deb0251", actual);
     }
 }

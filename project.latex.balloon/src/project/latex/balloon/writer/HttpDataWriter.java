@@ -114,8 +114,6 @@ public class HttpDataWriter implements DataWriter {
         }
         
         String csvString = this.converter.convertDataToCsvString(dataKeys, dataModel);
-        // Add a placeholder string to represent the checksum which is normally transmitted
-        csvString += "*2F";
         
         try {
             sendPostRequest(csvString);

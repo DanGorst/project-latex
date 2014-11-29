@@ -56,6 +56,8 @@ public class DataModelConverter {
             stringBuilder.append(",").append(getValueString(value));
         }
         
+        String checksumString = ChecksumGenerator.generateChecksum(stringBuilder.toString());
+        stringBuilder.append("*").append(checksumString);
         return stringBuilder.toString();
     }
     
