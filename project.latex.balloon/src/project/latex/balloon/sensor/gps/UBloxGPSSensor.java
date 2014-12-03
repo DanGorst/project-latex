@@ -9,7 +9,6 @@ import project.latex.balloon.sensor.SensorReadFailedException;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.pi4j.io.serial.SerialPortException;
-import java.io.IOException;
 import org.apache.log4j.Logger;
 
 /**
@@ -88,8 +87,6 @@ public class UBloxGPSSensor {
                             + "of data in serial port read buffer");
                 }
             }
-
-            System.out.println(sentence);
 
         } catch (UnsatisfiedLinkError error) {
             throw new SensorReadFailedException("Unsatisfied link error");
