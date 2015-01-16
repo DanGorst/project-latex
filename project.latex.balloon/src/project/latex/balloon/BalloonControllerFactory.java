@@ -83,7 +83,7 @@ public class BalloonControllerFactory {
         List<DataWriter> dataWriters = createDataWriters(properties,
                 transmittedDataKeys, converter, dataFolder);
         return createBalloonController(transmittedDataKeys,
-                converter, properties, sensors, dataWriters, dataFolder);
+                converter, properties, sensors, dataWriters, dataFolder, new UUIDSentenceIDGenerator());
     }
 
     static BalloonController createBalloonController(List<String> transmittedDataKeys,
@@ -91,7 +91,8 @@ public class BalloonControllerFactory {
             Properties properties,
             List<SensorController> sensors,
             List<DataWriter> dataWriters,
-            File dataFolder) throws IOException {
+            File dataFolder,
+            SentenceIdGenerator sentenceIdGenerator) throws IOException {
 
         if (transmittedDataKeys == null || transmittedDataKeys.isEmpty()) {
             throw new IllegalArgumentException("Cannot transmit data with no keys");
@@ -112,6 +113,7 @@ public class BalloonControllerFactory {
         } catch (IllegalArgumentException e) {
             logger.error("Unable to create camera file writer. No images will be saved in the flight directory");
         }
-        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties);
+        
+        return new BalloonController(transmittedDataKeys, converter, sensors, dataWriters, cameraSensor, cameraWriter, properties, sentenceIdGenerator);
     }
 }

@@ -50,6 +50,8 @@ public class BalloonController {
     private final CameraDataWriter cameraWriter;
 
     private final Properties properties;
+    
+    private final SentenceIdGenerator sentenceIdGenerator;
 
     /**
      * @param args the command line arguments
@@ -130,7 +132,8 @@ public class BalloonController {
             List<DataWriter> dataWriters,
             CameraSensorController cameraSensor,
             CameraDataWriter cameraWriter,
-            Properties properties) {
+            Properties properties,
+            SentenceIdGenerator sentenceIdGenerator) {
         this.transmittedTelemetryKeys = transmittedTelemetryKeys;
         this.converter = converter;
         this.sensors = sensors;
@@ -138,6 +141,7 @@ public class BalloonController {
         this.cameraSensor = cameraSensor;
         this.cameraWriter = cameraWriter;
         this.properties = properties;
+        this.sentenceIdGenerator = sentenceIdGenerator;
     }
 
     public List<String> getTransmittedTelemetryKeys() {
@@ -166,6 +170,10 @@ public class BalloonController {
 
     public CameraDataWriter getCameraWriter() {
         return cameraWriter;
+    }
+
+    public SentenceIdGenerator getSentenceIdGenerator() {
+        return sentenceIdGenerator;
     }
 
     void run(ControllerRunner runner) {
@@ -206,7 +214,7 @@ public class BalloonController {
             data.put(dateKey, dateFormat.format(now));
 
             data.put(payloadNameKey, this.payloadName);
-            data.put(sentenceIdKey, 0);
+            data.put(sentenceIdKey, this.sentenceIdGenerator.generateId());
             
             // Get readings from each of our sensors.
             for (SensorController controller : this.sensors) {
