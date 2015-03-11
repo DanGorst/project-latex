@@ -11,11 +11,11 @@ package project.latex.balloon.sensor;
  */
 public class CameraCableController {
 
-    private static final double ARMING_HEIGHT = 500;
+    private final double armingHeight;
 
-    private static final double SWITCHING_HEIGHT = 100;
+    private final double switchingHeight;
 
-    private static final int NUMBER_OF_READINGS_FOR_CONFIDENCE = 5;
+    static final int NUMBER_OF_READINGS_FOR_CONFIDENCE = 5;
 
     private int armingReadings = 0;
 
@@ -25,8 +25,14 @@ public class CameraCableController {
 
     private final SwitchingCable cable;
 
-    public CameraCableController(SwitchingCable cable) {
+    public CameraCableController(SwitchingCable cable, double armingHeight, double switchingHeight) {
         this.cable = cable;
+        this.armingHeight = armingHeight;
+        this.switchingHeight = switchingHeight;
+    }
+
+    public boolean isArmed() {
+        return armed;
     }
 
     /**
@@ -35,7 +41,7 @@ public class CameraCableController {
      *
      * @param height Current height of the balloon
      */
-    private void processHeight(double height) {
+    public void processHeight(double height) {
         if (!armed) {
             armIfReady(height);
         } else {
@@ -50,7 +56,7 @@ public class CameraCableController {
      * @param height
      */
     private void armIfReady(double height) {
-        if (height > ARMING_HEIGHT) {
+        if (height > armingHeight) {
             ++armingReadings;
         } else {
             armingReadings = 0;
@@ -67,7 +73,7 @@ public class CameraCableController {
      * @param height
      */
     private void switchIfReady(double height) {
-        if (height < SWITCHING_HEIGHT) {
+        if (height < switchingHeight) {
             ++switchingReadings;
         } else {
             switchingReadings = 0;
