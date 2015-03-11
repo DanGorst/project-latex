@@ -16,25 +16,25 @@ import static org.mockito.Mockito.verify;
  *
  * @author dgorst
  */
-public class SwitchingCableControllerTest {
+public class TransistorSwitchControllerTest {
 
     private static final double ARMING_HEIGHT = 500;
 
     private static final double SWITCHING_HEIGHT = 100;
 
-    private SwitchingCableController controller;
+    private TransistorSwitchController controller;
 
-    private SwitchingCable mockCable;
+    private TransistorSwitch mockSwitch;
 
     @Before
     public void setUp() {
-        mockCable = mock(SwitchingCable.class);
-        controller = new SwitchingCableController(mockCable, ARMING_HEIGHT, SWITCHING_HEIGHT);
+        mockSwitch = mock(TransistorSwitch.class);
+        controller = new TransistorSwitchController(mockSwitch, ARMING_HEIGHT, SWITCHING_HEIGHT);
     }
 
     @Test
     public void testControllerArmedAfterConsecutiveReadingsOverThreshold() {
-        for (int i = 0; i < SwitchingCableController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
+        for (int i = 0; i < TransistorSwitchController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
             assertFalse(controller.isArmed());
             controller.processHeight(ARMING_HEIGHT + 5);
         }
@@ -43,7 +43,7 @@ public class SwitchingCableControllerTest {
 
     @Test
     public void testControllerNotArmedAfterNonConsecutiveReadingsOverThreshold() {
-        for (int i = 0; i < SwitchingCableController.NUMBER_OF_READINGS_FOR_CONFIDENCE - 1; ++i) {
+        for (int i = 0; i < TransistorSwitchController.NUMBER_OF_READINGS_FOR_CONFIDENCE - 1; ++i) {
             assertFalse(controller.isArmed());
             controller.processHeight(ARMING_HEIGHT + 5);
         }
@@ -55,7 +55,7 @@ public class SwitchingCableControllerTest {
     }
 
     private void armController() {
-        for (int i = 0; i < SwitchingCableController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
+        for (int i = 0; i < TransistorSwitchController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
             controller.processHeight(ARMING_HEIGHT + 5);
         }
         assertTrue(controller.isArmed());
@@ -64,20 +64,20 @@ public class SwitchingCableControllerTest {
     @Test
     public void testControllerSwitchesAfterConsecutiveReadingsUnderThresholdWhenArmed() {
         armController();
-        for (int i = 0; i < SwitchingCableController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
+        for (int i = 0; i < TransistorSwitchController.NUMBER_OF_READINGS_FOR_CONFIDENCE; ++i) {
             controller.processHeight(SWITCHING_HEIGHT - 5);
         }
-        verify(mockCable).enable(true);
+        verify(mockSwitch).close();
     }
 
     @Test
     public void testControllerDoesntSwitchWithoutConsecutiveReadingsWhenArmed() {
         armController();
-        for (int i = 0; i < SwitchingCableController.NUMBER_OF_READINGS_FOR_CONFIDENCE - 1; ++i) {
+        for (int i = 0; i < TransistorSwitchController.NUMBER_OF_READINGS_FOR_CONFIDENCE - 1; ++i) {
             controller.processHeight(SWITCHING_HEIGHT - 5);
         }
         controller.processHeight(SWITCHING_HEIGHT + 5);
         controller.processHeight(SWITCHING_HEIGHT - 5);
-        verify(mockCable, never()).enable(true);
+        verify(mockSwitch, never()).close();
     }
 }

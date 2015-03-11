@@ -9,7 +9,7 @@ package project.latex.balloon.sensor;
  *
  * @author dgorst
  */
-public class SwitchingCableController {
+public class TransistorSwitchController {
 
     private final double armingHeight;
 
@@ -23,10 +23,10 @@ public class SwitchingCableController {
 
     private boolean armed;
 
-    private final SwitchingCable cable;
+    private final TransistorSwitch transistorSwitch;
 
-    public SwitchingCableController(SwitchingCable cable, double armingHeight, double switchingHeight) {
-        this.cable = cable;
+    public TransistorSwitchController(TransistorSwitch transistorSwitch, double armingHeight, double switchingHeight) {
+        this.transistorSwitch = transistorSwitch;
         this.armingHeight = armingHeight;
         this.switchingHeight = switchingHeight;
     }
@@ -37,7 +37,7 @@ public class SwitchingCableController {
 
     /**
      * Once we go above a threshold height, arm the controller. Once we
-     * subsequently go below a threshold, switch the cable on.
+     * subsequently go below a threshold, switch the transistorSwitch on.
      *
      * @param height Current height of the balloon
      */
@@ -67,8 +67,8 @@ public class SwitchingCableController {
     }
 
     /**
-     * Calculate if we should turn on the cable. For this, we require a number
-     * of consecutive readings below the switching threshold.
+     * Calculate if we should turn on the transistorSwitch. For this, we require
+     * a number of consecutive readings below the switching threshold.
      *
      * @param height
      */
@@ -79,7 +79,7 @@ public class SwitchingCableController {
             switchingReadings = 0;
         }
         if (switchingReadings >= NUMBER_OF_READINGS_FOR_CONFIDENCE) {
-            cable.enable(true);
+            transistorSwitch.close();
         }
     }
 }
