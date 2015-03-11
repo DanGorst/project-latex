@@ -9,7 +9,7 @@ package project.latex.balloon.sensor;
  *
  * @author dgorst
  */
-public class CameraCableController {
+public class SwitchingCableController {
 
     private final double armingHeight;
 
@@ -25,7 +25,7 @@ public class CameraCableController {
 
     private final SwitchingCable cable;
 
-    public CameraCableController(SwitchingCable cable, double armingHeight, double switchingHeight) {
+    public SwitchingCableController(SwitchingCable cable, double armingHeight, double switchingHeight) {
         this.cable = cable;
         this.armingHeight = armingHeight;
         this.switchingHeight = switchingHeight;
