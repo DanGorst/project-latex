@@ -24,6 +24,9 @@ public class TransistorSwitchRunner {
                 case "c":
                     mySwitch.close();
                     break;
+                default:
+                    System.out.println("Exiting the program");
+                    return;
             }
         }
     }
