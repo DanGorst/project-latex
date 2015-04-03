@@ -26,7 +26,7 @@ public class DefaultControllerRunner implements ControllerRunner {
     public void controllerFinishedRunLoop(Map<String, Object> data) {
         try {
             // Sleep this thread so we're not loading the CPU too much from the controller
-            Thread.sleep(1000);
+            Thread.sleep(60000);
         } catch (InterruptedException ex) {
             logger.error(ex);
         }
