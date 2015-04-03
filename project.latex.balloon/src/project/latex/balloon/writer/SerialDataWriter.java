@@ -40,7 +40,7 @@ public class SerialDataWriter implements DataWriter {
         serial.addListener(new SerialDataListener() {
             @Override
             public void dataReceived(SerialDataEvent event) {
-                logger.info(event.getData());
+                logger.info("Serial data received: " + event.getData());
             }
         });
     }
