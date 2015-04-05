@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package project.latex.writer;
-
-import java.util.List;
+package project.latex.balloon.writer;
 
 /**
  *
  * @author Dan
  */
-public interface CameraDataWriter {
-    void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException;
+public class DataWriteFailedException extends Exception {
+    public DataWriteFailedException(String message) {
+        super(message);
+    }
 }

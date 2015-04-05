@@ -8,8 +8,6 @@ package project.latex.balloon.writer;
 
 import java.io.File;
 import java.util.List;
-import project.latex.writer.CameraDataWriter;
-import project.latex.writer.DataWriteFailedException;
 
 /**
  *

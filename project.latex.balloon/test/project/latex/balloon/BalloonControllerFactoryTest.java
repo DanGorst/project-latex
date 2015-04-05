@@ -15,13 +15,16 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
+import project.latex.balloon.consumer.DataModelConsumer;
+import project.latex.balloon.consumer.TransistorSwitch;
+import project.latex.balloon.consumer.TransistorSwitchController;
 import project.latex.balloon.sensor.DummySensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.gps.GPSSensorController;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.FileDataWriter;
 import project.latex.balloon.writer.HttpDataWriter;
-import project.latex.writer.DataWriter;
+import project.latex.balloon.writer.DataWriter;
 
 /**
  *
@@ -34,6 +37,8 @@ public class BalloonControllerFactoryTest {
     private File testDataDir;
     private SensorController mockSensorController;
     private SentenceIdGenerator mockSentenceIdGenerator;
+    private TransistorSwitch transistorSwitch;
+    private BalloonControllerFactory balloonControllerFactory;
 
     public BalloonControllerFactoryTest() {
     }
@@ -52,6 +57,10 @@ public class BalloonControllerFactoryTest {
 
         this.mockSensorController = mock(SensorController.class);
         this.mockSentenceIdGenerator = mock(SentenceIdGenerator.class);
+        
+        this.transistorSwitch = mock(TransistorSwitch.class);
+        
+        this.balloonControllerFactory = new BalloonControllerFactory(this.transistorSwitch);
     }
 
     @After
@@ -64,7 +73,7 @@ public class BalloonControllerFactoryTest {
      */
     @Test
     public void testCreateSensorControllers() {
-        List<SensorController> result = BalloonControllerFactory.createSensorControllers(properties);
+        List<SensorController> result = balloonControllerFactory.createSensorControllers(properties);
         assertEquals(2, result.size());
         assertTrue(result.get(0) instanceof DummySensorController);
         assertTrue(result.get(1) instanceof GPSSensorController);
@@ -81,7 +90,7 @@ public class BalloonControllerFactoryTest {
     public void testCreateDataWriters() throws IOException {
         List<String> transmittedDataKeys = BalloonController.loadTransmittedDataKeys("test/testKeys.json");
         DataModelConverter converter = new DataModelConverter();
-        List<DataWriter> result = BalloonControllerFactory.createDataWriters(properties,
+        List<DataWriter> result = balloonControllerFactory.createDataWriters(properties,
                 transmittedDataKeys, converter, null);
         assertEquals(2, result.size());
         assertTrue(result.get(0) instanceof FileDataWriter);
@@ -92,6 +101,37 @@ public class BalloonControllerFactoryTest {
         FileDataWriter fileWriter = (FileDataWriter) result.get(0);
         fileWriter.closeAndDeleteFile();
     }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDataConsumersThrowsWhenNoArmingHeightSet() {
+        properties.setProperty("switchingHeight", "200");
+        properties.setProperty("altitude.key", "altitude");
+        balloonControllerFactory.createDataModelConsumers(properties);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDataConsumersThrowsWhenNoSwitchingHeightSet() {
+        properties.setProperty("armingHeight", "200");
+        properties.setProperty("altitude.key", "altitude");
+        balloonControllerFactory.createDataModelConsumers(properties);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDataConsumersThrowsWhenNoHeightKeySet() {
+        properties.setProperty("switchingHeight", "200");
+        properties.setProperty("armingHeight", "500");
+        balloonControllerFactory.createDataModelConsumers(properties);
+    }
+    
+    @Test
+    public void testCreateDataConsumersSucceedsWhenAllPrerequisitesAreMet() {
+        properties.setProperty("armingHeight", "200");
+        properties.setProperty("switchingHeight", "500");
+        properties.setProperty("altitude.key", "altitude");
+        List<DataModelConsumer> dataModelConsumers = balloonControllerFactory.createDataModelConsumers(properties);
+        assertNotNull(dataModelConsumers);
+        assertEquals(1, dataModelConsumers.size());
+    }
 
     /**
      * Test of createBalloonController method, of class BalloonController.
@@ -100,15 +140,16 @@ public class BalloonControllerFactoryTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateBalloonControllerThrowsWithNullKeys() throws Exception {
-        BalloonControllerFactory.createBalloonController(null, new DataModelConverter(), this.properties,
-                new ArrayList<SensorController>(), new ArrayList<DataWriter>(), testDataDir, mockSentenceIdGenerator);
+        balloonControllerFactory.createBalloonController(null, new DataModelConverter(), this.properties,
+                new ArrayList<SensorController>(), new ArrayList<DataWriter>(),
+                new ArrayList<DataModelConsumer>(), testDataDir, mockSentenceIdGenerator);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateBalloonControllerThrowsWithEmptyKeysArray() throws IOException {
-        BalloonControllerFactory.createBalloonController(new ArrayList<String>(), new DataModelConverter(),
+        balloonControllerFactory.createBalloonController(new ArrayList<String>(), new DataModelConverter(),
                 this.properties, new ArrayList<SensorController>(), new ArrayList<DataWriter>(),
-                testDataDir, mockSentenceIdGenerator);
+                new ArrayList<DataModelConsumer>(), testDataDir, mockSentenceIdGenerator);
     }
 
     @Test
@@ -116,9 +157,10 @@ public class BalloonControllerFactoryTest {
         List<String> transmittedDataKeys = BalloonController.loadTransmittedDataKeys("test/testKeys.json");
         List<SensorController> sensors = new ArrayList<>();
         sensors.add(this.mockSensorController);
-        BalloonController controller = BalloonControllerFactory.createBalloonController(transmittedDataKeys,
+        BalloonController controller = balloonControllerFactory.createBalloonController(transmittedDataKeys,
                 new DataModelConverter(), this.properties, sensors,
-                new ArrayList<DataWriter>(), testDataDir, mockSentenceIdGenerator);
+                new ArrayList<DataWriter>(), new ArrayList<DataModelConsumer>(),
+                testDataDir, mockSentenceIdGenerator);
 
         assertNotNull(controller);
         assertNotNull(controller.getCameraSensor());
@@ -126,6 +168,7 @@ public class BalloonControllerFactoryTest {
         assertNotNull(controller.getConverter());
         assertNotNull(controller.getDataWriters());
         assertNotNull(controller.getSensors());
+        assertNotNull(controller.getDataModelConsumers());
         assertEquals("$$latex", controller.getPayloadName());
 
         List<String> expectedKeys = new ArrayList<>();

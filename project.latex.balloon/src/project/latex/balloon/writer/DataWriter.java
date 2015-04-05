@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package project.latex.writer;
+package project.latex.balloon.writer;
 
 import java.util.Map;
 

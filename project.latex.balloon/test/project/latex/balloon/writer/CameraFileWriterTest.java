@@ -19,7 +19,6 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import project.latex.balloon.TestFileDeleteHelper;
-import project.latex.writer.DataWriteFailedException;
 
 /**
  *
