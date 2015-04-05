@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package project.latex.balloon.sensor;
+package project.latex.balloon.consumer;
 
 import com.pi4j.io.gpio.RaspiPin;
 import java.util.Scanner;

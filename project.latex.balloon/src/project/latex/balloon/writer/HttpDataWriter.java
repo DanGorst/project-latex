@@ -28,7 +28,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
-import project.latex.writer.DataWriter;
 
 /**
  * This is a class for use during testing, until we have our radio comms working.

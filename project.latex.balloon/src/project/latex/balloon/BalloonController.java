@@ -21,13 +21,14 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.writer.DataModelConverter;
-import project.latex.writer.CameraDataWriter;
-import project.latex.writer.DataWriteFailedException;
-import project.latex.writer.DataWriter;
+import project.latex.balloon.writer.CameraDataWriter;
+import project.latex.balloon.writer.DataWriteFailedException;
+import project.latex.balloon.writer.DataWriter;
 
 /**
  *
@@ -43,6 +44,9 @@ public class BalloonController {
 
     // Sensors to determine the current state of the balloon
     private final List<SensorController> sensors;
+    
+    private final List<DataModelConsumer> dataModelConsumers;
+    
     private final List<DataWriter> dataWriters;
 
     // Camera
@@ -68,7 +72,8 @@ public class BalloonController {
             List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
             File dataFolder = createDataFolder();
 
-            BalloonController balloonController = BalloonControllerFactory.createBalloonController(properties, 
+            BalloonControllerFactory balloonControllerFactory = new BalloonControllerFactory();
+            BalloonController balloonController = balloonControllerFactory.createBalloonController(properties, 
                     transmittedDataKeys, dataFolder);
 
             logger.info("Balloon created");
@@ -108,7 +113,7 @@ public class BalloonController {
             reader = new JsonReader(new FileReader(filePath));
             reader.beginObject();
             while (reader.hasNext()) {
-                String name = reader.nextName();
+                reader.nextName();
                 reader.beginArray();
                 while (reader.hasNext()) {
                     dataKeys.add(reader.nextString());
@@ -130,6 +135,7 @@ public class BalloonController {
             DataModelConverter converter,
             List<SensorController> sensors,
             List<DataWriter> dataWriters,
+            List<DataModelConsumer> dataModelConsumers,
             CameraSensorController cameraSensor,
             CameraDataWriter cameraWriter,
             Properties properties,
@@ -138,6 +144,7 @@ public class BalloonController {
         this.converter = converter;
         this.sensors = sensors;
         this.dataWriters = dataWriters;
+        this.dataModelConsumers = dataModelConsumers;
         this.cameraSensor = cameraSensor;
         this.cameraWriter = cameraWriter;
         this.properties = properties;
@@ -162,6 +169,10 @@ public class BalloonController {
 
     public List<DataWriter> getDataWriters() {
         return dataWriters;
+    }
+
+    public List<DataModelConsumer> getDataModelConsumers() {
+        return dataModelConsumers;
     }
 
     public CameraSensorController getCameraSensor() {
@@ -226,6 +237,11 @@ public class BalloonController {
                 } catch (SensorReadFailedException ex) {
                     logger.error(ex);
                 }
+            }
+            
+            // Allow our consumers to consume the data model
+            for (DataModelConsumer dataModelConsumer : this.dataModelConsumers) {
+                dataModelConsumer.consumeDataModel(data);
             }
 
             // Write the model

@@ -3,13 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project.latex.balloon.sensor;
+package project.latex.balloon.consumer;
+
+import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author dgorst
  */
-public class TransistorSwitchController {
+public class TransistorSwitchController implements DataModelConsumer {
+    
+    private static final Logger logger = Logger.getLogger(TransistorSwitchController.class);
 
     private final double armingHeight;
 
@@ -24,15 +29,37 @@ public class TransistorSwitchController {
     private boolean armed;
 
     private final TransistorSwitch transistorSwitch;
+    
+    private final String heightKey;
 
-    public TransistorSwitchController(TransistorSwitch transistorSwitch, double armingHeight, double switchingHeight) {
+    public TransistorSwitchController(TransistorSwitch transistorSwitch, double armingHeight, 
+            double switchingHeight, String heightKey) {
         this.transistorSwitch = transistorSwitch;
         this.armingHeight = armingHeight;
         this.switchingHeight = switchingHeight;
+        this.heightKey = heightKey;
     }
 
     public boolean isArmed() {
         return armed;
+    }
+
+    @Override
+    public void consumeDataModel(Map<String, Object> dataModel) {
+        if (dataModel == null) {
+            logger.warn("Could not consume null data model");
+            return;
+        }
+        Object heightValue =  dataModel.get(heightKey);
+        if (heightValue == null) {
+            logger.warn("No data found against the " + heightKey + " key within the data model");
+            return;
+        }
+        if (heightValue instanceof Double) {
+            processHeight((double) heightValue);
+        } else {
+            logger.warn("Object of wrong type passed for height. Object passed was: " + heightValue);
+        }
     }
 
     /**
