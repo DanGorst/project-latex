@@ -7,10 +7,8 @@ package project.latex.balloon;
 
 import com.google.gson.stream.JsonReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,15 +16,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.CameraDataWriter;
+import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataWriteFailedException;
 import project.latex.balloon.writer.DataWriter;
 
@@ -38,24 +38,29 @@ public class BalloonController {
 
     private static final Logger logger = Logger.getLogger(BalloonController.class);
 
-    private final List<String> transmittedTelemetryKeys;
-    private final DataModelConverter converter;
     private final String payloadName = "$$latex";
+    
+    private List<String> transmittedTelemetryKeys;
+    private DataModelConverter converter;
 
     // Sensors to determine the current state of the balloon
-    private final List<SensorController> sensors;
-    
-    private final List<DataModelConsumer> dataModelConsumers;
-    
-    private final List<DataWriter> dataWriters;
+    private List<SensorController> sensors;
+
+    private List<DataModelConsumer> dataModelConsumers;
+
+    private List<DataWriter> dataWriters;
 
     // Camera
-    private final CameraSensorController cameraSensor;
-    private final CameraDataWriter cameraWriter;
+    private CameraSensorController cameraSensor;
+    private CameraDataWriter cameraWriter;
 
-    private final Properties properties;
+    private SentenceIdGenerator sentenceIdGenerator;
     
-    private final SentenceIdGenerator sentenceIdGenerator;
+    // Required properties
+    private String timeKey;
+    private String dateKey;
+    private String payloadNameKey;
+    private String sentenceIdKey;
 
     /**
      * @param args the command line arguments
@@ -66,22 +71,22 @@ public class BalloonController {
 
             logger.info("Project Latex Balloon Controller, version 0.1");
 
-            Properties properties = loadProperties("config.properties");
-            logger.info("Properties loaded");
-
             List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
             File dataFolder = createDataFolder();
 
-            BalloonControllerFactory balloonControllerFactory = new BalloonControllerFactory();
-            BalloonController balloonController = balloonControllerFactory.createBalloonController(properties, 
-                    transmittedDataKeys, dataFolder);
+            ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
+            CameraFileWriter cameraFileWriter = (CameraFileWriter) context.getBean("cameraWriter");
+            cameraFileWriter.setBaseFolder(dataFolder);
+            // TODO: Set the data keys on the serial data writer
 
+            BalloonController balloonController = (BalloonController) context.getBean("balloonController");
             logger.info("Balloon created");
             balloonController.run(new DefaultControllerRunner());
         } catch (IOException ex) {
             logger.error(ex);
         }
     }
+
     static File createDataFolder() throws IOException {
         // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
         // flight is then put into that folder
@@ -93,13 +98,6 @@ public class BalloonController {
             throw new IOException("Unable to create directory to contain sensor data logs");
         }
         return dataFolder;
-    }
-
-    private static Properties loadProperties(String propertiesFilePath) throws IOException {
-        Properties properties = new Properties();
-        InputStream input = new FileInputStream(propertiesFilePath);
-        properties.load(input);
-        return properties;
     }
 
     static List<String> loadTransmittedDataKeys(String filePath) throws IOException {
@@ -129,26 +127,6 @@ public class BalloonController {
                 reader.close();
             }
         }
-    }
-
-    public BalloonController(List<String> transmittedTelemetryKeys,
-            DataModelConverter converter,
-            List<SensorController> sensors,
-            List<DataWriter> dataWriters,
-            List<DataModelConsumer> dataModelConsumers,
-            CameraSensorController cameraSensor,
-            CameraDataWriter cameraWriter,
-            Properties properties,
-            SentenceIdGenerator sentenceIdGenerator) {
-        this.transmittedTelemetryKeys = transmittedTelemetryKeys;
-        this.converter = converter;
-        this.sensors = sensors;
-        this.dataWriters = dataWriters;
-        this.dataModelConsumers = dataModelConsumers;
-        this.cameraSensor = cameraSensor;
-        this.cameraWriter = cameraWriter;
-        this.properties = properties;
-        this.sentenceIdGenerator = sentenceIdGenerator;
     }
 
     public List<String> getTransmittedTelemetryKeys() {
@@ -187,24 +165,68 @@ public class BalloonController {
         return sentenceIdGenerator;
     }
 
+    public void setTransmittedTelemetryKeys(List<String> transmittedTelemetryKeys) {
+        this.transmittedTelemetryKeys = transmittedTelemetryKeys;
+    }
+
+    public void setConverter(DataModelConverter converter) {
+        this.converter = converter;
+    }
+
+    public void setSensors(List<SensorController> sensors) {
+        this.sensors = sensors;
+    }
+
+    public void setDataModelConsumers(List<DataModelConsumer> dataModelConsumers) {
+        this.dataModelConsumers = dataModelConsumers;
+    }
+
+    public void setDataWriters(List<DataWriter> dataWriters) {
+        this.dataWriters = dataWriters;
+    }
+
+    public void setCameraSensor(CameraSensorController cameraSensor) {
+        this.cameraSensor = cameraSensor;
+    }
+
+    public void setCameraWriter(CameraDataWriter cameraWriter) {
+        this.cameraWriter = cameraWriter;
+    }
+
+    public void setSentenceIdGenerator(SentenceIdGenerator sentenceIdGenerator) {
+        this.sentenceIdGenerator = sentenceIdGenerator;
+    }
+
+    public void setTimeKey(String timeKey) {
+        this.timeKey = timeKey;
+    }
+
+    public void setDateKey(String dateKey) {
+        this.dateKey = dateKey;
+    }
+
+    public void setPayloadNameKey(String payloadNameKey) {
+        this.payloadNameKey = payloadNameKey;
+    }
+
+    public void setSentenceIdKey(String sentenceIdKey) {
+        this.sentenceIdKey = sentenceIdKey;
+    }
+
     void run(ControllerRunner runner) {
         if (runner == null) {
             throw new IllegalArgumentException("Cannot run with null ControllerRunner");
         }
 
-        String timeKey = properties.getProperty("time.key");
         if (timeKey == null) {
             throw new IllegalArgumentException("Null time key specified");
         }
-        String dateKey = properties.getProperty("date.key");
         if (dateKey == null) {
             throw new IllegalArgumentException("Null date key specified");
         }
-        String payloadNameKey = properties.getProperty("payloadName.key");
         if (payloadNameKey == null) {
             throw new IllegalArgumentException("Null payload name key specified");
         }
-        String sentenceIdKey = properties.getProperty("sentenceId.key");
         if (sentenceIdKey == null) {
             throw new IllegalArgumentException("Null sentence id key specified");
         }
@@ -226,7 +248,7 @@ public class BalloonController {
 
             data.put(payloadNameKey, this.payloadName);
             data.put(sentenceIdKey, this.sentenceIdGenerator.generateId());
-            
+
             // Get readings from each of our sensors.
             for (SensorController controller : this.sensors) {
                 try {
@@ -238,7 +260,7 @@ public class BalloonController {
                     logger.error(ex);
                 }
             }
-            
+
             // Allow our consumers to consume the data model
             for (DataModelConsumer dataModelConsumer : this.dataModelConsumers) {
                 dataModelConsumer.consumeDataModel(data);
@@ -264,7 +286,7 @@ public class BalloonController {
                 }
             }
 
-            runner.controllerFinishedRunLoop(data);            
+            runner.controllerFinishedRunLoop(data);
         }
     }
 }

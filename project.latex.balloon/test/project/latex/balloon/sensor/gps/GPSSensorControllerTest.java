@@ -7,8 +7,9 @@ package project.latex.balloon.sensor.gps;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -53,12 +54,13 @@ public class GPSSensorControllerTest {
         mockStatic(PolledSentenceParser.class);
         when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        GPSSensorController controller = new GPSSensorController(ublox,
-                properties.getProperty("time.key"),
-                properties.getProperty("latitude.key"),
-                properties.getProperty("longitude.key"),
-                properties.getProperty("altitude.key"),
-                properties.getProperty("speed.key"));
+        List<String> keys = new ArrayList<>();
+        keys.add("time");
+        keys.add("latitude");
+        keys.add("longitude");
+        keys.add("altitude");
+        keys.add("speed");
+        GPSSensorController controller = new GPSSensorController(ublox, keys);
         
         HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(!result.isEmpty());
@@ -86,11 +88,12 @@ public class GPSSensorControllerTest {
         mockStatic(PolledSentenceParser.class);
         when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        GPSSensorController controller = new GPSSensorController(ublox,
-                properties.getProperty("time.key"),
-                properties.getProperty("latitude.key"),
-                properties.getProperty("longitude.key"),
-                properties.getProperty("altitude.key"));
+        List<String> keys = new ArrayList<>();
+        keys.add("time");
+        keys.add("latitude");
+        keys.add("longitude");
+        keys.add("altitude");
+        GPSSensorController controller = new GPSSensorController(ublox, keys);
         
         HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(!result.isEmpty());
@@ -115,12 +118,13 @@ public class GPSSensorControllerTest {
         mockStatic(PolledSentenceParser.class);
         when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        GPSSensorController controller = new GPSSensorController(ublox,
-                properties.getProperty("time.key"),
-                properties.getProperty("latitude.key"),
-                properties.getProperty("longitude.key"),
-                properties.getProperty("altitude.key"),
-                properties.getProperty("speed.key"));
+        List<String> keys = new ArrayList<>();
+        keys.add("time");
+        keys.add("latitude");
+        keys.add("longitude");
+        keys.add("altitude");
+        keys.add("speed");
+        GPSSensorController controller = new GPSSensorController(ublox, keys);
         
         HashMap<String, Object> result = controller.getCurrentData();
         assertTrue(result.isEmpty());           
@@ -142,7 +146,8 @@ public class GPSSensorControllerTest {
         mockStatic(PolledSentenceParser.class);
         when(PolledSentenceParser.parse(anyString())).thenReturn(parsedSentence);
         
-        GPSSensorController controller = new GPSSensorController(ublox);    
+        List<String> keys = new ArrayList<>();
+        GPSSensorController controller = new GPSSensorController(ublox, keys);    
         HashMap<String, Object> result = controller.getCurrentData();
         
         assertTrue(result.isEmpty());         

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -28,7 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static project.latex.balloon.BalloonController.loadTransmittedDataKeys;
 import project.latex.balloon.consumer.DataModelConsumer;
-import project.latex.balloon.consumer.TransistorSwitch;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.writer.DataModelConverter;
@@ -40,9 +38,6 @@ import project.latex.balloon.writer.DataWriter;
  */
 public class BalloonControllerTest {
 
-    private Properties properties;
-    private File testImagesDir;
-    private File testDataDir;
     private SensorController mockSensorController;
     private SentenceIdGenerator mockSentenceIdGenerator;
     private DataModelConsumer mockDataModelConsumer;
@@ -61,26 +56,9 @@ public class BalloonControllerTest {
 
     @Before
     public void setUp() {
-        this.properties = new Properties();
-        String testImagesDirPath = "test/images";
-        testImagesDir = new File(testImagesDirPath);
-        testImagesDir.mkdir();
-
-        testDataDir = new File("test/data");
-        testDataDir.mkdir();
-
-        this.properties.setProperty("cameraDir", testImagesDirPath);
-
         this.mockSensorController = mock(SensorController.class);
         this.mockSentenceIdGenerator = mock(SentenceIdGenerator.class);
         this.mockDataModelConsumer = mock(DataModelConsumer.class);
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        this.properties = null;
-        TestFileDeleteHelper.delete(testImagesDir);
-        TestFileDeleteHelper.delete(testDataDir);
     }
 
     private BalloonController createDefaultController() throws IOException {
@@ -89,13 +67,20 @@ public class BalloonControllerTest {
         sensors.add(this.mockSensorController);
         List<DataModelConsumer> dataModelConsumers = new ArrayList<>();
         dataModelConsumers.add(this.mockDataModelConsumer);
-        TransistorSwitch transistorSwitch = mock(TransistorSwitch.class);
-        BalloonControllerFactory balloonControllerFactory = new BalloonControllerFactory(transistorSwitch);
-        BalloonController controller = balloonControllerFactory.createBalloonController(transmittedDataKeys,
-                new DataModelConverter(), this.properties, sensors,
-                new ArrayList<DataWriter>(), dataModelConsumers, testDataDir,
-                mockSentenceIdGenerator);
-
+        List<DataWriter> dataWriters = new ArrayList<>();
+        
+        BalloonController controller = new BalloonController();
+        controller.setTransmittedTelemetryKeys(transmittedDataKeys);
+        controller.setConverter(new DataModelConverter());
+        controller.setSensors(sensors);
+        controller.setDataWriters(dataWriters);
+        controller.setDataModelConsumers(dataModelConsumers);
+        controller.setSentenceIdGenerator(mockSentenceIdGenerator);
+        controller.setTimeKey("time");
+        controller.setDateKey("date");
+        controller.setPayloadNameKey("payload_name");
+        controller.setSentenceIdKey("sentence_id");
+        
         return controller;
     }
 
@@ -133,6 +118,7 @@ public class BalloonControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoTimeDataKeyIsSpecified() throws IOException {
         BalloonController controller = createDefaultController();
+        controller.setTimeKey(null);
         ControllerRunner runner = mock(ControllerRunner.class);
         when(runner.shouldKeepRunning()).thenReturn(true, false);
         controller.run(runner);
@@ -140,9 +126,8 @@ public class BalloonControllerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoPayloadNameKeyIsSpecified() throws IOException {
-        this.properties.setProperty("time.key", "time");
-        this.properties.setProperty("date.key", "date");
         BalloonController controller = createDefaultController();
+        controller.setPayloadNameKey(null);
         ControllerRunner runner = mock(ControllerRunner.class);
         when(runner.shouldKeepRunning()).thenReturn(true, false);
         controller.run(runner);
@@ -150,10 +135,8 @@ public class BalloonControllerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoSentenceIdKeyIsSpecified() throws IOException {
-        this.properties.setProperty("time.key", "time");
-        this.properties.setProperty("date.key", "date");
-        this.properties.setProperty("payloadName.key", "payload_name");
         BalloonController controller = createDefaultController();
+        controller.setSentenceIdKey(null);
         ControllerRunner runner = mock(ControllerRunner.class);
         when(runner.shouldKeepRunning()).thenReturn(true, false);
         controller.run(runner);
@@ -161,12 +144,6 @@ public class BalloonControllerTest {
 
     @Test
     public void testRunSucceedsIfValidPropertiesArePassed() throws IOException, SensorReadFailedException {
-        this.properties.setProperty("time.key", "time");
-        this.properties.setProperty("date.key", "date");
-        this.properties.setProperty("payloadName.key", "payload_name");
-        this.properties.setProperty("sentenceId.key", "sentence_id");
-        this.properties.setProperty("altitude.key", "altitude");
-
         BalloonController controller = createDefaultController();
 
         ControllerRunner runner = mock(ControllerRunner.class);
@@ -205,12 +182,6 @@ public class BalloonControllerTest {
 
     @Test
     public void testThatDataModelConsumerIsCalledAfterModelIsPopulated() throws IOException, SensorReadFailedException {
-        this.properties.setProperty("time.key", "time");
-        this.properties.setProperty("date.key", "date");
-        this.properties.setProperty("payloadName.key", "payload_name");
-        this.properties.setProperty("sentenceId.key", "sentence_id");
-        this.properties.setProperty("altitude.key", "altitude");
-
         BalloonController controller = createDefaultController();
 
         ControllerRunner runner = mock(ControllerRunner.class);

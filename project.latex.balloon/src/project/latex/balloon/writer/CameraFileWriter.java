@@ -15,10 +15,21 @@ import java.util.List;
  */
 public class CameraFileWriter implements CameraDataWriter {
     
-    private final File savedImagesDirectory;
+    private File savedImagesDirectory;
     final static String imagesDirectoryName = "images";
     
+    public CameraFileWriter()  {
+    }
+    
     public CameraFileWriter(File baseFolder)    {
+        setSavedImagesDirectoryFromBaseFolder(baseFolder);
+    }
+    
+    public void setBaseFolder(File baseFolder) {
+        setSavedImagesDirectoryFromBaseFolder(baseFolder);
+    }
+    
+    private void setSavedImagesDirectoryFromBaseFolder(File baseFolder) {
         if (baseFolder == null || !baseFolder.isDirectory())    {
             throw new IllegalArgumentException("Base folder is not a directory");
         }

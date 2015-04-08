@@ -7,8 +7,8 @@ package project.latex.balloon.sensor.gps;
 
 import project.latex.balloon.sensor.SensorReadFailedException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.log4j.Logger;
 import project.latex.balloon.sensor.SensorController;
 
@@ -22,8 +22,8 @@ public class GPSSensorController implements SensorController {
     private final UBloxGPSSensor gps;
     private final ArrayList<String> keys = new ArrayList<>();
 
-    public GPSSensorController(UBloxGPSSensor gps, String... keys) {
-        this.keys.addAll(Arrays.asList(keys));
+    public GPSSensorController(UBloxGPSSensor gps, List<String> keys) {
+        this.keys.addAll(keys);
         this.gps = gps;
     }
 

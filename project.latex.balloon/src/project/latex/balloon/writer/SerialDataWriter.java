@@ -24,12 +24,11 @@ public class SerialDataWriter implements DataWriter {
     public static final int BAUD_RATE = 50;
 
     private final DataModelConverter converter;
-    private final List<String> dataKeys;
+    private List<String> dataKeys;
     private final Serial serial;
 
-    public SerialDataWriter(List<String> dataKeys, DataModelConverter converter, Serial serial) {
+    public SerialDataWriter(DataModelConverter converter, Serial serial) {
         this.converter = converter;
-        this.dataKeys = dataKeys;
         this.serial = serial;
         
         // open the default serial port provided on the GPIO header
@@ -44,8 +43,12 @@ public class SerialDataWriter implements DataWriter {
         });
     }
     
-    public SerialDataWriter(List<String> dataKeys, DataModelConverter converter) {
-        this(dataKeys, converter, SerialFactory.createInstance());
+    public SerialDataWriter(DataModelConverter converter) {
+        this(converter, SerialFactory.createInstance());
+    }
+
+    public void setDataKeys(List<String> dataKeys) {
+        this.dataKeys = dataKeys;
     }
 
     @Override
