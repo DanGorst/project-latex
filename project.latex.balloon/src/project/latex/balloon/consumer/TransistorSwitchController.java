@@ -90,6 +90,7 @@ public class TransistorSwitchController implements DataModelConsumer {
         }
         if (armingReadings >= NUMBER_OF_READINGS_FOR_CONFIDENCE) {
             armed = true;
+            logger.info("Transistor switch armed");
         }
     }
 
@@ -107,6 +108,7 @@ public class TransistorSwitchController implements DataModelConsumer {
         }
         if (switchingReadings >= NUMBER_OF_READINGS_FOR_CONFIDENCE) {
             transistorSwitch.close();
+            logger.info("Transistor switch closed");
         }
     }
 }
