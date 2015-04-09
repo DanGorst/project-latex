@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import project.latex.balloon.DataFolderResource;
 import project.latex.balloon.TestFileDeleteHelper;
 
 /**
@@ -26,7 +27,7 @@ import project.latex.balloon.TestFileDeleteHelper;
  */
 public class CameraFileWriterTest {
     
-    private File mockImagesDirectory;
+    private DataFolderResource mockDataFolderResource;
     private CameraFileWriter writer;
     
     public CameraFileWriterTest() {
@@ -42,12 +43,11 @@ public class CameraFileWriterTest {
     
     @Before
     public void setUp() {
-        this.mockImagesDirectory = mock(File.class);
+        this.mockDataFolderResource = mock(DataFolderResource.class);
     }
     
     @After
     public void tearDown() throws IOException {
-        this.mockImagesDirectory = null;
         if (this.writer != null) {
             File imagesFolder = this.writer.getSavedImagesDirectory();
             if (imagesFolder.exists()) {
@@ -62,16 +62,11 @@ public class CameraFileWriterTest {
         new CameraFileWriter(null);
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreatingWriterThrowsIfGivenFileRatherThanDirectory()  {
-        when(this.mockImagesDirectory.isDirectory()).thenReturn(false);
-        new CameraFileWriter(this.mockImagesDirectory);
-    }
-    
     @Test
     public void testCreatingWriterCreatesDirectoryForSavedImages()  {
         File baseDirectory = new File(System.getProperty("user.dir"));
-        writer = new CameraFileWriter(baseDirectory);
+        when(mockDataFolderResource.getDataFolder()).thenReturn(baseDirectory);
+        writer = new CameraFileWriter(mockDataFolderResource);
         File savedImagesDirectory = writer.getSavedImagesDirectory();
         assertTrue(savedImagesDirectory.exists());
         assertEquals(CameraFileWriter.imagesDirectoryName, savedImagesDirectory.getName());
@@ -80,14 +75,16 @@ public class CameraFileWriterTest {
     @Test(expected = IllegalArgumentException.class)
     public void testWriterThrowsIfGivenNullDataObject() throws DataWriteFailedException {
         File baseDirectory = new File(System.getProperty("user.dir"));
-        writer = new CameraFileWriter(baseDirectory);
+        when(mockDataFolderResource.getDataFolder()).thenReturn(baseDirectory);
+        writer = new CameraFileWriter(mockDataFolderResource);
         writer.writeImageFiles(null);
     }
     
     @Test
     public void testWriterDoesNothingIfGivenDataObjectWithNoImages() throws DataWriteFailedException {
         File baseDirectory = new File(System.getProperty("user.dir"));
-        writer = new CameraFileWriter(baseDirectory);
+        when(mockDataFolderResource.getDataFolder()).thenReturn(baseDirectory);
+        writer = new CameraFileWriter(mockDataFolderResource);
         writer.writeImageFiles(new ArrayList<String>());
         File[] filesInImagesDir = writer.getSavedImagesDirectory().listFiles();
         assertEquals(0, filesInImagesDir.length);
@@ -97,7 +94,8 @@ public class CameraFileWriterTest {
     public void testWriterMovesFileIntoSavedImagesDirectory()   {
         try {
             File baseDirectory = new File(System.getProperty("user.dir"));
-            writer = new CameraFileWriter(baseDirectory);
+            when(mockDataFolderResource.getDataFolder()).thenReturn(baseDirectory);
+            writer = new CameraFileWriter(mockDataFolderResource);
             
             File emptyImage = new File("test.jpg");
             emptyImage.createNewFile();

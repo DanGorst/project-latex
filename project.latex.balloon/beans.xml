@@ -11,6 +11,7 @@
    
    <bean id="sentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
    
+   <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
    <!-- Data model consumers -->
    <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
@@ -75,6 +76,7 @@
    </bean>
    
    <bean id="cameraWriter" class="project.latex.balloon.writer.CameraFileWriter">
+       <constructor-arg ref="dataFolderResource" />
    </bean>
    
    <!-- Now the main balloon controller -->

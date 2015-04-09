@@ -8,6 +8,7 @@ package project.latex.balloon.writer;
 
 import java.io.File;
 import java.util.List;
+import project.latex.balloon.DataFolderResource;
 
 /**
  *
@@ -21,12 +22,11 @@ public class CameraFileWriter implements CameraDataWriter {
     public CameraFileWriter()  {
     }
     
-    public CameraFileWriter(File baseFolder)    {
-        setSavedImagesDirectoryFromBaseFolder(baseFolder);
-    }
-    
-    public void setBaseFolder(File baseFolder) {
-        setSavedImagesDirectoryFromBaseFolder(baseFolder);
+    public CameraFileWriter(DataFolderResource dataFolderResource)    {
+        if (dataFolderResource == null) {
+            throw new IllegalArgumentException("Null data folder resource");
+        }
+        setSavedImagesDirectoryFromBaseFolder(dataFolderResource.getDataFolder());
     }
     
     private void setSavedImagesDirectoryFromBaseFolder(File baseFolder) {

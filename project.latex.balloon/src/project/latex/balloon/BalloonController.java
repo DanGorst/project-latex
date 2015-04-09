@@ -72,11 +72,8 @@ public class BalloonController {
             logger.info("Project Latex Balloon Controller, version 0.1");
 
             List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
-            File dataFolder = createDataFolder();
 
             ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
-            CameraFileWriter cameraFileWriter = (CameraFileWriter) context.getBean("cameraWriter");
-            cameraFileWriter.setBaseFolder(dataFolder);
             // TODO: Set the data keys on the serial data writer
 
             BalloonController balloonController = (BalloonController) context.getBean("balloonController");
@@ -85,19 +82,6 @@ public class BalloonController {
         } catch (IOException ex) {
             logger.error(ex);
         }
-    }
-
-    static File createDataFolder() throws IOException {
-        // We create a new folder for each flight that the balloon makes. All of our sensor data for the 
-        // flight is then put into that folder
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
-        Date date = new Date();
-        String baseUrl = "data" + File.separator + "Flight starting - " + dateFormat.format(date);
-        File dataFolder = new File(baseUrl);
-        if (!dataFolder.mkdirs()) {
-            throw new IOException("Unable to create directory to contain sensor data logs");
-        }
-        return dataFolder;
     }
 
     static List<String> loadTransmittedDataKeys(String filePath) throws IOException {
