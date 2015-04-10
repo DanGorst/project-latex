@@ -48,6 +48,8 @@ public class BalloonController {
     private CameraDataWriter cameraWriter;
 
     private SentenceIdGenerator sentenceIdGenerator;
+    
+    private ControllerRunner controllerRunner;
 
     // Required properties
     private String timeKey;
@@ -65,8 +67,8 @@ public class BalloonController {
         ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
         BalloonController balloonController = (BalloonController) context.getBean("balloonController");
         logger.info("Balloon created");
-        // TODO - the runner should be set in the config
-        balloonController.run(new DefaultControllerRunner());
+        
+        balloonController.run();
     }
 
     public DataModelConverter getConverter() {
@@ -145,8 +147,12 @@ public class BalloonController {
         this.sentenceIdKey = sentenceIdKey;
     }
 
-    void run(ControllerRunner runner) {
-        if (runner == null) {
+    public void setControllerRunner(ControllerRunner controllerRunner) {
+        this.controllerRunner = controllerRunner;
+    }
+
+    void run() {
+        if (controllerRunner == null) {
             throw new IllegalArgumentException("Cannot run with null ControllerRunner");
         }
 
@@ -163,7 +169,7 @@ public class BalloonController {
             throw new IllegalArgumentException("Null sentence id key specified");
         }
 
-        while (runner.shouldKeepRunning()) {
+        while (controllerRunner.shouldKeepRunning()) {
             // Build up a model of the current balloon state from the sensors
             Map<String, Object> data = new HashMap<>();
 
@@ -218,7 +224,7 @@ public class BalloonController {
                 }
             }
 
-            runner.controllerFinishedRunLoop(data);
+            controllerRunner.controllerFinishedRunLoop(data);
         }
     }
 }

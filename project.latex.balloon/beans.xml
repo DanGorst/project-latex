@@ -95,6 +95,7 @@
        <property name="dateKey" value="date" />
        <property name="payloadNameKey" value="payload_name" />
        <property name="sentenceIdKey" value="sentence_id" />
+       <property name="controllerRunner" ref="controllerRunner" />
        <property name="sensors">
            <list>
                <ref bean="dummySensorController" />

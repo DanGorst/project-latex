@@ -36,6 +36,7 @@ public class BalloonControllerTest {
     private SensorController mockSensorController;
     private SentenceIdGenerator mockSentenceIdGenerator;
     private DataModelConsumer mockDataModelConsumer;
+    private ControllerRunner mockControllerRunner;
 
     public BalloonControllerTest() {
     }
@@ -54,6 +55,7 @@ public class BalloonControllerTest {
         this.mockSensorController = mock(SensorController.class);
         this.mockSentenceIdGenerator = mock(SentenceIdGenerator.class);
         this.mockDataModelConsumer = mock(DataModelConsumer.class);
+        this.mockControllerRunner = mock(ControllerRunner.class);
     }
 
     private BalloonController createDefaultController() throws IOException {
@@ -73,6 +75,7 @@ public class BalloonControllerTest {
         controller.setDateKey("date");
         controller.setPayloadNameKey("payload_name");
         controller.setSentenceIdKey("sentence_id");
+        controller.setControllerRunner(mockControllerRunner);
         
         return controller;
     }
@@ -80,55 +83,52 @@ public class BalloonControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfRunnerIsNull() throws IOException {
         BalloonController controller = createDefaultController();
-        controller.run(null);
+        controller.setControllerRunner(null);
+        controller.run();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoTimeDataKeyIsSpecified() throws IOException {
         BalloonController controller = createDefaultController();
         controller.setTimeKey(null);
-        ControllerRunner runner = mock(ControllerRunner.class);
-        when(runner.shouldKeepRunning()).thenReturn(true, false);
-        controller.run(runner);
+        when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
+        controller.run();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoPayloadNameKeyIsSpecified() throws IOException {
         BalloonController controller = createDefaultController();
         controller.setPayloadNameKey(null);
-        ControllerRunner runner = mock(ControllerRunner.class);
-        when(runner.shouldKeepRunning()).thenReturn(true, false);
-        controller.run(runner);
+        when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
+        controller.run();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunThrowsIfNoSentenceIdKeyIsSpecified() throws IOException {
         BalloonController controller = createDefaultController();
         controller.setSentenceIdKey(null);
-        ControllerRunner runner = mock(ControllerRunner.class);
-        when(runner.shouldKeepRunning()).thenReturn(true, false);
-        controller.run(runner);
+        when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
+        controller.run();
     }
 
     @Test
     public void testRunSucceedsIfValidPropertiesArePassed() throws IOException, SensorReadFailedException {
         BalloonController controller = createDefaultController();
 
-        ControllerRunner runner = mock(ControllerRunner.class);
-        when(runner.shouldKeepRunning()).thenReturn(true, false);
+        when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
 
         Map<String, Object> mockSensorData = new HashMap<>();
         mockSensorData.put("altitude", 0.1234);
         when(mockSensorController.getCurrentData()).thenReturn(mockSensorData);
         when(mockSentenceIdGenerator.generateId()).thenReturn("2");
 
-        controller.run(runner);
+        controller.run();
 
         Map<String, Object> expectedData = new HashMap<>();
         expectedData.put("payload_name", "$$latex");
         expectedData.put("sentence_id", "2");
         expectedData.put("altitude", 0.1234);
-        verify(runner).controllerFinishedRunLoop(argThat(fieldsEqualTo(expectedData)));
+        verify(mockControllerRunner).controllerFinishedRunLoop(argThat(fieldsEqualTo(expectedData)));
     }
 
     // Custom argument matcher to verify our model data, without caring about the time, which we won't know exactly
@@ -152,15 +152,14 @@ public class BalloonControllerTest {
     public void testThatDataModelConsumerIsCalledAfterModelIsPopulated() throws IOException, SensorReadFailedException {
         BalloonController controller = createDefaultController();
 
-        ControllerRunner runner = mock(ControllerRunner.class);
-        when(runner.shouldKeepRunning()).thenReturn(true, false);
+        when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
 
         Map<String, Object> mockSensorData = new HashMap<>();
         mockSensorData.put("altitude", 0.1234);
         when(mockSensorController.getCurrentData()).thenReturn(mockSensorData);
         when(mockSentenceIdGenerator.generateId()).thenReturn("2");
 
-        controller.run(runner);
+        controller.run();
 
         verify(mockDataModelConsumer).consumeDataModel(anyMap());
     }
