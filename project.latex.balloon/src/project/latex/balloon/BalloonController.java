@@ -5,13 +5,8 @@
  */
 package project.latex.balloon;
 
-import com.google.gson.stream.JsonReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +21,6 @@ import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
 import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.CameraDataWriter;
-import project.latex.balloon.writer.CameraFileWriter;
 import project.latex.balloon.writer.DataWriteFailedException;
 import project.latex.balloon.writer.DataWriter;
 
@@ -39,8 +33,7 @@ public class BalloonController {
     private static final Logger logger = Logger.getLogger(BalloonController.class);
 
     private final String payloadName = "$$latex";
-    
-    private List<String> transmittedTelemetryKeys;
+
     private DataModelConverter converter;
 
     // Sensors to determine the current state of the balloon
@@ -55,7 +48,7 @@ public class BalloonController {
     private CameraDataWriter cameraWriter;
 
     private SentenceIdGenerator sentenceIdGenerator;
-    
+
     // Required properties
     private String timeKey;
     private String dateKey;
@@ -66,55 +59,14 @@ public class BalloonController {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        try {
-            PropertyConfigurator.configure("logger.properties");
+        PropertyConfigurator.configure("logger.properties");
+        logger.info("Project Latex Balloon Controller, version 0.1");
 
-            logger.info("Project Latex Balloon Controller, version 0.1");
-
-            List<String> transmittedDataKeys = loadTransmittedDataKeys("../telemetryKeys.json");
-
-            ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
-            // TODO: Set the data keys on the serial data writer
-
-            BalloonController balloonController = (BalloonController) context.getBean("balloonController");
-            logger.info("Balloon created");
-            balloonController.run(new DefaultControllerRunner());
-        } catch (IOException ex) {
-            logger.error(ex);
-        }
-    }
-
-    static List<String> loadTransmittedDataKeys(String filePath) throws IOException {
-        if (filePath == null) {
-            throw new IllegalArgumentException("Cannot load keys from null file");
-        }
-
-        JsonReader reader = null;
-        try {
-            List<String> dataKeys = new ArrayList<>();
-            reader = new JsonReader(new FileReader(filePath));
-            reader.beginObject();
-            while (reader.hasNext()) {
-                reader.nextName();
-                reader.beginArray();
-                while (reader.hasNext()) {
-                    dataKeys.add(reader.nextString());
-                }
-                reader.endArray();
-            }
-            reader.endObject();
-            reader.close();
-
-            return dataKeys;
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-    }
-
-    public List<String> getTransmittedTelemetryKeys() {
-        return transmittedTelemetryKeys;
+        ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
+        BalloonController balloonController = (BalloonController) context.getBean("balloonController");
+        logger.info("Balloon created");
+        // TODO - the runner should be set in the config
+        balloonController.run(new DefaultControllerRunner());
     }
 
     public DataModelConverter getConverter() {
@@ -147,10 +99,6 @@ public class BalloonController {
 
     public SentenceIdGenerator getSentenceIdGenerator() {
         return sentenceIdGenerator;
-    }
-
-    public void setTransmittedTelemetryKeys(List<String> transmittedTelemetryKeys) {
-        this.transmittedTelemetryKeys = transmittedTelemetryKeys;
     }
 
     public void setConverter(DataModelConverter converter) {

@@ -5,17 +5,13 @@
  */
 package project.latex.balloon;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.PropertyConfigurator;
-import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +21,6 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static project.latex.balloon.BalloonController.loadTransmittedDataKeys;
 import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
@@ -62,7 +57,6 @@ public class BalloonControllerTest {
     }
 
     private BalloonController createDefaultController() throws IOException {
-        List<String> transmittedDataKeys = loadTransmittedDataKeys("test/testKeys.json");
         List<SensorController> sensors = new ArrayList<>();
         sensors.add(this.mockSensorController);
         List<DataModelConsumer> dataModelConsumers = new ArrayList<>();
@@ -70,7 +64,6 @@ public class BalloonControllerTest {
         List<DataWriter> dataWriters = new ArrayList<>();
         
         BalloonController controller = new BalloonController();
-        controller.setTransmittedTelemetryKeys(transmittedDataKeys);
         controller.setConverter(new DataModelConverter());
         controller.setSensors(sensors);
         controller.setDataWriters(dataWriters);
@@ -82,31 +75,6 @@ public class BalloonControllerTest {
         controller.setSentenceIdKey("sentence_id");
         
         return controller;
-    }
-
-    /**
-     * Test of loadTransmittedDataKeys method, of class BalloonController.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testLoadTransmittedDataKeysThrowsIfFilePathIsNull() throws Exception {
-        BalloonController.loadTransmittedDataKeys(null);
-    }
-
-    @Test(expected = FileNotFoundException.class)
-    public void testLoadTransmittedDataKeysThrowsIfFilePathIsInvalid() throws Exception {
-        BalloonController.loadTransmittedDataKeys("invalid");
-    }
-
-    @Test
-    public void testLoadTransmittedDataKeysSucceedsWithValidFile() throws IOException {
-        List<String> actual = BalloonController.loadTransmittedDataKeys("test/testKeys.json");
-        List<String> expected = new ArrayList<>();
-        expected.add("first");
-        expected.add("second");
-        expected.add("last");
-        assertEquals(expected, actual);
     }
 
     @Test(expected = IllegalArgumentException.class)

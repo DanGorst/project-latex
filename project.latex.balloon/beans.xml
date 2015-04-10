@@ -13,6 +13,10 @@
    
    <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
+   <bean id="transmittedDataKeysResource" class="project.latex.balloon.TransmittedDataKeysResource">
+       <constructor-arg value="../telemetryKeys.json" />
+   </bean>
+   
    <!-- Data model consumers -->
    <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
    
@@ -53,9 +57,10 @@
    </bean>
    
    <!-- Data writers -->
-   <!-- TODO: Add a real file data writer -->
-   <bean id="fileDataWriter" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="project.latex.balloon.writer.FileDataWriter" />
+   <bean id="fileDataWriter" class="project.latex.balloon.writer.FileDataWriter">
+       <constructor-arg ref="dataFolderResource" />
+       <constructor-arg ref="transmittedDataKeysResource" />
+       <constructor-arg ref="dataModelConverter" />
    </bean>
    
    <bean id="dataModelConverter" class="project.latex.balloon.writer.DataModelConverter">
@@ -63,10 +68,11 @@
    
    <!-- TODO: Put real serial data writer back in -->
 <!--   <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
-       <constructor-arg ref="dataModelConverter" />
+        <constructor-arg ref="transmittedDataKeysResource" />
+        <constructor-arg ref="dataModelConverter" />
    </bean> -->
    <bean id="serialDataWriter" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="project.latex.balloon.writer.SerialDataWriter" />
+       <constructor-arg value="project.latex.balloon.writer.SerialDataWriter" />
    </bean>
    
    <!-- Camera sensor and file writer -->
