@@ -66,6 +66,12 @@
    <bean id="dataModelConverter" class="project.latex.balloon.writer.DataModelConverter">
    </bean>
    
+   <bean id="httpDataWriter" class="project.latex.balloon.writer.HttpDataWriter">
+       <constructor-arg ref="transmittedDataKeysResource" />
+       <constructor-arg ref="dataModelConverter" />
+       <constructor-arg value="http://project-latex-dlfldigi.herokuapp.com/" />
+   </bean>
+   
    <!-- TODO: Put real serial data writer back in -->
 <!--   <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
         <constructor-arg ref="transmittedDataKeysResource" />

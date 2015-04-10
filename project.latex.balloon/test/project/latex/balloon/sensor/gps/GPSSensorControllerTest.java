@@ -26,13 +26,6 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({PolledSentenceParser.class})
 public class GPSSensorControllerTest {
-    private final Properties properties;
-            
-    public GPSSensorControllerTest() throws Exception {
-        properties = new Properties();
-        InputStream input = new FileInputStream("config.properties");
-        properties.load(input);
-    }
 
     /**
      * Test of getCurrentData method, of class GPSSensorController.
