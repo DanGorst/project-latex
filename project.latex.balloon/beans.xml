@@ -72,19 +72,14 @@
        <constructor-arg value="http://project-latex-dlfldigi.herokuapp.com/" />
    </bean>
    
-   <!-- TODO: Put real serial data writer back in -->
-<!--   <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
-        <constructor-arg ref="transmittedDataKeysResource" />
-        <constructor-arg ref="dataModelConverter" />
-   </bean> -->
-   <bean id="serialDataWriter" class="org.mockito.Mockito" factory-method="mock">
-       <constructor-arg value="project.latex.balloon.writer.SerialDataWriter" />
+   <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
+       <constructor-arg ref="transmittedDataKeysResource" />
+       <constructor-arg ref="dataModelConverter" />
    </bean>
    
    <!-- Camera sensor and file writer -->
    <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
-    <!--   <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" /> -->
-       <constructor-arg type="java.lang.String" value="C:\Users\Dan" />
+       <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
    </bean>
    
    <bean id="cameraWriter" class="project.latex.balloon.writer.CameraFileWriter">
