@@ -8,6 +8,7 @@ package project.latex.balloon.writer;
 
 import java.io.File;
 import java.util.List;
+import project.latex.balloon.DataFolderResource;
 
 /**
  *
@@ -15,10 +16,20 @@ import java.util.List;
  */
 public class CameraFileWriter implements CameraDataWriter {
     
-    private final File savedImagesDirectory;
+    private File savedImagesDirectory;
     final static String imagesDirectoryName = "images";
     
-    public CameraFileWriter(File baseFolder)    {
+    public CameraFileWriter()  {
+    }
+    
+    public CameraFileWriter(DataFolderResource dataFolderResource)    {
+        if (dataFolderResource == null) {
+            throw new IllegalArgumentException("Null data folder resource");
+        }
+        setSavedImagesDirectoryFromBaseFolder(dataFolderResource.getDataFolder());
+    }
+    
+    private void setSavedImagesDirectoryFromBaseFolder(File baseFolder) {
         if (baseFolder == null || !baseFolder.isDirectory())    {
             throw new IllegalArgumentException("Base folder is not a directory");
         }

@@ -17,6 +17,8 @@ import org.junit.Test;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import project.latex.balloon.TransmittedDataKeysResource;
 
 /**
  *
@@ -27,6 +29,7 @@ public class SerialDataWriterTest {
     private SerialDataWriter writer;
     private Serial mockSerial;
     private List<String> dataKeys;
+    private TransmittedDataKeysResource mockTransmittedDataKeysResource;
     
     public SerialDataWriterTest() {
     }
@@ -37,7 +40,9 @@ public class SerialDataWriterTest {
         dataKeys = new ArrayList<>();
         dataKeys.add("Test");
         dataKeys.add("Test2");
-        writer = new SerialDataWriter(dataKeys, new DataModelConverter(), mockSerial);
+        mockTransmittedDataKeysResource = mock(TransmittedDataKeysResource.class);
+        when(mockTransmittedDataKeysResource.getTransmittedDataKeys()).thenReturn(dataKeys);
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial);
     }
     
     @After
@@ -47,7 +52,7 @@ public class SerialDataWriterTest {
     @Test(expected = UnsatisfiedLinkError.class)
     public void testConstructorThrowsIfSerialPortCantOpen()    {
         doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, SerialDataWriter.BAUD_RATE);
-        writer = new SerialDataWriter(dataKeys, new DataModelConverter(), mockSerial);
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial);
     }
     
     /**

@@ -14,6 +14,8 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import project.latex.balloon.DataFolderResource;
+import project.latex.balloon.TransmittedDataKeysResource;
 
 /**
  *
@@ -35,11 +37,12 @@ public class FileDataWriter implements DataWriter {
         this.dataKeys = dataKeys;
         writeHeaders();
     }
-    
-    public FileDataWriter(File dataFolder, List<String> dataKeys, DataModelConverter converter)   {
-        this(dataKeys, converter, Logger.getLogger(FileDataWriter.class), createFileAppender(dataFolder));
+ 
+    public FileDataWriter(DataFolderResource dataFolderResource, TransmittedDataKeysResource transmittedDataKeysResource, DataModelConverter converter) {
+        this(transmittedDataKeysResource.getTransmittedDataKeys(), converter, Logger.getLogger(FileDataWriter.class),
+                createFileAppender(dataFolderResource.getDataFolder()));
     }
-    
+
     private static FileAppender createFileAppender(File dataFolder)    {
         String filePath = fileName;
         if (dataFolder != null)  {

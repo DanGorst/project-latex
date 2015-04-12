@@ -28,6 +28,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import project.latex.balloon.TransmittedDataKeysResource;
 
 /**
  * This is a class for use during testing, until we have our radio comms working.
@@ -43,9 +44,9 @@ public class HttpDataWriter implements DataWriter {
     
     private static final Logger logger = Logger.getLogger(HttpDataWriter.class);
     
-    public HttpDataWriter(List<String> dataKeys, DataModelConverter converter, String receiverUrl) {
+    public HttpDataWriter(TransmittedDataKeysResource transmittedDataKeysResource, DataModelConverter converter, String receiverUrl) {
         this.converter = converter;
-        this.dataKeys = dataKeys;
+        this.dataKeys = transmittedDataKeysResource.getTransmittedDataKeys();
         this.receiverUrl = receiverUrl;
     }
     

@@ -49,7 +49,8 @@ public class CameraControllerTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testControllerThrowsIfGivenNullImagesDir()  {
-        new CameraController(null);
+        File directory = null;
+        CameraController cameraController = new CameraController(directory);
     }
     
     @Test(expected = IllegalArgumentException.class)

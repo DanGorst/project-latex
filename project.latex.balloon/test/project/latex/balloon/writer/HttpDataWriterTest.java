@@ -19,6 +19,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import project.latex.balloon.TransmittedDataKeysResource;
 
 /**
  *
@@ -28,6 +31,7 @@ public class HttpDataWriterTest {
     
     private HttpDataWriter writer;
     private List<String> dataKeys;
+    private TransmittedDataKeysResource mockTransmittedDataKeysResource;
     
     public HttpDataWriterTest() {
     }
@@ -43,7 +47,9 @@ public class HttpDataWriterTest {
     @Before
     public void setUp() {
         this.dataKeys = new ArrayList<>();
-        this.writer = new HttpDataWriter(dataKeys, new DataModelConverter(), null);
+        this.mockTransmittedDataKeysResource = mock(TransmittedDataKeysResource.class);
+        when(mockTransmittedDataKeysResource.getTransmittedDataKeys()).thenReturn(dataKeys);
+        this.writer = new HttpDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), null);
     }
     
     @After

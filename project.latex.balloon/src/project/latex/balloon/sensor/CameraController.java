@@ -19,6 +19,10 @@ public class CameraController implements CameraSensorController {
     private final File imagesDirectory;
     final static String sensorName = "Camera";
     
+    public CameraController(String imagesDirectoryString)   {
+        this(new File(imagesDirectoryString));
+    }
+    
     public CameraController(File imagesDirectory)   {
         if (imagesDirectory == null || !(imagesDirectory.isDirectory()))  {
             throw new IllegalArgumentException("File is not a directory");
