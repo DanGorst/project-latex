@@ -14,7 +14,7 @@
    <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
    <bean id="transmittedDataKeysResource" class="project.latex.balloon.TransmittedDataKeysResource">
-       <constructor-arg value="../telemetryKeys.json" />
+       <constructor-arg value="telemetryKeys.json" />
    </bean>
    
    <!-- Data model consumers -->
@@ -23,6 +23,12 @@
    <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
        <constructor-arg ref="IO_PIN_01"/>
    </bean>
+   
+   <!-- Put this mock transistor switch in instead of the real one above if you want to 
+        run the software from Netbeans.   -->
+   <!-- <bean id="transistorSwitch" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="project.latex.balloon.consumer.TransistorSwitch" />
+    </bean> -->
    
    <bean id="transistorSwitchController" class="project.latex.balloon.consumer.TransistorSwitchController">
        <constructor-arg ref="transistorSwitch" />
