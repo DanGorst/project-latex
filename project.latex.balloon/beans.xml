@@ -20,11 +20,8 @@
    <!-- Data model consumers -->
    <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
    
-   <!--  <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
+   <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
        <constructor-arg ref="IO_PIN_01"/>
-   </bean> -->
-   <bean id="transistorSwitch" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="project.latex.balloon.consumer.TransistorSwitch" />
    </bean>
    
    <bean id="transistorSwitchController" class="project.latex.balloon.consumer.TransistorSwitchController">
