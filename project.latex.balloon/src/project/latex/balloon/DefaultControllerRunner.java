@@ -17,6 +17,12 @@ public class DefaultControllerRunner implements ControllerRunner {
 
     private final Logger logger = Logger.getLogger(DefaultControllerRunner.class);
     
+    private int delay;
+
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+    
     @Override
     public boolean shouldKeepRunning() {
         return true;
@@ -26,7 +32,7 @@ public class DefaultControllerRunner implements ControllerRunner {
     public void controllerFinishedRunLoop(Map<String, Object> data) {
         try {
             // Sleep this thread so we're not loading the CPU too much from the controller
-            Thread.sleep(60000);
+            Thread.sleep(delay);
         } catch (InterruptedException ex) {
             logger.error(ex);
         }

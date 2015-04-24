@@ -7,7 +7,9 @@
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
-   <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner" />
+   <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
+       <property name="delay" value="60000" />
+   </bean>
    
    <bean id="sentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
    
