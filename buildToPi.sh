@@ -9,3 +9,4 @@ scp dist/project.latex.balloon.jar pi@192.168.0.7:/home/pi/project-latex/project
 scp beans.xml pi@192.168.0.7:/home/pi/project-latex/project.latex.balloon/dist
 scp logger.properties pi@192.168.0.7:/home/pi/project-latex/project.latex.balloon/dist
 scp telemetryKeys.json pi@192.168.0.7:/home/pi/project-latex/project.latex.balloon/dist
+scp -r dist/lib pi@192.168.0.7:/home/pi/project-latex/project.latex.balloon/dist

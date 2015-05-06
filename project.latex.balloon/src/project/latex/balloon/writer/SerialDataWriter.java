@@ -51,11 +51,19 @@ public class SerialDataWriter implements DataWriter {
 
     @Override
     public void writeData(Map<String, Object> dataModel) {
+        String csvString = convertDataToCsvString(dataModel);
+        serial.writeln(csvString);
+    }
+    
+    public String convertDataToCsvString(Map<String, Object> dataModel) {
         if (dataModel == null) {
             throw new IllegalArgumentException("Cannot write null data object");
         }
 
-        String csvString = this.converter.convertDataToCsvString(dataKeys, dataModel);
-        serial.writeln(csvString);
+        return this.converter.convertDataToCsvString(dataKeys, dataModel);
+    }
+    
+    public void writeString(String data) {
+        serial.write(data);
     }
 }
