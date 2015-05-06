@@ -38,13 +38,15 @@ public class ChunkedSerialDataWriter implements DataWriter {
 
             @Override
             public void run() {
-                // Write the next chunk of data if it is available
-                writeNextChunk();
-                try {
-                    // Wait for the specified delay before writing the next chunk
-                    Thread.sleep(delayInMilliseconds);
-                } catch (InterruptedException ex) {
-                    logger.error(ex.getMessage(), ex);
+                while (true) {
+                    // Write the next chunk of data if it is available
+                    writeNextChunk();
+                    try {
+                        // Wait for the specified delay before writing the next chunk
+                        Thread.sleep(delayInMilliseconds);
+                    } catch (InterruptedException ex) {
+                        logger.error(ex.getMessage(), ex);
+                    }
                 }
             }
         });
@@ -66,6 +68,7 @@ public class ChunkedSerialDataWriter implements DataWriter {
     synchronized void writeNextChunk() {
         if (!this.chunks.isEmpty()) {
             String chunk = this.chunks.remove(0);
+            logger.info("Next chunk to write: " + chunk);
             this.dataWriter.writeString(chunk);
         }
     }
@@ -82,6 +85,7 @@ public class ChunkedSerialDataWriter implements DataWriter {
     @Override
     public void writeData(Map<String, Object> dataModel) {
         String csvString = this.dataWriter.convertDataToCsvString(dataModel);
+        logger.info(csvString);
         // Add a new line character to the end of our data so that we can separate sentences
         csvString += "\n";
         // Break our data into chunks to pass to our serial data writer

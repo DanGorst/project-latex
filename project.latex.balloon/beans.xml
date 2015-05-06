@@ -82,6 +82,12 @@
        <constructor-arg ref="dataModelConverter" />
    </bean>
    
+   <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
+       <constructor-arg value="60" />
+       <constructor-arg value="15000" />
+       <constructor-arg ref="serialDataWriter" />
+   </bean>
+   
    <!-- Camera sensor and file writer -->
    <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
        <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
@@ -116,7 +122,7 @@
        <property name="dataWriters">
            <list>
                <ref bean="fileDataWriter" />
-               <ref bean="serialDataWriter" />
+               <ref bean="chunkedSerialDataWriter" />
            </list>
        </property>
    </bean>
