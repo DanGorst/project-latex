@@ -80,6 +80,7 @@
    <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
        <constructor-arg ref="transmittedDataKeysResource" />
        <constructor-arg ref="dataModelConverter" />
+       <constructor-arg value="50" />
    </bean>
    
    <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
