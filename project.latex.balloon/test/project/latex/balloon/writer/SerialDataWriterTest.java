@@ -42,7 +42,7 @@ public class SerialDataWriterTest {
         dataKeys.add("Test2");
         mockTransmittedDataKeysResource = mock(TransmittedDataKeysResource.class);
         when(mockTransmittedDataKeysResource.getTransmittedDataKeys()).thenReturn(dataKeys);
-        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial);
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial, 50);
     }
     
     @After
@@ -51,8 +51,8 @@ public class SerialDataWriterTest {
 
     @Test(expected = UnsatisfiedLinkError.class)
     public void testConstructorThrowsIfSerialPortCantOpen()    {
-        doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, SerialDataWriter.BAUD_RATE);
-        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial);
+        doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, 50);
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial, 50);
     }
     
     /**

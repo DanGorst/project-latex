@@ -22,19 +22,18 @@ public class SerialDataWriter implements DataWriter {
 
     private static final Logger logger = Logger.getLogger(SerialDataWriter.class);
 
-    public static final int BAUD_RATE = 50;
-
     private final DataModelConverter converter;
     private final List<String> dataKeys;
     private final Serial serial;
 
-    public SerialDataWriter(TransmittedDataKeysResource transmittedDataKeysResource, DataModelConverter converter, Serial serial) {
+    public SerialDataWriter(TransmittedDataKeysResource transmittedDataKeysResource, 
+            DataModelConverter converter, Serial serial, int baudRate) {
         this.converter = converter;
         this.serial = serial;
         this.dataKeys = transmittedDataKeysResource.getTransmittedDataKeys();
 
         // open the default serial port provided on the GPIO header
-        serial.open(Serial.DEFAULT_COM_PORT, BAUD_RATE);
+        serial.open(Serial.DEFAULT_COM_PORT, baudRate);
 
         // Add a serial data listener to allow us to echo out any data written
         serial.addListener(new SerialDataListener() {
@@ -45,8 +44,9 @@ public class SerialDataWriter implements DataWriter {
         });
     }
 
-    public SerialDataWriter(TransmittedDataKeysResource transmittedDataKeysResource, DataModelConverter converter) {
-        this(transmittedDataKeysResource, converter, SerialFactory.createInstance());
+    public SerialDataWriter(TransmittedDataKeysResource transmittedDataKeysResource, DataModelConverter converter,
+            int baudRate) {
+        this(transmittedDataKeysResource, converter, SerialFactory.createInstance(), baudRate);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SerialDataWriter implements DataWriter {
         String csvString = convertDataToCsvString(dataModel);
         serial.writeln(csvString);
     }
-    
+
     public String convertDataToCsvString(Map<String, Object> dataModel) {
         if (dataModel == null) {
             throw new IllegalArgumentException("Cannot write null data object");
@@ -62,7 +62,7 @@ public class SerialDataWriter implements DataWriter {
 
         return this.converter.convertDataToCsvString(dataKeys, dataModel);
     }
-    
+
     public void writeString(String data) {
         serial.write(data);
     }
