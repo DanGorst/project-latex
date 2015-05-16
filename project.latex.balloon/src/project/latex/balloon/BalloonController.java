@@ -64,7 +64,9 @@ public class BalloonController {
         PropertyConfigurator.configure("logger.properties");
         logger.info("Project Latex Balloon Controller, version 0.1");
 
-        ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
+        String configFile = args[0];
+        
+        ApplicationContext context = new FileSystemXmlApplicationContext(configFile);
         BalloonController balloonController = (BalloonController) context.getBean("balloonController");
         logger.info("Balloon created");
         

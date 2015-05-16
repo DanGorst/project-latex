@@ -4,4 +4,4 @@
 cd project.latex.balloon/dist
 
 # Run it as root, specifying the main class
-sudo java -cp project.latex.balloon.jar project.latex.balloon.BalloonController
+sudo java -cp project.latex.balloon.jar project.latex.balloon.BalloonController beans.xml
