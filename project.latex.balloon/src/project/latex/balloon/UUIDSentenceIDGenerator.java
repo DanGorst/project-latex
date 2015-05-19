@@ -15,7 +15,8 @@ public class UUIDSentenceIDGenerator implements SentenceIdGenerator {
 
     @Override
     public String generateId() {
-        return UUID.randomUUID().toString();
+        //return UUID.randomUUID().toString();
+        return "123";
     }
 
 }

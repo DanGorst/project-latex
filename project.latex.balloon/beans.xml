@@ -8,7 +8,7 @@
     http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
    <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
-       <property name="delay" value="60000" />
+       <property name="delay" value="30000" />
    </bean>
    
    <bean id="sentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
@@ -84,8 +84,8 @@
    </bean>
    
    <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
-       <constructor-arg value="60" />
-       <constructor-arg value="15000" />
+       <constructor-arg value="16" />
+       <constructor-arg value="5000" />
        <constructor-arg ref="serialDataWriter" />
    </bean>
    
