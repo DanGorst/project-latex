@@ -58,8 +58,7 @@ public class DataModelConverter {
         
         String checksumString = ChecksumGenerator.generateChecksum(stringBuilder.toString());
         stringBuilder.append("*").append(checksumString);
-        //return stringBuilder.toString();
-        return "$$icarus,722,12:18:36,52.072820,0.250666,28608,19.26,178.8,17.6,-16.6*20";
+        return stringBuilder.toString();
     }
     
     String getValueString(Object value)  {
