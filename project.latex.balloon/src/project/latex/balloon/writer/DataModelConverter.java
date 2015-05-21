@@ -16,6 +16,12 @@ import java.util.Map;
  */
 public class DataModelConverter {
     
+    private final ChecksumGenerator checksumGenerator;
+    
+    public DataModelConverter(ChecksumGenerator checksumGenerator) {
+        this.checksumGenerator = checksumGenerator;
+    }
+    
     public String convertDataKeysToCsvString(List<String> dataKeys)   {
         if (dataKeys == null)   {
             throw new IllegalArgumentException("Cannot convert null object to csv");
@@ -56,7 +62,7 @@ public class DataModelConverter {
             stringBuilder.append(",").append(getValueString(value));
         }
         
-        String checksumString = ChecksumGenerator.generateChecksum(stringBuilder.toString());
+        String checksumString = checksumGenerator.generateChecksum(stringBuilder.toString());
         stringBuilder.append("*").append(checksumString);
         return stringBuilder.toString();
     }

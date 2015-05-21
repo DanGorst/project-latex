@@ -14,10 +14,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,24 +30,15 @@ public class HttpDataWriterTest {
     private HttpDataWriter writer;
     private List<String> dataKeys;
     private TransmittedDataKeysResource mockTransmittedDataKeysResource;
-    
-    public HttpDataWriterTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    private ChecksumGenerator mockChecksumGenerator;
     
     @Before
     public void setUp() {
         this.dataKeys = new ArrayList<>();
         this.mockTransmittedDataKeysResource = mock(TransmittedDataKeysResource.class);
         when(mockTransmittedDataKeysResource.getTransmittedDataKeys()).thenReturn(dataKeys);
-        this.writer = new HttpDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), null);
+        mockChecksumGenerator = mock(ChecksumGenerator.class);
+        this.writer = new HttpDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(mockChecksumGenerator), null);
     }
     
     @After

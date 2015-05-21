@@ -15,26 +15,22 @@ import static org.junit.Assert.*;
  *
  * @author Dan
  */
-public class ChecksumGeneratorTest {
-    
-    public ChecksumGeneratorTest() {
-    }
+public class Adler32ChecksumGeneratorTest {
+
+    private Adler32ChecksumGenerator checksumGenerator;
     
     @Before
     public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
+        checksumGenerator = new Adler32ChecksumGenerator();
     }
 
     /**
-     * Test of generateChecksum method, of class ChecksumGenerator.
+     * Test of generateChecksum method, of class Adler32ChecksumGenerator.
      */
     @Test
     public void testGenerateChecksum() {
-        assertEquals("59b016d", ChecksumGenerator.generateChecksum("1234567"));
-        assertEquals("81e0256", ChecksumGenerator.generateChecksum("abcdef"));
+        assertEquals("59b016d", checksumGenerator.generateChecksum("1234567"));
+        assertEquals("81e0256", checksumGenerator.generateChecksum("abcdef"));
     }
     
 }
