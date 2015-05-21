@@ -15,10 +15,8 @@ import java.util.Map;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
 
@@ -33,24 +31,15 @@ public class FileDataWriterTest {
     private DataModelConverter converter;
     private Logger mockLogger;
     private FileAppender mockAppender;
-    
-    public FileDataWriterTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    private ChecksumGenerator checksumGenerator;
     
     @Before
     public void setUp() {
         dataKeys = new ArrayList<>();
         dataKeys.add("Date");
         dataKeys.add("Value");
-        converter = new DataModelConverter();
+        checksumGenerator = mock(ChecksumGenerator.class);
+        converter = new DataModelConverter(checksumGenerator);
         mockLogger = mock(Logger.class);
         mockAppender = mock(FileAppender.class);
         writer = new FileDataWriter(dataKeys, converter, mockLogger, mockAppender);
@@ -64,11 +53,9 @@ public class FileDataWriterTest {
 
     /**
      * Test of writeData method, of class FileDataWriter.
-     *
-     * @throws project.latex.writer.DataWriteFailedException
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testWriteDataThrowsMeaningfulExceptionIfDataIsNull() throws DataWriteFailedException {
+    public void testWriteDataThrowsMeaningfulExceptionIfDataIsNull() {
         writer.writeData(null);
     }
     
@@ -80,14 +67,15 @@ public class FileDataWriterTest {
             Date modelDate = new Date();
             dataMap.put("Date", modelDate);
             
+            when(checksumGenerator.generateChecksum(anyString())).thenReturn("XX");
+            
             writer.writeData(dataMap);
             writer.writeData(dataMap);
             
             verify(mockLogger).info("Date,Value");
             String expectedDataString = modelDate.toString() + ",5";
             
-            verify(mockLogger, times(2)).info(expectedDataString + "*" 
-                    + ChecksumGenerator.generateChecksum(expectedDataString));
+            verify(mockLogger, times(2)).info(expectedDataString + "*XX");
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

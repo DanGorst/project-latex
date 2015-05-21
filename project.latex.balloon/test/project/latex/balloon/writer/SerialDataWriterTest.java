@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package project.latex.balloon.writer;
 
 import com.pi4j.io.serial.Serial;
@@ -11,9 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -25,15 +24,13 @@ import project.latex.balloon.TransmittedDataKeysResource;
  * @author Dan
  */
 public class SerialDataWriterTest {
-    
+
     private SerialDataWriter writer;
     private Serial mockSerial;
     private List<String> dataKeys;
     private TransmittedDataKeysResource mockTransmittedDataKeysResource;
-    
-    public SerialDataWriterTest() {
-    }
-    
+    private ChecksumGenerator mockChecksumGenerator;
+
     @Before
     public void setUp() {
         mockSerial = mock(Serial.class);
@@ -42,19 +39,17 @@ public class SerialDataWriterTest {
         dataKeys.add("Test2");
         mockTransmittedDataKeysResource = mock(TransmittedDataKeysResource.class);
         when(mockTransmittedDataKeysResource.getTransmittedDataKeys()).thenReturn(dataKeys);
-        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial, 50);
-    }
-    
-    @After
-    public void tearDown() {
+        mockChecksumGenerator = mock(ChecksumGenerator.class);
+        when(mockChecksumGenerator.generateChecksum(Matchers.anyString())).thenReturn("XX");
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(mockChecksumGenerator), mockSerial, 50);
     }
 
     @Test(expected = UnsatisfiedLinkError.class)
-    public void testConstructorThrowsIfSerialPortCantOpen()    {
+    public void testConstructorThrowsIfSerialPortCantOpen() {
         doThrow(UnsatisfiedLinkError.class).when(mockSerial).open(Serial.DEFAULT_COM_PORT, 50);
-        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(), mockSerial, 50);
+        writer = new SerialDataWriter(mockTransmittedDataKeysResource, new DataModelConverter(mockChecksumGenerator), mockSerial, 50);
     }
-    
+
     /**
      * Test of writeData method, of class SerialDataWriter.
      */
@@ -64,20 +59,20 @@ public class SerialDataWriterTest {
         dataModel.put("Test", "DataString");
         dataModel.put("Test2", "HelloWorld");
         writer.writeData(dataModel);
-        verify(mockSerial).writeln("DataString,HelloWorld*5774081a");
+        verify(mockSerial).writeln("DataString,HelloWorld*XX");
     }
-    
+
     @Test
     public void testWriteDataWhichDoesntMatchKeys() {
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("Invalid", "DataString");
         dataModel.put("Invalid2", "HelloWorld");
         writer.writeData(dataModel);
-        verify(mockSerial).writeln("99.99,99.99*deb0251");
+        verify(mockSerial).writeln("99.99,99.99*XX");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
-    public void testWriteDataThrowsIfDataModelIsNull()  {
+    public void testWriteDataThrowsIfDataModelIsNull() {
         writer.writeData(null);
     }
 }

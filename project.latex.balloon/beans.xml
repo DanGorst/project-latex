@@ -68,7 +68,10 @@
        <constructor-arg ref="dataModelConverter" />
    </bean>
    
+   <bean id="adler32ChecksumGenerator" class="project.latex.balloon.writer.Adler32ChecksumGenerator" />
+   
    <bean id="dataModelConverter" class="project.latex.balloon.writer.DataModelConverter">
+       <constructor-arg ref="adler32ChecksumGenerator" />
    </bean>
    
    <bean id="httpDataWriter" class="project.latex.balloon.writer.HttpDataWriter">

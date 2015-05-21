@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.mockito.Matchers;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -23,23 +23,15 @@ import static org.junit.Assert.*;
  */
 public class DataModelConverterTest {
     
-    public DataModelConverterTest() {
-    }
+    private ChecksumGenerator mockChecksumGenerator;
     
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    private DataModelConverter dataModelConverter;
     
     @Before
     public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
+        mockChecksumGenerator = mock(ChecksumGenerator.class);
+        when(mockChecksumGenerator.generateChecksum(Matchers.anyString())).thenReturn("XX");
+        dataModelConverter = new DataModelConverter(mockChecksumGenerator);
     }
 
     /**
@@ -50,22 +42,19 @@ public class DataModelConverterTest {
         List<String> dataKeys = new ArrayList<>();
         dataKeys.add("First");
         dataKeys.add("Second");
-        DataModelConverter instance = new DataModelConverter();
         String expResult = "First,Second";
-        String result = instance.convertDataKeysToCsvString(dataKeys);
+        String result = dataModelConverter.convertDataKeysToCsvString(dataKeys);
         assertEquals(expResult, result);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConvertDataKeysThrowsIfPassedNullString()   {
-        DataModelConverter converter = new DataModelConverter();
-        converter.convertDataKeysToCsvString(null);
+        dataModelConverter.convertDataKeysToCsvString(null);
     }
     
     @Test
     public void testConvertDataKeysReturnsEmptyStringIfPassedEmptyList()    {
-        DataModelConverter converter = new DataModelConverter();
-        String actual = converter.convertDataKeysToCsvString(new ArrayList<String>());
+        String actual = dataModelConverter.convertDataKeysToCsvString(new ArrayList<String>());
         assertEquals("", actual);
     }
 
@@ -82,43 +71,38 @@ public class DataModelConverterTest {
         data.put("Second", 0.34);
         data.put("First", 1.23);
         
-        DataModelConverter instance = new DataModelConverter();
-        String expResult = "1.23,0.34*88201b6";
-        String result = instance.convertDataToCsvString(dataKeys, data);
+        String expResult = "1.23,0.34*XX";
+        String result = dataModelConverter.convertDataToCsvString(dataKeys, data);
         assertEquals(expResult, result);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConvertDataToCsvStringThrowsIfPassedNullDataKeys()  {
-        DataModelConverter converter = new DataModelConverter();
-        converter.convertDataToCsvString(null, new HashMap<String, Object>());
+        dataModelConverter.convertDataToCsvString(null, new HashMap<String, Object>());
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConvertDataToCsvStringThrowsIfPassedNullData()  {
-        DataModelConverter converter = new DataModelConverter();
         List<String> dataKeys = new ArrayList<>();
         dataKeys.add("First");
         dataKeys.add("Second");
         
-        converter.convertDataToCsvString(dataKeys, null);
+        dataModelConverter.convertDataToCsvString(dataKeys, null);
     }
     
     @Test
     public void testConvertDataToCsvStringReturnsEmptyStringIfPassedEmptyKeysArray()    {
-        DataModelConverter converter = new DataModelConverter();
         List<String> dataKeys = new ArrayList<>();
         
         Map<String, Object> data = new HashMap<>();
         data.put("Second", 0.34);
         data.put("First", 1.23);
-        String actual = converter.convertDataToCsvString(dataKeys, data);
+        String actual = dataModelConverter.convertDataToCsvString(dataKeys, data);
         assertEquals("", actual);
     }
     
     @Test
     public void testConvertDataToCsvStringReturnsNullStringsIfDataDoesntMatchKeys() {
-        DataModelConverter converter = new DataModelConverter();
         List<String> dataKeys = new ArrayList<>();
         dataKeys.add("First");
         dataKeys.add("Second");
@@ -126,7 +110,7 @@ public class DataModelConverterTest {
         Map<String, Object> data = new HashMap<>();
         data.put("X", 0.34);
         data.put("Y", 1.23);
-        String actual = converter.convertDataToCsvString(dataKeys, data);
-        assertEquals("99.99,99.99*deb0251", actual);
+        String actual = dataModelConverter.convertDataToCsvString(dataKeys, data);
+        assertEquals("99.99,99.99*XX", actual);
     }
 }
