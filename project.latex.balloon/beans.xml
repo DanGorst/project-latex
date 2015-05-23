@@ -1,135 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
-   <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
-       <property name="delay" value="30000" />
-   </bean>
+    <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
+        <property name="delay" value="25000" />
+    </bean>
    
-   <bean id="uuidSentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
+    <bean id="uuidSentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
    
-   <bean id="testSentenceIdGenerator" class="project.latex.balloon.TestSentenceIdGenerator" />
+    <bean id="testSentenceIdGenerator" class="project.latex.balloon.TestSentenceIdGenerator" />
    
-   <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
+    <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
-   <bean id="transmittedDataKeysResource" class="project.latex.balloon.TransmittedDataKeysResource">
-       <constructor-arg value="telemetryKeys.json" />
-   </bean>
+    <bean id="transmittedDataKeysResource" class="project.latex.balloon.TransmittedDataKeysResource">
+        <constructor-arg value="telemetryKeys.json" />
+    </bean>
    
-   <!-- Data model consumers -->
-   <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
+    <!-- Data model consumers -->
+    <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
    
-   <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
-       <constructor-arg ref="IO_PIN_01"/>
-   </bean>
+    <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
+        <constructor-arg ref="IO_PIN_01"/>
+    </bean>
    
-   <!-- Put this mock transistor switch in instead of the real one above if you want to 
-        run the software from Netbeans.   -->
-   <!-- <bean id="transistorSwitch" class="org.mockito.Mockito" factory-method="mock">
+    <!-- Put this mock transistor switch in instead of the real one above if you want to 
+    run the software from Netbeans.   -->
+    <!-- <bean id="transistorSwitch" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="project.latex.balloon.consumer.TransistorSwitch" />
     </bean> -->
    
-   <bean id="transistorSwitchController" class="project.latex.balloon.consumer.TransistorSwitchController">
-       <constructor-arg ref="transistorSwitch" />
-       <constructor-arg type="double" value="500" />
-       <constructor-arg type="double" value="100" />
-       <constructor-arg value="altitude" />
-   </bean>
+    <bean id="transistorSwitchController" class="project.latex.balloon.consumer.TransistorSwitchController">
+        <constructor-arg ref="transistorSwitch" />
+        <constructor-arg type="double" value="500" />
+        <constructor-arg type="double" value="100" />
+        <constructor-arg value="altitude" />
+    </bean>
    
-   <!-- Sensors -->
-   <bean id="dummySensorController" class="project.latex.balloon.sensor.DummySensorController">
-       <constructor-arg value="temp_external" />
-   </bean>
+    <!-- Sensors -->
+    <bean id="dummySensorController" class="project.latex.balloon.sensor.DummySensorController">
+        <constructor-arg value="temp_external" />
+    </bean>
    
-   <bean id="ubloxGpsSensor" class="project.latex.balloon.sensor.gps.UBloxGPSSensor">    
-   </bean>
+    <bean id="ubloxGpsSensor" class="project.latex.balloon.sensor.gps.UBloxGPSSensor">    
+    </bean>
    
-   <bean id="gpsSensorController" class="project.latex.balloon.sensor.gps.GPSSensorController">
-       <constructor-arg ref="ubloxGpsSensor" />
-       <constructor-arg>
-           <list>
-               <value>time</value>
-               <value>latitude</value>
-               <value>longitude</value>
-               <value>altitude</value>
-               <value>heading</value>
-               <value>speed</value>
-           </list>
-       </constructor-arg>
-   </bean>
+    <bean id="gpsSensorController" class="project.latex.balloon.sensor.gps.GPSSensorController">
+        <constructor-arg ref="ubloxGpsSensor" />
+        <constructor-arg>
+            <list>
+                <value>time</value>
+                <value>latitude</value>
+                <value>longitude</value>
+                <value>altitude</value>
+                <value>heading</value>
+                <value>speed</value>
+            </list>
+        </constructor-arg>
+    </bean>
    
-   <!-- Data writers -->
-   <bean id="fileDataWriter" class="project.latex.balloon.writer.FileDataWriter">
-       <constructor-arg ref="dataFolderResource" />
-       <constructor-arg ref="transmittedDataKeysResource" />
-       <constructor-arg ref="dataModelConverter" />
-   </bean>
+    <!-- Data writers -->
+    <bean id="fileDataWriter" class="project.latex.balloon.writer.FileDataWriter">
+        <constructor-arg ref="dataFolderResource" />
+        <constructor-arg ref="transmittedDataKeysResource" />
+        <constructor-arg ref="dataModelConverter" />
+    </bean>
    
-   <bean id="adler32ChecksumGenerator" class="project.latex.balloon.writer.Adler32ChecksumGenerator" />
+    <bean id="adler32ChecksumGenerator" class="project.latex.balloon.writer.Adler32ChecksumGenerator" />
    
-   <bean id="dataModelConverter" class="project.latex.balloon.writer.DataModelConverter">
-       <constructor-arg ref="adler32ChecksumGenerator" />
-   </bean>
+    <bean id="crc16ccittChecksumGenerator" class="project.latex.balloon.writer.CRC16CCITTChecksumGenerator" />
    
-   <bean id="httpDataWriter" class="project.latex.balloon.writer.HttpDataWriter">
-       <constructor-arg ref="transmittedDataKeysResource" />
-       <constructor-arg ref="dataModelConverter" />
-       <constructor-arg value="http://project-latex-dlfldigi.herokuapp.com/" />
-   </bean>
+    <bean id="dataModelConverter" class="project.latex.balloon.writer.DataModelConverter">
+        <constructor-arg ref="crc16ccittChecksumGenerator" />
+    </bean>
    
-   <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
-       <constructor-arg ref="transmittedDataKeysResource" />
-       <constructor-arg ref="dataModelConverter" />
-       <constructor-arg value="50" />
-   </bean>
+    <bean id="httpDataWriter" class="project.latex.balloon.writer.HttpDataWriter">
+        <constructor-arg ref="transmittedDataKeysResource" />
+        <constructor-arg ref="dataModelConverter" />
+        <constructor-arg value="http://project-latex-dlfldigi.herokuapp.com/" />
+    </bean>
    
-   <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
-       <constructor-arg value="32" />
-       <constructor-arg value="7000" />
-       <constructor-arg ref="serialDataWriter" />
-   </bean>
+    <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
+        <constructor-arg ref="transmittedDataKeysResource" />
+        <constructor-arg ref="dataModelConverter" />
+        <constructor-arg value="50" />
+    </bean>
    
-   <!-- Camera sensor and file writer -->
-   <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
-       <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
-   </bean>
+    <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
+        <constructor-arg value="32" />
+        <constructor-arg value="10000" />
+        <constructor-arg ref="serialDataWriter" />
+    </bean>
    
-   <bean id="cameraWriter" class="project.latex.balloon.writer.CameraFileWriter">
-       <constructor-arg ref="dataFolderResource" />
-   </bean>
+    <!-- Camera sensor and file writer -->
+    <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
+        <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
+    </bean>
    
-   <!-- Now the main balloon controller -->
-   <bean id="balloonController" class="project.latex.balloon.BalloonController">
-       <property name="converter" ref="dataModelConverter" />
-       <property name="cameraSensor" ref="cameraSensor" />
-       <property name="cameraWriter" ref="cameraWriter" />
-       <property name="sentenceIdGenerator" ref="testSentenceIdGenerator" />
-       <property name="timeKey" value="time" />
-       <property name="dateKey" value="date" />
-       <property name="payloadNameKey" value="payload_name" />
-       <property name="sentenceIdKey" value="sentence_id" />
-       <property name="controllerRunner" ref="controllerRunner" />
-       <property name="sensors">
-           <list>
-               <ref bean="dummySensorController" />
-               <ref bean="gpsSensorController" />
-           </list>
-       </property>
-       <property name="dataModelConsumers">
-           <list>
-               <ref bean="transistorSwitchController" />
-           </list>
-       </property>
-       <property name="dataWriters">
-           <list>
-               <ref bean="fileDataWriter" />
-               <ref bean="chunkedSerialDataWriter" />
-           </list>
-       </property>
-   </bean>
+    <bean id="cameraWriter" class="project.latex.balloon.writer.CameraFileWriter">
+        <constructor-arg ref="dataFolderResource" />
+    </bean>
+   
+    <!-- Now the main balloon controller -->
+    <bean id="balloonController" class="project.latex.balloon.BalloonController">
+        <property name="converter" ref="dataModelConverter" />
+        <property name="cameraSensor" ref="cameraSensor" />
+        <property name="cameraWriter" ref="cameraWriter" />
+        <property name="sentenceIdGenerator" ref="testSentenceIdGenerator" />
+        <property name="timeKey" value="time" />
+        <property name="dateKey" value="date" />
+        <property name="payloadNameKey" value="payload_name" />
+        <property name="sentenceIdKey" value="sentence_id" />
+        <property name="controllerRunner" ref="controllerRunner" />
+        <property name="sensors">
+            <list>
+                <ref bean="dummySensorController" />
+                <ref bean="gpsSensorController" />
+            </list>
+        </property>
+        <property name="dataModelConsumers">
+            <list>
+                <ref bean="transistorSwitchController" />
+            </list>
+        </property>
+        <property name="dataWriters">
+            <list>
+                <ref bean="fileDataWriter" />
+                <ref bean="chunkedSerialDataWriter" />
+            </list>
+        </property>
+    </bean>
 </beans>
