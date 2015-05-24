@@ -13,7 +13,7 @@
    
     <bean id="uuidSentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
    
-    <bean id="testSentenceIdGenerator" class="project.latex.balloon.TestSentenceIdGenerator" />
+    <bean id="incrementalSentenceIdGenerator" class="project.latex.balloon.IncrementalSentenceIdGenerator" />
    
     <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
@@ -110,7 +110,7 @@
         <property name="converter" ref="dataModelConverter" />
         <property name="cameraSensor" ref="cameraSensor" />
         <property name="cameraWriter" ref="cameraWriter" />
-        <property name="sentenceIdGenerator" ref="testSentenceIdGenerator" />
+        <property name="sentenceIdGenerator" ref="incrementalSentenceIdGenerator" />
         <property name="timeKey" value="time" />
         <property name="dateKey" value="date" />
         <property name="payloadNameKey" value="payload_name" />
