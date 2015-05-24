@@ -6,9 +6,11 @@
 
 package project.latex.balloon;
 
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -18,16 +20,20 @@ public class IncrementalSentenceIdGeneratorTest {
     
     private IncrementalSentenceIdGenerator sentenceIdGenerator;
     
+    private FlightInfoManager flightInfoManager;
+    
     @Before
     public void setUp() {
-        sentenceIdGenerator = new IncrementalSentenceIdGenerator();
+        flightInfoManager = mock(FlightInfoManager.class);
+        when(flightInfoManager.getFlightInfo()).thenReturn(new FlightInfo());
+        sentenceIdGenerator = new IncrementalSentenceIdGenerator(flightInfoManager);
     }
 
     @Test
     public void testGenerateId() {
-        assertEquals("0", sentenceIdGenerator.generateId());
-        assertEquals("1", sentenceIdGenerator.generateId());
-        assertEquals("2", sentenceIdGenerator.generateId());
+        assertEquals("1_0", sentenceIdGenerator.generateId());
+        assertEquals("1_1", sentenceIdGenerator.generateId());
+        assertEquals("1_2", sentenceIdGenerator.generateId());
     }
     
 }

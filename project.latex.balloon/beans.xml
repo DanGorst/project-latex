@@ -13,7 +13,13 @@
    
     <bean id="uuidSentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
    
-    <bean id="incrementalSentenceIdGenerator" class="project.latex.balloon.IncrementalSentenceIdGenerator" />
+    <bean id="flightInfoManager" class="project.latex.balloon.FlightInfoManager">
+        <constructor-arg value="flightInfo.json" />
+    </bean>
+    
+    <bean id="incrementalSentenceIdGenerator" class="project.latex.balloon.IncrementalSentenceIdGenerator">
+        <constructor-arg ref="flightInfoManager" />
+    </bean>
    
     <bean id="dataFolderResource" class="project.latex.balloon.DataFolderResource" />
    
