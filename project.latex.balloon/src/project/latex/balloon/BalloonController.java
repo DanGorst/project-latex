@@ -34,8 +34,6 @@ public class BalloonController {
 
     private final String payloadName = "$$latex";
 
-    private DataModelConverter converter;
-
     // Sensors to determine the current state of the balloon
     private List<SensorController> sensors;
 
@@ -73,10 +71,6 @@ public class BalloonController {
         balloonController.run();
     }
 
-    public DataModelConverter getConverter() {
-        return converter;
-    }
-
     public String getPayloadName() {
         return payloadName;
     }
@@ -103,10 +97,6 @@ public class BalloonController {
 
     public SentenceIdGenerator getSentenceIdGenerator() {
         return sentenceIdGenerator;
-    }
-
-    public void setConverter(DataModelConverter converter) {
-        this.converter = converter;
     }
 
     public void setSensors(List<SensorController> sensors) {

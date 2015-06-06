@@ -24,8 +24,6 @@ import static org.mockito.Mockito.when;
 import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
-import project.latex.balloon.writer.ChecksumGenerator;
-import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.DataWriter;
 
 /**
@@ -38,7 +36,6 @@ public class BalloonControllerTest {
     private SentenceIdGenerator mockSentenceIdGenerator;
     private DataModelConsumer mockDataModelConsumer;
     private ControllerRunner mockControllerRunner;
-    private ChecksumGenerator mockChecksumGenerator;
 
     public BalloonControllerTest() {
     }
@@ -58,7 +55,6 @@ public class BalloonControllerTest {
         this.mockSentenceIdGenerator = mock(SentenceIdGenerator.class);
         this.mockDataModelConsumer = mock(DataModelConsumer.class);
         this.mockControllerRunner = mock(ControllerRunner.class);
-        this.mockChecksumGenerator = mock(ChecksumGenerator.class);
     }
 
     private BalloonController createDefaultController() throws IOException {
@@ -69,7 +65,6 @@ public class BalloonControllerTest {
         List<DataWriter> dataWriters = new ArrayList<>();
         
         BalloonController controller = new BalloonController();
-        controller.setConverter(new DataModelConverter(mockChecksumGenerator));
         controller.setSensors(sensors);
         controller.setDataWriters(dataWriters);
         controller.setDataModelConsumers(dataModelConsumers);

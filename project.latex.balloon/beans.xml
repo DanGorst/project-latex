@@ -113,7 +113,6 @@
    
     <!-- Now the main balloon controller -->
     <bean id="balloonController" class="project.latex.balloon.BalloonController">
-        <property name="converter" ref="dataModelConverter" />
         <property name="cameraSensor" ref="cameraSensor" />
         <property name="cameraWriter" ref="cameraWriter" />
         <property name="sentenceIdGenerator" ref="incrementalSentenceIdGenerator" />
