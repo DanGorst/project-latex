@@ -68,6 +68,7 @@
    
     <!-- Now the main balloon controller -->
     <bean id="balloonController" class="project.latex.balloon.BalloonController">
+        <property name="sentenceIdGenerator" ref="incrementalSentenceIdGenerator" />
         <property name="timeKey" value="time" />
         <property name="dateKey" value="date" />
         <property name="payloadNameKey" value="payload_name" />
@@ -85,7 +86,7 @@
         </property>
         <property name="dataWriters">
             <list>
-                <ref bean="fileDataWriter" />
+             <!--   <ref bean="fileDataWriter" /> -->
             </list>
         </property>
     </bean>
