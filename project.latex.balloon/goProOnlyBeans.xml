@@ -64,7 +64,9 @@
     </bean>
    
     <!-- Data writers -->
-    <!-- TODO -->
+    <bean id="fileDataWriter" class="project.latex.balloon.writer.GoProFileDataWriter">
+        <constructor-arg name="dataFolder" value="/home/pi/goProData" />
+    </bean>
    
     <!-- Now the main balloon controller -->
     <bean id="balloonController" class="project.latex.balloon.BalloonController">
@@ -86,7 +88,7 @@
         </property>
         <property name="dataWriters">
             <list>
-             <!--   <ref bean="fileDataWriter" /> -->
+                <ref bean="fileDataWriter" />
             </list>
         </property>
     </bean>

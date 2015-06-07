@@ -19,7 +19,6 @@ import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
-import project.latex.balloon.writer.DataModelConverter;
 import project.latex.balloon.writer.CameraDataWriter;
 import project.latex.balloon.writer.DataWriteFailedException;
 import project.latex.balloon.writer.DataWriter;
