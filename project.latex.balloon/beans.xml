@@ -7,6 +7,8 @@
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
+    <import resource="email.xml" />
+    
     <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
         <property name="delay" value="30000" />
     </bean>
