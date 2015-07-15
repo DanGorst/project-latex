@@ -19,8 +19,6 @@ import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
-import project.latex.balloon.writer.CameraDataWriter;
-import project.latex.balloon.writer.DataWriteFailedException;
 import project.latex.balloon.writer.DataWriter;
 
 /**
@@ -42,10 +40,9 @@ public class BalloonController {
 
     // Camera
     private CameraSensorController cameraSensor;
-    private CameraDataWriter cameraWriter;
 
     private SentenceIdGenerator sentenceIdGenerator;
-    
+
     private ControllerRunner controllerRunner;
 
     // Required properties
@@ -62,11 +59,11 @@ public class BalloonController {
         logger.info("Project Latex Balloon Controller, version 0.1");
 
         String configFile = args[0];
-        
+
         ApplicationContext context = new FileSystemXmlApplicationContext(configFile);
         BalloonController balloonController = (BalloonController) context.getBean("balloonController");
         logger.info("Balloon created");
-        
+
         balloonController.run();
     }
 
@@ -90,10 +87,6 @@ public class BalloonController {
         return cameraSensor;
     }
 
-    public CameraDataWriter getCameraWriter() {
-        return cameraWriter;
-    }
-
     public SentenceIdGenerator getSentenceIdGenerator() {
         return sentenceIdGenerator;
     }
@@ -112,10 +105,6 @@ public class BalloonController {
 
     public void setCameraSensor(CameraSensorController cameraSensor) {
         this.cameraSensor = cameraSensor;
-    }
-
-    public void setCameraWriter(CameraDataWriter cameraWriter) {
-        this.cameraWriter = cameraWriter;
     }
 
     public void setSentenceIdGenerator(SentenceIdGenerator sentenceIdGenerator) {
@@ -205,14 +194,9 @@ public class BalloonController {
                 }
             }
 
-            // Find any new camera images and write them out
+            // Handle any new camera images which are available
             if (this.cameraSensor != null) {
-                List<String> imageFiles = this.cameraSensor.getImageFileNames();
-                try {
-                    this.cameraWriter.writeImageFiles(imageFiles);
-                } catch (DataWriteFailedException ex) {
-                    logger.error("Failed to write image files", ex);
-                }
+                cameraSensor.handleNewImages();
             }
 
             controllerRunner.controllerFinishedRunLoop(data);
