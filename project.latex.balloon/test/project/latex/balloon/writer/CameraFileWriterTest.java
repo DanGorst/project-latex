@@ -85,7 +85,7 @@ public class CameraFileWriterTest {
         File baseDirectory = new File(System.getProperty("user.dir"));
         when(mockDataFolderResource.getDataFolder()).thenReturn(baseDirectory);
         writer = new CameraFileWriter(mockDataFolderResource);
-        writer.writeImageFiles(new ArrayList<String>());
+        writer.writeImageFiles(new ArrayList<File>());
         File[] filesInImagesDir = writer.getSavedImagesDirectory().listFiles();
         assertEquals(0, filesInImagesDir.length);
     }
@@ -99,8 +99,8 @@ public class CameraFileWriterTest {
             
             File emptyImage = new File("test.jpg");
             emptyImage.createNewFile();
-            List<String> imagePaths = new ArrayList<>();
-            imagePaths.add(emptyImage.getPath());
+            List<File> imagePaths = new ArrayList<>();
+            imagePaths.add(emptyImage);
             
             writer.writeImageFiles(imagePaths);
             

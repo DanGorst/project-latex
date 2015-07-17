@@ -6,6 +6,7 @@
 
 package project.latex.balloon.writer;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -13,5 +14,5 @@ import java.util.List;
  * @author Dan
  */
 public interface CameraDataWriter {
-    void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException;
+    void writeImageFiles(List<File> imageFiles) throws DataWriteFailedException;
 }

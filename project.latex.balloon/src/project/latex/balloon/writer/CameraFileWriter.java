@@ -44,12 +44,11 @@ public class CameraFileWriter implements CameraDataWriter {
     }
     
     @Override
-    public void writeImageFiles(List<String> imageFiles) throws DataWriteFailedException   {
+    public void writeImageFiles(List<File> imageFiles) throws DataWriteFailedException   {
         if (imageFiles == null) {
             throw new IllegalArgumentException("Null list of images passed to camera file writer");
         }
-        for (String imagePath : imageFiles) {
-            File imageFile = new File(imagePath);
+        for (File imageFile : imageFiles) {
             File movedFile = new File(this.savedImagesDirectory.getPath() + File.separator + imageFile.getName());
             if (!imageFile.renameTo(movedFile)) {
                 throw new DataWriteFailedException("Failed to move file " + imageFile.getPath());
