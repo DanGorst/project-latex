@@ -104,10 +104,10 @@
         <constructor-arg ref="serialDataWriter" />
     </bean>
    
-    <!-- Camera sensor and file writer -->
+    <!-- Camera sensor -->
     <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
         <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
-        <constructor-arg type="project.latex.balloon.writer.CameraDataWriter" ref="cameraWriter" />
+        <constructor-arg type="project.latex.balloon.writer.CameraDataWriter" ref="emailCameraDataWriter" />
         <constructor-arg type="java.lang.String" value="PiCam" />
     </bean>
    
