@@ -9,8 +9,8 @@
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="smtp.gmail.com" />
         <property name="port" value="587" />
-        <property name="username" value="projectlatexuk@gmail.com" />
-        <property name="password" value="projectlatex1" />
+        <property name="username" value="Missionaltitude@gmail.com" />
+        <property name="password" value="ProjectL4tex" />
  
         <property name="javaMailProperties">
             <props>
@@ -24,7 +24,7 @@
         <property name="mailSender" ref="mailSender" />
         <property name="maxNumberOfEmailAttempts" value="10" />
         <property name="delayBetweenEmailAttemptsMs" value="5000" />
-        <property name="toAddress" value="projectlatexuk@gmail.com" />
+        <property name="toAddress" value="Missionaltitude@gmail.com" />
         <property name="fromAddress" value="balloon@projectlatex.co.uk" />
     </bean>
 </beans>
