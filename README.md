@@ -6,7 +6,7 @@ Project to launch a high altitude balloon. This repo will contain code for both 
 Configuration
 -------------
 
-To get the software running on the Pi at startup, add the following to the /etc/rc.local file:
+To get the software running on the Pi at startup, add the following to the `/etc/rc.local` file:
 
 ```
 # Auto run the balloon software
