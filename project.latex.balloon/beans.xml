@@ -139,6 +139,7 @@
             <list>
                 <ref bean="fileDataWriter" />
                 <ref bean="chunkedSerialDataWriter" />
+                <ref bean="httpDataWriter" />
             </list>
         </property>
     </bean>
