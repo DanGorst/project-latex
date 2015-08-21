@@ -47,26 +47,27 @@ public class GoProImageSource implements ImageSource {
         return segments[segments.length - 1];
     }
 
-    void getAvailableImagesFromImageFinder() {
+    void loadAvailableImagesFromImageFinder() {
         List<String> availableImageUrls = imageFinder.getAvailableImages();
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         // Add any new images to our directory
         for (String imageUrl : availableImageUrls) {
-            HttpGet httpGet = new HttpGet(imageUrl);
             try {
-                HttpResponse response = httpclient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    String imageName = getImageName(imageUrl);
-                    File file = new File(imagesDirectory + File.separator + imageName);
-                    if (!file.exists()) {
-                        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                String imageName = getImageName(imageUrl);
+                File file = new File(imagesDirectory + File.separator + imageName);
+                if (!file.exists()) {
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                        HttpGet httpGet = new HttpGet(imageUrl);
+                        HttpResponse response = httpclient.execute(httpGet);
+                        HttpEntity entity = response.getEntity();
+                        if (entity != null) {
                             entity.writeTo(fileOutputStream);
                         }
                     }
                 }
+
             } catch (IOException | URISyntaxException ex) {
                 logger.error(ex.getLocalizedMessage());
             }
@@ -75,7 +76,7 @@ public class GoProImageSource implements ImageSource {
 
     @Override
     public List<File> getAvailableImages() {
-        getAvailableImagesFromImageFinder();
+        loadAvailableImagesFromImageFinder();
 
         List<File> availableImages = new ArrayList<>();
         // Now return the contents of the directory
