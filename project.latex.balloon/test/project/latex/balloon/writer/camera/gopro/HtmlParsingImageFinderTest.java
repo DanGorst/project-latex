@@ -5,7 +5,6 @@
  */
 package project.latex.balloon.writer.camera.gopro;
 
-import project.latex.balloon.writer.camera.gopro.HtmlParsingImageFinder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
