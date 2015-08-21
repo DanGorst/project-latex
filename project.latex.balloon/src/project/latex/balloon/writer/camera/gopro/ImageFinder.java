@@ -4,15 +4,14 @@
  * and open the template in the editor.
  */
 
-package project.latex.balloon.writer;
+package project.latex.balloon.writer.camera.gopro;
 
-import java.io.File;
 import java.util.List;
 
 /**
  *
  * @author Dan
  */
-public interface CameraDataWriter {
-    void writeImageFiles(List<File> imageFiles) throws DataWriteFailedException;
+public interface ImageFinder {
+    List<String> getAvailableImages();
 }

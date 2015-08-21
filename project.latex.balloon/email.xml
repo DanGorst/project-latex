@@ -20,7 +20,7 @@
         </property>
     </bean>
  
-    <bean id="emailCameraDataWriter" class="project.latex.balloon.writer.EmailCameraDataWriter">
+    <bean id="emailCameraDataWriter" class="project.latex.balloon.writer.camera.EmailCameraDataWriter">
         <property name="mailSender" ref="mailSender" />
         <property name="maxNumberOfEmailAttempts" value="10" />
         <property name="delayBetweenEmailAttemptsMs" value="5000" />

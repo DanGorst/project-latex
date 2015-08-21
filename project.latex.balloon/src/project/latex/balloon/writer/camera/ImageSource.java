@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package project.latex.balloon.writer.camera;
 
-package project.latex.balloon.writer.gopro;
-
+import java.io.File;
 import java.util.List;
 
 /**
  *
- * @author Dan
+ * @author dgorst
  */
-public interface ImageFinder {
-    List<String> getAvailableImages();
+public interface ImageSource {
+    List<File> getAvailableImages();
 }

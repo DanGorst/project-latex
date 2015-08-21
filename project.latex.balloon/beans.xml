@@ -104,20 +104,38 @@
         <constructor-arg ref="serialDataWriter" />
     </bean>
    
-    <!-- Camera sensor -->
-    <bean id="cameraSensor" class="project.latex.balloon.sensor.CameraController">
-        <constructor-arg type="java.lang.String" value="/home/pi/cameraImages" />
-        <constructor-arg type="project.latex.balloon.writer.CameraDataWriter" ref="emailCameraDataWriter" />
+    <!-- Camera sensors -->
+    <bean id="piCamImageSource" class="project.latex.balloon.writer.camera.DirectoryImageSource">
+        <property name="imagesDirectoryPath" value="/home/pi/cameraImages" />
+    </bean>
+    
+    <bean id="piCamController" class="project.latex.balloon.sensor.CameraController">
+        <constructor-arg type="project.latex.balloon.writer.camera.ImageSource" ref="piCamImageSource" />
+        <constructor-arg type="project.latex.balloon.writer.camera.CameraDataWriter" ref="emailCameraDataWriter" />
         <constructor-arg type="java.lang.String" value="PiCam" />
     </bean>
    
     <bean id="cameraWriter" class="project.latex.balloon.writer.CameraFileWriter">
         <constructor-arg ref="dataFolderResource" />
     </bean>
+    
+    <bean id="htmlImageFinder" class="project.latex.balloon.writer.camera.gopro.HtmlParsingImageFinder">
+    </bean>
+    
+    <bean id="goProImageSource" class="project.latex.balloon.writer.camera.gopro.GoProImageSource">
+        <constructor-arg type="project.latex.balloon.writer.camera.gopro.ImageFinder" ref="htmlImageFinder" />
+        <constructor-arg type="java.lang.String" value="/home/pi/goProImages" />
+    </bean>
+    
+    <bean id="goProController" class="project.latex.balloon.sensor.CameraController">
+        <constructor-arg type="project.latex.balloon.writer.camera.ImageSource" ref="goProImageSource" />
+        <constructor-arg type="project.latex.balloon.writer.camera.CameraDataWriter" ref="emailCameraDataWriter" />
+        <constructor-arg type="java.lang.String" value="GoPro" />
+    </bean>
    
     <!-- Now the main balloon controller -->
     <bean id="balloonController" class="project.latex.balloon.BalloonController">
-        <property name="cameraSensor" ref="cameraSensor" />
+        <property name="cameraSensor" ref="piCamController" />
         <property name="sentenceIdGenerator" ref="incrementalSentenceIdGenerator" />
         <property name="timeKey" value="time" />
         <property name="dateKey" value="date" />

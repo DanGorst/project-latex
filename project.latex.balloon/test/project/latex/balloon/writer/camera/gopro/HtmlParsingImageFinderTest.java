@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project.latex.balloon.writer.gopro;
+package project.latex.balloon.writer.camera.gopro;
 
+import project.latex.balloon.writer.camera.gopro.HtmlParsingImageFinder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class HtmlParsingImageFinderTest {
     public void testGetAvailableImagesFromDocument() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         File input = new File(classLoader.getResource(
-                "project/latex/balloon/writer/gopro/sampleImagesList.html").getFile());
+                "project/latex/balloon/writer/camera/gopro/sampleImagesList.html").getFile());
         Document doc = Jsoup.parse(input, "UTF-8");
         List<String> imagePaths = imageFinder.getAvailableImagesFromDocument(doc);
 
@@ -50,7 +51,7 @@ public class HtmlParsingImageFinderTest {
     public void testImageFinderReturnsEmptyListWhenNoImagesAvailable() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         File input = new File(classLoader.getResource(
-                "project/latex/balloon/writer/gopro/emptyImagesList.html").getFile());
+                "project/latex/balloon/writer/camera/gopro/emptyImagesList.html").getFile());
         Document doc = Jsoup.parse(input, "UTF-8");
         List<String> imagePaths = imageFinder.getAvailableImagesFromDocument(doc);
         List<String> expectedPaths = new ArrayList<>();

@@ -11,8 +11,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.log4j.Logger;
-import project.latex.balloon.writer.CameraDataWriter;
+import project.latex.balloon.writer.camera.CameraDataWriter;
 import project.latex.balloon.writer.DataWriteFailedException;
+import project.latex.balloon.writer.camera.ImageSource;
 
 /**
  *
@@ -22,22 +23,15 @@ public class CameraController implements CameraSensorController {
 
     private static final Logger logger = Logger.getLogger(CameraController.class);
 
-    private final File imagesDirectory;
+    private final ImageSource imageSource;
     private final String sensorName;
 
     private long mostRecentModifiedTime = 0;
 
-    private CameraDataWriter cameraDataWriter;
+    private final CameraDataWriter cameraDataWriter;
 
-    public CameraController(String imagesDirectoryString, CameraDataWriter cameraDataWriter, String sensorName) {
-        this(new File(imagesDirectoryString), cameraDataWriter, sensorName);
-    }
-
-    public CameraController(File imagesDirectory, CameraDataWriter cameraDataWriter, String sensorName) {
-        if (imagesDirectory == null) {
-            throw new IllegalArgumentException("Images directory cannot be null");
-        }
-        this.imagesDirectory = imagesDirectory;
+    public CameraController(ImageSource imageSource, CameraDataWriter cameraDataWriter, String sensorName) {
+        this.imageSource = imageSource;
         this.cameraDataWriter = cameraDataWriter;
         this.sensorName = sensorName;
     }
@@ -48,20 +42,14 @@ public class CameraController implements CameraSensorController {
 
     @Override
     public void handleNewImages() {
-        if (!imagesDirectory.exists() || !imagesDirectory.isDirectory()) {
-            logger.debug("Cannot find images directory: " + imagesDirectory);
-            return;
-        }
-        File[] imageFiles = imagesDirectory.listFiles();
-        if (imageFiles.length == 0) {
+        List<File> imageFiles = imageSource.getAvailableImages();
+        if (imageFiles.isEmpty()) {
             logger.debug("No images to handle");
             return;
         }
 
-        List<File> sortedImageFiles = new ArrayList<>();
-        Collections.addAll(sortedImageFiles, imageFiles);
         // Sort the image files into descending date/time order
-        Collections.sort(sortedImageFiles, new Comparator<File>() {
+        Collections.sort(imageFiles, new Comparator<File>() {
 
             @Override
             public int compare(File o1, File o2) {
@@ -70,13 +58,13 @@ public class CameraController implements CameraSensorController {
 
         });
 
-        if (mostRecentModifiedTime >= sortedImageFiles.get(0).lastModified()) {
+        if (mostRecentModifiedTime >= imageFiles.get(0).lastModified()) {
             logger.debug("Already handled all available images");
             return;
         }
 
         List<File> imagesToHandle = new ArrayList<>();
-        for (File imageFile : sortedImageFiles) {
+        for (File imageFile : imageFiles) {
             if (mostRecentModifiedTime >= imageFile.lastModified()) {
                 break;
             }
@@ -87,7 +75,7 @@ public class CameraController implements CameraSensorController {
             this.cameraDataWriter.writeImageFiles(imagesToHandle);
 
             // Update our time so we know which images we've handled already
-            mostRecentModifiedTime = sortedImageFiles.get(0).lastModified();
+            mostRecentModifiedTime = imageFiles.get(0).lastModified();
         } catch (DataWriteFailedException ex) {
             logger.error(ex.getMessage());
         }

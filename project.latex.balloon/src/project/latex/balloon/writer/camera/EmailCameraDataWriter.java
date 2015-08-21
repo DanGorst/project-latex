@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project.latex.balloon.writer;
+package project.latex.balloon.writer.camera;
 
 import java.io.File;
 import java.util.List;
@@ -16,6 +16,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import project.latex.balloon.writer.DataWriteFailedException;
 
 /**
  *

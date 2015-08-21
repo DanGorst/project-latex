@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project.latex.balloon.writer;
+package project.latex.balloon.writer.camera;
 
+import project.latex.balloon.writer.camera.EmailCameraDataWriter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+import project.latex.balloon.writer.DataWriteFailedException;
 
 /**
  *
