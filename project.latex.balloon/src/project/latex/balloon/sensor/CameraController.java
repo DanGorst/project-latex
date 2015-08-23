@@ -26,18 +26,24 @@ public class CameraController implements CameraSensorController {
     private final ImageSource imageSource;
     private final String sensorName;
 
-    private long mostRecentModifiedTime = 0;
-
     private final CameraDataWriter cameraDataWriter;
+    
+    private final List<File> handledImages;
 
     public CameraController(ImageSource imageSource, CameraDataWriter cameraDataWriter, String sensorName) {
         this.imageSource = imageSource;
         this.cameraDataWriter = cameraDataWriter;
         this.sensorName = sensorName;
+        
+        this.handledImages = new ArrayList<>();
     }
 
     public String getSensorName() {
         return sensorName;
+    }
+
+    public List<File> getHandledImages() {
+        return handledImages;
     }
 
     @Override
@@ -58,24 +64,21 @@ public class CameraController implements CameraSensorController {
 
         });
 
-        if (mostRecentModifiedTime >= imageFiles.get(0).lastModified()) {
-            logger.debug("Already handled all available images");
-            return;
-        }
-
         List<File> imagesToHandle = new ArrayList<>();
-        for (File imageFile : imageFiles) {
-            if (mostRecentModifiedTime >= imageFile.lastModified()) {
-                break;
-            }
-            imagesToHandle.add(imageFile);
-        }
+        imagesToHandle.addAll(imageFiles);
+        // Now remove all of the images we've already handled
+        imagesToHandle.removeAll(handledImages);
 
         try {
             this.cameraDataWriter.writeImageFiles(imagesToHandle);
-
-            // Update our time so we know which images we've handled already
-            mostRecentModifiedTime = imageFiles.get(0).lastModified();
+            
+            // Keep track of the images we've handled. If an exception is thrown
+            // while writing, then none of the images are marked as such. This
+            // could lead to us writing some images multiple times, if some
+            // are written successfully and others not. For now, we're accepting
+            // this for the sake of simplicity, but it might be good to
+            // improve this behaviour
+            handledImages.addAll(imagesToHandle);
         } catch (DataWriteFailedException ex) {
             logger.error(ex.getMessage());
         }

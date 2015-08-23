@@ -8,10 +8,15 @@ package project.latex.balloon.sensor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import project.latex.balloon.writer.DataWriteFailedException;
@@ -46,7 +51,7 @@ public class CameraControllerTest {
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
 
         cameraController.handleNewImages();
-        
+
         verify(cameraDataWriter, never()).writeImageFiles(availableFiles);
     }
 
@@ -62,12 +67,55 @@ public class CameraControllerTest {
         availableFiles.add(mockFile1);
         availableFiles.add(mockFile2);
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
-        
+
         cameraController.handleNewImages();
 
         List<File> expectedFiles = new ArrayList<>();
         expectedFiles.add(mockFile2);
         expectedFiles.add(mockFile1);
         verify(cameraDataWriter).writeImageFiles(expectedFiles);
+    }
+
+    @Test
+    public void testImagesAreMarkedAsHandledOnceTheyAreSuccessfullyWritten() throws DataWriteFailedException {
+        File mockFile1 = mock(File.class);
+        when(mockFile1.lastModified()).thenReturn(10L);
+
+        File mockFile2 = mock(File.class);
+        when(mockFile2.lastModified()).thenReturn(20L);
+
+        List<File> availableFiles = new ArrayList<>();
+        availableFiles.add(mockFile1);
+        availableFiles.add(mockFile2);
+        when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
+
+        cameraController.handleNewImages();
+
+        List<File> expectedFiles = new ArrayList<>();
+        expectedFiles.add(mockFile2);
+        expectedFiles.add(mockFile1);
+        verify(cameraDataWriter).writeImageFiles(expectedFiles);
+        assertEquals(expectedFiles, cameraController.getHandledImages());
+    }
+
+    @Test
+    public void testImagesAreNotMarkedAsHandledIfThereIsAnErrorDuringWriting() throws DataWriteFailedException {
+        File mockFile1 = mock(File.class);
+        when(mockFile1.lastModified()).thenReturn(10L);
+
+        File mockFile2 = mock(File.class);
+        when(mockFile2.lastModified()).thenReturn(20L);
+
+        List<File> availableFiles = new ArrayList<>();
+        availableFiles.add(mockFile1);
+        availableFiles.add(mockFile2);
+        when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
+
+        doThrow(new DataWriteFailedException("test")).when(cameraDataWriter).writeImageFiles((List<File>) any());
+
+        cameraController.handleNewImages();
+        
+        List<File> expectedHandledFiles = new ArrayList<>();
+        assertEquals(expectedHandledFiles, cameraController.getHandledImages());
     }
 }
