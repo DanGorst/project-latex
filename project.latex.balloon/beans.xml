@@ -29,26 +29,6 @@
         <constructor-arg value="telemetryKeys.json" />
     </bean>
    
-    <!-- Data model consumers -->
-    <util:constant id="IO_PIN_01" static-field="com.pi4j.io.gpio.RaspiPin.GPIO_01"/>
-   
-    <bean id="transistorSwitch" class="project.latex.balloon.consumer.TransistorSwitch">
-        <constructor-arg ref="IO_PIN_01"/>
-    </bean>
-   
-    <!-- Put this mock transistor switch in instead of the real one above if you want to 
-    run the software from Netbeans.   -->
-    <!-- <bean id="transistorSwitch" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="project.latex.balloon.consumer.TransistorSwitch" />
-    </bean> -->
-   
-    <bean id="transistorSwitchController" class="project.latex.balloon.consumer.TransistorSwitchController">
-        <constructor-arg ref="transistorSwitch" />
-        <constructor-arg type="double" value="500" />
-        <constructor-arg type="double" value="100" />
-        <constructor-arg value="altitude" />
-    </bean>
-   
     <!-- Sensors -->
     <bean id="dummySensorController" class="project.latex.balloon.sensor.DummySensorController">
         <constructor-arg value="temp_external" />
@@ -150,7 +130,6 @@
         </property>
         <property name="dataModelConsumers">
             <list>
-                <ref bean="transistorSwitchController" />
             </list>
         </property>
         <property name="dataWriters">
