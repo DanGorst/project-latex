@@ -32,9 +32,11 @@ public class DirectoryImageSourceTest {
 
     @Test
     public void testGetAvailableImagesFromEmptyDirectoryReturnsEmptyArray() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        directoryImageSource = new DirectoryImageSource(classLoader.getResource(
-                "project/latex/balloon/writer/camera/emptyImagesFolder").getFile());
+        File imagesDirectory = new File(System.getProperty("java.io.tmpdir") + File.separator + "emptyFolder");
+        if (!imagesDirectory.exists()) {
+            imagesDirectory.mkdir();
+        }
+        directoryImageSource = new DirectoryImageSource(imagesDirectory.getAbsolutePath());
         List<File> expectedImages = new ArrayList<>();
         assertEquals(expectedImages, directoryImageSource.getAvailableImages());
     }

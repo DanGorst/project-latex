@@ -34,8 +34,7 @@ public class GoProImageSourceTest {
     public void setUp() {
         imageFinder = mock(ImageFinder.class);
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        imagesDirectoryPath = classLoader.getResource("project/latex/balloon/writer/camera/gopro/goProImages").getPath();
+        imagesDirectoryPath = System.getProperty("java.io.tmpdir") + File.separator + "goPro";
         File imagesDirectory = new File(imagesDirectoryPath);
         if (!imagesDirectory.exists()) {
             imagesDirectory.mkdir();
