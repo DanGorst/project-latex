@@ -6,9 +6,9 @@
 package project.latex.balloon.writer.camera;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -29,8 +29,8 @@ public class DirectoryImageSource implements ImageSource {
     }
 
     @Override
-    public List<File> getAvailableImages() {
-        List<File> availableImages = new ArrayList<>();
+    public Set<File> getAvailableImages() {
+        Set<File> availableImages = new HashSet<>();
         File[] imagesArray = imagesDirectory.listFiles();
         if (imagesArray != null) {
             Collections.addAll(availableImages, imagesArray);

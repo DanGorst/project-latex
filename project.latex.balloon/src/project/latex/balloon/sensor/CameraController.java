@@ -9,7 +9,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import project.latex.balloon.writer.camera.CameraDataWriter;
 import project.latex.balloon.writer.DataWriteFailedException;
@@ -28,34 +30,39 @@ public class CameraController implements CameraSensorController {
 
     private final CameraDataWriter cameraDataWriter;
     
-    private final List<File> handledImages;
+    private final Set<File> handledImages;
 
     public CameraController(ImageSource imageSource, CameraDataWriter cameraDataWriter, String sensorName) {
         this.imageSource = imageSource;
         this.cameraDataWriter = cameraDataWriter;
         this.sensorName = sensorName;
         
-        this.handledImages = new ArrayList<>();
+        this.handledImages = new HashSet<>();
     }
 
     public String getSensorName() {
         return sensorName;
     }
 
-    public List<File> getHandledImages() {
+    public Set<File> getHandledImages() {
         return handledImages;
     }
 
     @Override
     public void handleNewImages() {
-        List<File> imageFiles = imageSource.getAvailableImages();
+        Set<File> imageFiles = imageSource.getAvailableImages();
         if (imageFiles.isEmpty()) {
             logger.debug("No images to handle");
             return;
         }
 
+        List<File> imagesToHandle = new ArrayList<>();
+        imagesToHandle.addAll(imageFiles);
+        // Now remove all of the images we've already handled
+        imagesToHandle.removeAll(handledImages);
+        
         // Sort the image files into descending date/time order
-        Collections.sort(imageFiles, new Comparator<File>() {
+        Collections.sort(imagesToHandle, new Comparator<File>() {
 
             @Override
             public int compare(File o1, File o2) {
@@ -63,11 +70,6 @@ public class CameraController implements CameraSensorController {
             }
 
         });
-
-        List<File> imagesToHandle = new ArrayList<>();
-        imagesToHandle.addAll(imageFiles);
-        // Now remove all of the images we've already handled
-        imagesToHandle.removeAll(handledImages);
 
         try {
             this.cameraDataWriter.writeImageFiles(imagesToHandle);

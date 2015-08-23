@@ -12,7 +12,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -75,10 +77,10 @@ public class GoProImageSource implements ImageSource {
     }
 
     @Override
-    public List<File> getAvailableImages() {
+    public Set<File> getAvailableImages() {
         loadAvailableImagesFromImageFinder();
 
-        List<File> availableImages = new ArrayList<>();
+        Set<File> availableImages = new HashSet<>();
         // Now return the contents of the directory
         Collections.addAll(availableImages, imagesDirectory.listFiles());
         return availableImages;

@@ -7,8 +7,9 @@ package project.latex.balloon.sensor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
+import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import project.latex.balloon.writer.DataWriteFailedException;
@@ -47,12 +47,12 @@ public class CameraControllerTest {
 
     @Test
     public void testHandleNewImagesNoImagesAvailable() throws DataWriteFailedException {
-        List<File> availableFiles = new ArrayList<>();
+        Set<File> availableFiles = new HashSet<>();
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
 
         cameraController.handleNewImages();
 
-        verify(cameraDataWriter, never()).writeImageFiles(availableFiles);
+        verify(cameraDataWriter, never()).writeImageFiles((List<File>) any());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class CameraControllerTest {
         File mockFile2 = mock(File.class);
         when(mockFile2.lastModified()).thenReturn(20L);
 
-        List<File> availableFiles = new ArrayList<>();
+        Set<File> availableFiles = new HashSet<>();
         availableFiles.add(mockFile1);
         availableFiles.add(mockFile2);
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
@@ -84,7 +84,7 @@ public class CameraControllerTest {
         File mockFile2 = mock(File.class);
         when(mockFile2.lastModified()).thenReturn(20L);
 
-        List<File> availableFiles = new ArrayList<>();
+        Set<File> availableFiles = new HashSet<>();
         availableFiles.add(mockFile1);
         availableFiles.add(mockFile2);
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
@@ -95,7 +95,11 @@ public class CameraControllerTest {
         expectedFiles.add(mockFile2);
         expectedFiles.add(mockFile1);
         verify(cameraDataWriter).writeImageFiles(expectedFiles);
-        assertEquals(expectedFiles, cameraController.getHandledImages());
+        
+        Set<File> expectedHandledFiles = new HashSet<>();
+        expectedHandledFiles.add(mockFile2);
+        expectedHandledFiles.add(mockFile1);
+        assertEquals(expectedHandledFiles, cameraController.getHandledImages());
     }
 
     @Test
@@ -106,7 +110,7 @@ public class CameraControllerTest {
         File mockFile2 = mock(File.class);
         when(mockFile2.lastModified()).thenReturn(20L);
 
-        List<File> availableFiles = new ArrayList<>();
+        Set<File> availableFiles = new HashSet<>();
         availableFiles.add(mockFile1);
         availableFiles.add(mockFile2);
         when(mockImageSource.getAvailableImages()).thenReturn(availableFiles);
@@ -115,7 +119,7 @@ public class CameraControllerTest {
 
         cameraController.handleNewImages();
         
-        List<File> expectedHandledFiles = new ArrayList<>();
+        Set<File> expectedHandledFiles = new HashSet<>();
         assertEquals(expectedHandledFiles, cameraController.getHandledImages());
     }
 }

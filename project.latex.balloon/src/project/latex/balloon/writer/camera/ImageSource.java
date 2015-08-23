@@ -6,12 +6,12 @@
 package project.latex.balloon.writer.camera;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author dgorst
  */
 public interface ImageSource {
-    List<File> getAvailableImages();
+    Set<File> getAvailableImages();
 }

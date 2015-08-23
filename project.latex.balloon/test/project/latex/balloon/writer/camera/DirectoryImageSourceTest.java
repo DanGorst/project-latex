@@ -6,10 +6,9 @@
 package project.latex.balloon.writer.camera;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -37,7 +36,7 @@ public class DirectoryImageSourceTest {
             imagesDirectory.mkdir();
         }
         directoryImageSource = new DirectoryImageSource(imagesDirectory.getAbsolutePath());
-        List<File> expectedImages = new ArrayList<>();
+        Set<File> expectedImages = new HashSet<>();
         assertEquals(expectedImages, directoryImageSource.getAvailableImages());
     }
 
@@ -47,7 +46,7 @@ public class DirectoryImageSourceTest {
         String testImagesFolderPath = classLoader.getResource(
                 "project/latex/balloon/writer/camera/testImagesFolder").getFile();
         directoryImageSource = new DirectoryImageSource(testImagesFolderPath);
-        List<File> expectedImages = new ArrayList<>();
+        Set<File> expectedImages = new HashSet<>();
         expectedImages.add(new File(testImagesFolderPath + File.separator + "testImage.png"));
         expectedImages.add(new File(testImagesFolderPath + File.separator + "testImage2.png"));
         assertEquals(expectedImages, directoryImageSource.getAvailableImages());

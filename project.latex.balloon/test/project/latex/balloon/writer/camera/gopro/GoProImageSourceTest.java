@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
@@ -59,9 +61,10 @@ public class GoProImageSourceTest {
         availableImageUrls.add("https://upload.wikimedia.org/wikipedia/commons/d/d9/Balloon_free_image.jpg");
         when(imageFinder.getAvailableImages()).thenReturn(availableImageUrls);
 
-        List<File> expectedFiles = new ArrayList<>();
+        Set<File> expectedFiles = new HashSet<>();
         expectedFiles.add(new File(imagesDirectoryPath + File.separator + "2000px-Balloons-aj.svg.png"));
         expectedFiles.add(new File(imagesDirectoryPath + File.separator + "Balloon_free_image.jpg"));
+        
         assertEquals(expectedFiles, goProImageSource.getAvailableImages());
     }
 
