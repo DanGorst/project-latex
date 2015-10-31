@@ -19,6 +19,7 @@ import project.latex.balloon.consumer.DataModelConsumer;
 import project.latex.balloon.sensor.CameraSensorController;
 import project.latex.balloon.sensor.SensorController;
 import project.latex.balloon.sensor.SensorReadFailedException;
+import project.latex.balloon.ssdv.SsdvController;
 import project.latex.balloon.writer.DataWriter;
 
 /**
@@ -45,6 +46,9 @@ public class BalloonController {
 
     private ControllerRunner controllerRunner;
 
+    // Ssdv
+    private SsdvController ssdvController;
+    
     // Required properties
     private String timeKey;
     private String dateKey;
@@ -86,6 +90,10 @@ public class BalloonController {
     public CameraSensorController getCameraSensor() {
         return cameraSensor;
     }
+    
+    public SsdvController getSsdvController() {
+        return ssdvController;
+    }
 
     public SentenceIdGenerator getSentenceIdGenerator() {
         return sentenceIdGenerator;
@@ -105,6 +113,10 @@ public class BalloonController {
 
     public void setCameraSensor(CameraSensorController cameraSensor) {
         this.cameraSensor = cameraSensor;
+    }
+    
+    public void setSsdvController(SsdvController ssdvController) {
+        this.ssdvController = ssdvController;
     }
 
     public void setSentenceIdGenerator(SentenceIdGenerator sentenceIdGenerator) {
@@ -150,56 +162,69 @@ public class BalloonController {
         }
 
         while (controllerRunner.shouldKeepRunning()) {
-            // Build up a model of the current balloon state from the sensors
-            Map<String, Object> data = new HashMap<>();
-
-            // Add entries for date and time. If the GPS module is running, that will 
-            // override these values when we read data from it.
-            // For now we put the date into the same timeFormat as the Icarus test data, 
-            // as this means we don't need to change the receiver to be able to handle both
-            // sets of data
-            Date now = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            data.put(timeKey, timeFormat.format(now));
-            DateFormat dateFormat = new SimpleDateFormat("ddMMYY");
-            data.put(dateKey, dateFormat.format(now));
-
-            data.put(payloadNameKey, this.payloadName);
-            data.put(sentenceIdKey, this.sentenceIdGenerator.generateId());
-
-            // Get readings from each of our sensors.
-            for (SensorController controller : this.sensors) {
-                try {
-                    Map<String, Object> sensorData = controller.getCurrentData();
-                    for (String key : sensorData.keySet()) {
-                        data.put(key, sensorData.get(key));
+            switch (controllerRunner.getCurrentRunLoop()) {
+                case SensorDataRunLoop:
+                    processSensorData();
+                    break;
+                case SsdvRunLoop:
+                    if (ssdvController != null) {
+                        ssdvController.sendNextPacket();                    
                     }
-                } catch (SensorReadFailedException ex) {
-                    logger.error(ex);
-                }
+                    controllerRunner.controllerFinishedRunLoop(null);
             }
-
-            // Allow our consumers to consume the data model
-            for (DataModelConsumer dataModelConsumer : this.dataModelConsumers) {
-                dataModelConsumer.consumeDataModel(data);
-            }
-
-            // Write the model
-            for (DataWriter dataWriter : this.dataWriters) {
-                try {
-                    dataWriter.writeData(data);
-                } // If we get some kind of exception, let's catch it here rather than just crashing the app
-                catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-
-            // Handle any new camera images which are available
-            if (this.cameraSensor != null) {
-                cameraSensor.handleNewImages();
-            }
-
-            controllerRunner.controllerFinishedRunLoop(data);
         }
+    }
+    
+    private void processSensorData() {
+        // Build up a model of the current balloon state from the sensors
+        Map<String, Object> data = new HashMap<>();
+
+        // Add entries for date and time. If the GPS module is running, that will 
+        // override these values when we read data from it.
+        // For now we put the date into the same timeFormat as the Icarus test data, 
+        // as this means we don't need to change the receiver to be able to handle both
+        // sets of data
+        Date now = new Date();
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        data.put(timeKey, timeFormat.format(now));
+        DateFormat dateFormat = new SimpleDateFormat("ddMMYY");
+        data.put(dateKey, dateFormat.format(now));
+
+        data.put(payloadNameKey, this.payloadName);
+        data.put(sentenceIdKey, this.sentenceIdGenerator.generateId());
+
+        // Get readings from each of our sensors.
+        for (SensorController controller : this.sensors) {
+            try {
+                Map<String, Object> sensorData = controller.getCurrentData();
+                for (String key : sensorData.keySet()) {
+                    data.put(key, sensorData.get(key));
+                }
+            } catch (SensorReadFailedException ex) {
+                logger.error(ex);
+            }
+        }
+
+        // Allow our consumers to consume the data model
+        for (DataModelConsumer dataModelConsumer : this.dataModelConsumers) {
+            dataModelConsumer.consumeDataModel(data);
+        }
+
+        // Write the model
+        for (DataWriter dataWriter : this.dataWriters) {
+            try {
+                dataWriter.writeData(data);
+            } // If we get some kind of exception, let's catch it here rather than just crashing the app
+            catch (Exception e) {
+                logger.error(e);
+            }
+        }
+
+        // Handle any new camera images which are available
+        if (this.cameraSensor != null) {
+            cameraSensor.handleNewImages();
+        }
+
+        controllerRunner.controllerFinishedRunLoop(data);
     }
 }

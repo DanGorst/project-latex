@@ -37,5 +37,4 @@ public class DirectoryImageSource implements ImageSource {
         }
         return availableImages;
     }
-
 }

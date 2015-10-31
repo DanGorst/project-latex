@@ -79,14 +79,14 @@
     </bean>
    
     <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
-        <constructor-arg value="32" />
-        <constructor-arg value="10000" />
+        <constructor-arg value="16" />
+        <constructor-arg value="5000" />
         <constructor-arg ref="serialDataWriter" />
     </bean>
    
     <!-- Camera sensors -->
     <bean id="piCamImageSource" class="project.latex.balloon.writer.camera.DirectoryImageSource">
-        <property name="imagesDirectoryPath" value="/home/pi/cameraImages" />
+        <constructor-arg name="imagesDirectoryPath" value="/home/pi/cameraImages" />
     </bean>
     
     <bean id="piCamController" class="project.latex.balloon.sensor.CameraController">

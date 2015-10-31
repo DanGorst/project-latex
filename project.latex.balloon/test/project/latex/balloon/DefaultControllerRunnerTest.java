@@ -29,4 +29,17 @@ public class DefaultControllerRunnerTest {
     public void testShouldKeepRunning() {
         assertEquals(true, instance.shouldKeepRunning());
     }
+    
+    @Test
+    public void testInitialControllerRunLoopShouldBeSensorDataRunLoop() {
+        assertEquals(true, instance.getCurrentRunLoop() == ControllerRunLoop.SensorDataRunLoop);
+    }
+    
+    @Test
+    public void testControllerFinishedRunLoopShouldAlternateCurrentRunLoopsBetweenSensorDataAndSsdv() {
+        instance.controllerFinishedRunLoop(null);
+        assertEquals(true, instance.getCurrentRunLoop() == ControllerRunLoop.SsdvRunLoop);
+        instance.controllerFinishedRunLoop(null);
+        assertEquals(true, instance.getCurrentRunLoop() == ControllerRunLoop.SensorDataRunLoop);
+    }
 }

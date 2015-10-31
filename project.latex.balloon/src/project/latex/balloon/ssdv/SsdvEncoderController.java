@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package project.latex.balloon.writer.camera;
+
+package project.latex.balloon.ssdv;
 
 import java.io.File;
-import java.util.Set;
 
 /**
  *
- * @author dgorst
+ * @author will
  */
-public interface ImageSource {
-    
-    Set<File> getAvailableImages();
+public interface SsdvEncoderController {
+   
+    public File getEncodedImageFile();
 }

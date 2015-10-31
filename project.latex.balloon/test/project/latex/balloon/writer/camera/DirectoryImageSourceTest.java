@@ -51,4 +51,5 @@ public class DirectoryImageSourceTest {
         expectedImages.add(new File(testImagesFolderPath + File.separator + "testImage2.png"));
         assertEquals(expectedImages, directoryImageSource.getAvailableImages());
     }
+    
 }

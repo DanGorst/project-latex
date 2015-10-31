@@ -114,7 +114,8 @@ public class BalloonControllerTest {
         BalloonController controller = createDefaultController();
 
         when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
-
+        when(mockControllerRunner.getCurrentRunLoop()).thenReturn(ControllerRunLoop.SensorDataRunLoop);
+        
         Map<String, Object> mockSensorData = new HashMap<>();
         mockSensorData.put("altitude", 0.1234);
         when(mockSensorController.getCurrentData()).thenReturn(mockSensorData);
@@ -151,7 +152,8 @@ public class BalloonControllerTest {
         BalloonController controller = createDefaultController();
 
         when(mockControllerRunner.shouldKeepRunning()).thenReturn(true, false);
-
+        when(mockControllerRunner.getCurrentRunLoop()).thenReturn(ControllerRunLoop.SensorDataRunLoop);
+        
         Map<String, Object> mockSensorData = new HashMap<>();
         mockSensorData.put("altitude", 0.1234);
         when(mockSensorController.getCurrentData()).thenReturn(mockSensorData);

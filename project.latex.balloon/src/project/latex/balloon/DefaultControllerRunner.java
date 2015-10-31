@@ -18,6 +18,12 @@ public class DefaultControllerRunner implements ControllerRunner {
     private final Logger logger = Logger.getLogger(DefaultControllerRunner.class);
     
     private int delay;
+    
+    private ControllerRunLoop currentRunLoop;
+
+    public DefaultControllerRunner() {
+        this.currentRunLoop = ControllerRunLoop.SensorDataRunLoop;
+    }
 
     public void setDelay(int delay) {
         this.delay = delay;
@@ -31,11 +37,25 @@ public class DefaultControllerRunner implements ControllerRunner {
     @Override
     public void controllerFinishedRunLoop(Map<String, Object> data) {
         try {
-            // Sleep this thread so we're not loading the CPU too much from the controller
+            logger.info(String.format("%s loop finished. Going to sleep for %f seconds.", currentRunLoop.toString(), delay/1000.0));
+            switch (currentRunLoop) {
+                case SensorDataRunLoop:
+                    currentRunLoop = ControllerRunLoop.SsdvRunLoop;
+                    break;
+                case SsdvRunLoop:
+                    currentRunLoop = ControllerRunLoop.SensorDataRunLoop;
+                    break;  
+            }
+            // Sleep this thread so we're not loading the CPU too much from the controller          
             Thread.sleep(delay);
         } catch (InterruptedException ex) {
             logger.error(ex);
         }
+    }
+    
+    @Override
+    public ControllerRunLoop getCurrentRunLoop() {
+        return currentRunLoop;
     }
     
 }

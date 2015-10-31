@@ -6,16 +6,11 @@
 
 package project.latex.balloon;
 
-import java.util.Map;
-
 /**
  *
- * @author dgorst
+ * @author will
  */
-public interface ControllerRunner {
-    ControllerRunLoop getCurrentRunLoop();
-    
-    boolean shouldKeepRunning();
-    
-    void controllerFinishedRunLoop(Map<String, Object> data);
+public enum ControllerRunLoop {
+    SensorDataRunLoop, 
+    SsdvRunLoop
 }
