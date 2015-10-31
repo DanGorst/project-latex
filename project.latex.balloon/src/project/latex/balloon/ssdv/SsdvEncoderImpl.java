@@ -27,7 +27,7 @@ public class SsdvEncoderImpl implements SsdvEncoder{
         {
             // Run the encode script.
             encodeScript = Runtime.getRuntime().exec(String.format(
-                    "ssdv -e -c {0} -i {1} {2} {3}",
+                    "ssdv -e -c %s -i %d %s %s",
                     callSign, imageId, inputImage.getPath(), outputImagePath));
             // Checks exit status of the script.
             if (encodeScript.waitFor() != 0)
@@ -38,7 +38,7 @@ public class SsdvEncoderImpl implements SsdvEncoder{
                 String errorMessage = "";
                 String line;
 
-                logger.warn(String.format("Errorstream from encoding image {0}:", inputImage.getName()));
+                logger.warn(String.format("Errorstream from encoding image %s:", inputImage.getName()));
                 while ((line = bufferedReader.readLine()) != null) {
                     errorMessage += line + "\n";
                 }                   
@@ -48,7 +48,7 @@ public class SsdvEncoderImpl implements SsdvEncoder{
         }
         catch (IOException | InterruptedException e) 
         {
-            logger.error(String.format("Could not encode image file {0}", inputImage.getPath()));
+            logger.error(String.format("Could not encode image file %s", inputImage.getPath()));
         }
     }
 }

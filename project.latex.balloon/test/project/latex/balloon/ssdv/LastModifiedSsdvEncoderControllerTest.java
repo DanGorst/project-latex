@@ -45,7 +45,7 @@ public class LastModifiedSsdvEncoderControllerTest {
         mockEncodedImage = mock(File.class);
         mockEncodedImageDirectoryContents[0] = mockEncodedImage;
         mockEncodedImagesDirectory = mock(File.class);
-        when(mockEncodedImagesDirectory.getPath()).thenReturn("path/");
+        when(mockEncodedImagesDirectory.getPath()).thenReturn("path");
         when(mockEncodedImagesDirectory.listFiles()).thenReturn(mockEncodedImageDirectoryContents);
         when(mockEncodedImageSource.getImagesDirectory()).thenReturn(mockEncodedImagesDirectory);
         // Mock last modified image.

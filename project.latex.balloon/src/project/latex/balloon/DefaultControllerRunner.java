@@ -41,13 +41,15 @@ public class DefaultControllerRunner implements ControllerRunner {
             switch (currentRunLoop) {
                 case SensorDataRunLoop:
                     currentRunLoop = ControllerRunLoop.SsdvRunLoop;
+                    // Sleep this thread so we're not loading the CPU too much from the controller          
+                    Thread.sleep(delay);
                     break;
                 case SsdvRunLoop:
                     currentRunLoop = ControllerRunLoop.SensorDataRunLoop;
+                    // Sleep this thread so we're not loading the CPU too much from the controller          
+                    Thread.sleep(75000);
                     break;  
             }
-            // Sleep this thread so we're not loading the CPU too much from the controller          
-            Thread.sleep(delay);
         } catch (InterruptedException ex) {
             logger.error(ex);
         }

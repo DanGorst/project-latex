@@ -35,13 +35,13 @@ public class SerialSsdvDataWriter implements SsdvDataWriter {
     
     // This constructor is for testing only.
     public SerialSsdvDataWriter(int baudRate, Serial serial) {
-        // Delay should be enough time for buffer to send 16 bytes at the given baudRate
-        
-        this.delayInMilliseconds = (int) ceil(((bufferSize*8.0)/baudRate)*1000);
+        // Delay should be enough time for buffer to send 16 bytes at the given baudRate. 
+        // Give an extra 50% of the time that should be required to make sure there is enough time to send the data.     
+        this.delayInMilliseconds = (int) ceil(1.50 * ((bufferSize*8.0)/baudRate)*1000);
         this.serial = serial;
         this.dataChunks = new ArrayList<>();
         
-         // open the default serial port provided on the GPIO header
+        // open the default serial port provided on the GPIO header
         serial.open(Serial.DEFAULT_COM_PORT, baudRate);
 
         // Add a serial data listener to allow us to echo out any data written
@@ -94,6 +94,7 @@ public class SerialSsdvDataWriter implements SsdvDataWriter {
     
     private void writeNextChunk() {
         if (!dataChunks.isEmpty()) {
+            logger.info("Writing next chunk");
             serial.write(dataChunks.remove(0));
         }
     }  

@@ -39,7 +39,7 @@ public class LastModifiedSsdvEncoderController implements SsdvEncoderController 
         // Get the last modified image and encode it, put the encoded
         // file in the encoded image directory.
         File lastModifiedImage = piCamImageSource.getLastModifiedImage();
-        String outputImagePath = encodedImageSource.getImagesDirectory().getPath() + lastModifiedImage.getName();
+        String outputImagePath = encodedImageSource.getImagesDirectory().getPath() + "/" + lastModifiedImage.getName();
         ssdvEncoder.encode(callSign, imageId, lastModifiedImage, outputImagePath);
         imageId = (imageId + 1) % 256;
         // Check to see if the encoded file is there in the directory.
@@ -48,7 +48,7 @@ public class LastModifiedSsdvEncoderController implements SsdvEncoderController 
             return encodedImageFolderContents[0];
         } else {
             logger.error(String.format("Expected encoded image folder "
-                    + "to contain a single encoded image, but {0} files were found.", 
+                    + "to contain a single encoded image, but %d files were found.", 
                     encodedImageFolderContents.length));
             return null;            
         }
