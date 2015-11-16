@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  */
 public class SsdvControllerImpleTest {
     
-    SsdvControllerImpl ssdvController;
+    SsdvController ssdvController;
     SsdvEncoderController encoder;
     SsdvDataWriter writer;
     
@@ -30,14 +30,14 @@ public class SsdvControllerImpleTest {
     public void setUp() {
         encoder = mock(SsdvEncoderController.class);
         writer = mock(SsdvDataWriter.class);
-        ssdvController = new SsdvControllerImpl(encoder, writer);
+        ssdvController = new SsdvController(encoder, writer);
     }
     
     @Test
     public void testSendNextPacketDoesNotWritePacketIfNoEncodedImageAvailable() {
         when(encoder.getEncodedImageFile()).thenReturn(null);
         ssdvController.sendNextPacket();
-        verify(writer, never()).writeData(any(byte[].class));     
+        verify(writer, never()).writePacket(any(String.class), any(int.class));     
     }
     
     @Test
@@ -46,7 +46,7 @@ public class SsdvControllerImpleTest {
         File mockEncodedImage = new File(testImageFilePath);
         when(encoder.getEncodedImageFile()).thenReturn(mockEncodedImage);
         ssdvController.sendNextPacket();
-        verify(writer).writeData(any(byte[].class));
+        verify(writer).writePacket(mockEncodedImage.getAbsolutePath(), 0);
     }
     
     @Test
@@ -57,12 +57,12 @@ public class SsdvControllerImpleTest {
         when(encoder.getEncodedImageFile()).thenReturn(mockEncodedImage);
         ssdvController.sendNextPacket();
         verify(encoder).getEncodedImageFile();
-        verify(writer).writeData(any(byte[].class));        
+        verify(writer).writePacket(mockEncodedImage.getAbsolutePath(), 0);        
         ssdvController.sendNextPacket();
-        verify(writer, times(2)).writeData(any(byte[].class));
+        verify(writer).writePacket(mockEncodedImage.getAbsolutePath(), 1);
         verify(encoder).getEncodedImageFile();
         ssdvController.sendNextPacket();
-        verify(writer, times(3)).writeData(any(byte[].class));
+        verify(writer, times(2)).writePacket(mockEncodedImage.getAbsolutePath(), 0);
         verify(encoder, times(2)).getEncodedImageFile();       
     }
 }

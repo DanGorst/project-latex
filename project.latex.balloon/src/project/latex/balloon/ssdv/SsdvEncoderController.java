@@ -13,6 +13,7 @@ import java.io.File;
  * @author will
  */
 public interface SsdvEncoderController {
-   
+    
+    // Gets an encoded image file.
     public File getEncodedImageFile();
 }

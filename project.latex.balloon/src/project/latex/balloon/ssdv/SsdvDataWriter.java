@@ -12,5 +12,6 @@ package project.latex.balloon.ssdv;
  */
 public interface SsdvDataWriter {
     
-    void writeData(byte[] data);
+    // Send a particular packet of an encoded image at the given path.
+    void writePacket(String encodedImageFilePath, int packetToSend);
 }

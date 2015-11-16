@@ -11,6 +11,8 @@ import java.io.File;
 /**
  *
  * @author will
+ * 
+ * An image source, providing access to image files.
  */
 public interface SsdvImageSource {
     

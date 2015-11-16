@@ -16,10 +16,12 @@ import org.apache.log4j.Logger;
  *
  * @author will
  */
-public class SsdvEncoderImpl implements SsdvEncoder{
+public class DefaultSsdvEncoder implements SsdvEncoder {
     
     private static final Logger logger = Logger.getLogger(LastModifiedSsdvEncoderController.class);
     
+    // Encodes images to ssdv format using a 3rd party tool, found here:
+    // https://github.com/fsphil/ssdv
     @Override
     public void encode(String callSign, int imageId, File inputImage, String outputImagePath) {
         Process encodeScript;

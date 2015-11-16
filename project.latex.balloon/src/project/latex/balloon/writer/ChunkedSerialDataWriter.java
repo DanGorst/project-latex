@@ -18,7 +18,8 @@ public class ChunkedSerialDataWriter implements DataWriter {
 
     private static final Logger logger = Logger.getLogger(ChunkedSerialDataWriter.class);
     
-    private final int chunkSize;
+    // Size of data chunks in bytes.
+    private final int chunkSize = 16;
 
     private final int delayInMilliseconds;
 
@@ -28,10 +29,13 @@ public class ChunkedSerialDataWriter implements DataWriter {
     
     private final Thread worker;
 
-    public ChunkedSerialDataWriter(int chunkSize, final int delayInMilliseconds, SerialDataWriter dataWriter) {
+    public ChunkedSerialDataWriter(int baudRate, SerialDataWriter dataWriter) {
         this.chunks = new ArrayList<>();
-        this.chunkSize = chunkSize;
-        this.delayInMilliseconds = delayInMilliseconds;
+        final int byteSize = 8;
+        // This provides some allowance for the time that there is no data being sent
+        // due to the software being on another thread etc.. gives some margin of error.
+        final double extraDelayMultiplier = 1.1;
+        this.delayInMilliseconds = (int) ((chunkSize * byteSize/baudRate) * 1000 * extraDelayMultiplier);
         this.dataWriter = dataWriter;
         
         worker = new Thread(new Runnable() {
@@ -86,8 +90,8 @@ public class ChunkedSerialDataWriter implements DataWriter {
     public void writeData(Map<String, Object> dataModel) {
         String csvString = this.dataWriter.convertDataToCsvString(dataModel);
         logger.info(csvString);
-        // Add a new line character to the end of our data so that we can separate sentences
-        csvString += "\n";
+        // Add a new line character to the start and end of our data so that we can separate sentences
+        csvString = "\n" + csvString + "\n";
         // Break our data into chunks to pass to our serial data writer
         List<String> newChunks = breakDataIntoChunks(csvString);
         // Add the chunks to our collection

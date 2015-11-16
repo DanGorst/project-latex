@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 /**
  *
  * @author will
+ * 
  */
 public class LastModifiedSsdvEncoderController implements SsdvEncoderController {
     
@@ -30,7 +31,8 @@ public class LastModifiedSsdvEncoderController implements SsdvEncoderController 
         this.ssdvEncoder = ssdvEncoder;
     }
     
-    // Gets an encoded version of the last modified image file from the PiCam images folder.
+    // Gets an encoded version of the last modified image file from the PiCam 
+    // images folder.
     @Override
     public File getEncodedImageFile() {
         // There should only be one encoded image in the directory, so delete any

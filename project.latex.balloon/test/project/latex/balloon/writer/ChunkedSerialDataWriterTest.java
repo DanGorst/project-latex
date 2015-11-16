@@ -31,7 +31,7 @@ public class ChunkedSerialDataWriterTest {
     @Before
     public void setUp() {
         mockDataWriter = mock(SerialDataWriter.class);
-        chunkedSerialDataWriter = new ChunkedSerialDataWriter(5, 15000, mockDataWriter);
+        chunkedSerialDataWriter = new ChunkedSerialDataWriter(200, mockDataWriter);
     }
 
     /**
@@ -39,11 +39,11 @@ public class ChunkedSerialDataWriterTest {
      */
     @Test
     public void testBreakDataIntoChunks() {
-        String data = "abcdef1234\n";
+        String data = "abcdef123445678912345678901234567890\n";
         List<String> expResult = new ArrayList<>();
-        expResult.add("abcde");
-        expResult.add("f1234");
-        expResult.add("\n");
+        expResult.add("abcdef1234456789");
+        expResult.add("1234567890123456");
+        expResult.add("7890\n");
         List<String> result = chunkedSerialDataWriter.breakDataIntoChunks(data);
         assertEquals(expResult, result);
     }
@@ -64,12 +64,11 @@ public class ChunkedSerialDataWriterTest {
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("value1", 2.34567);
         dataModel.put("value2", "test");
-        when(mockDataWriter.convertDataToCsvString(dataModel)).thenReturn("2.34567, test");
+        when(mockDataWriter.convertDataToCsvString(dataModel)).thenReturn("2.3456789, teststring");
         chunkedSerialDataWriter.writeData(dataModel);
         List<String> expResult = new ArrayList<>();
-        expResult.add("2.345");
-        expResult.add("67, t");
-        expResult.add("est\n");
+        expResult.add("\n2.3456789, test");
+        expResult.add("string\n");
         assertEquals(expResult, chunkedSerialDataWriter.getChunks());
     }
     

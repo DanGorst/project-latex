@@ -8,9 +8,13 @@
     http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
     <import resource="email.xml" />
-    
+
+    <bean id="baudRate" class="java.lang.Integer">
+        <constructor-arg value="150" />
+    </bean>
+
     <bean id="controllerRunner" class="project.latex.balloon.DefaultControllerRunner">
-        <property name="delay" value="30000" />
+        <constructor-arg ref="baudRate" />
     </bean>
    
     <bean id="uuidSentenceIdGenerator" class="project.latex.balloon.UUIDSentenceIDGenerator" />
@@ -75,22 +79,21 @@
     <bean id="serialDataWriter" class="project.latex.balloon.writer.SerialDataWriter">
         <constructor-arg ref="transmittedDataKeysResource" />
         <constructor-arg ref="dataModelConverter" />
-        <constructor-arg value="50" />
+        <constructor-arg ref="baudRate" />
     </bean>
    
     <bean id="chunkedSerialDataWriter" class="project.latex.balloon.writer.ChunkedSerialDataWriter" init-method="start">
-        <constructor-arg value="16" />
-        <constructor-arg value="5000" />
+        <constructor-arg ref="baudRate" />
         <constructor-arg ref="serialDataWriter" />
     </bean>
 
     <!-- SSDV -->
 
-    <bean id="serialSsdvDataWriter" class="project.latex.balloon.ssdv.SerialSsdvDataWriter" init-method="start">
-      <constructor-arg value="50" />
+    <bean id="serialSsdvDataWriter" class="project.latex.balloon.ssdv.SerialSsdvDataWriter">
+      <constructor-arg ref="baudRate" />
     </bean>
 
-    <bean id="ssdvEncoder" class="project.latex.balloon.ssdv.SsdvEncoderImpl"></bean>
+    <bean id="ssdvEncoder" class="project.latex.balloon.ssdv.DefaultSsdvEncoder"></bean>
 
     <bean id="ssdvPiCamImageSource" class="project.latex.balloon.ssdv.DirectorySsdvImageSource">
       <constructor-arg name="imagesDirectoryPath" value="/home/pi/cameraImages" />
@@ -106,7 +109,7 @@
       <constructor-arg type="project.latex.balloon.ssdv.SsdvEncoder" ref="ssdvEncoder" />
     </bean>
 
-    <bean id="ssdvController" class="project.latex.balloon.ssdv.SsdvControllerImpl">
+    <bean id="ssdvController" class="project.latex.balloon.ssdv.SsdvController">
       <constructor-arg type="project.latex.balloon.ssdv.SsdvEncoderController" ref="lastModifiedSsdvEncoderController" />
       <constructor-arg type="project.latex.balloon.ssdv.SsdvDataWriter" ref="serialSsdvDataWriter" />
     </bean>

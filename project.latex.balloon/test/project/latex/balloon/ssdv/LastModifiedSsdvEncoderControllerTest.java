@@ -26,7 +26,7 @@ public class LastModifiedSsdvEncoderControllerTest {
     
     private SsdvImageSource mockPiCamImageSource;
     private DirectorySsdvImageSource mockEncodedImageSource;
-    private SsdvEncoder mockSsdvEncoder;
+    private DefaultSsdvEncoder mockSsdvEncoder;
     private File mockLastModifiedImage;
     private File mockEncodedImage;
     File mockEncodedImagesDirectory;
@@ -37,7 +37,7 @@ public class LastModifiedSsdvEncoderControllerTest {
     public void setUp() {
         this.mockPiCamImageSource = mock(SsdvImageSource.class);
         this.mockEncodedImageSource = mock(DirectorySsdvImageSource.class);
-        this.mockSsdvEncoder = mock(SsdvEncoder.class); 
+        this.mockSsdvEncoder = mock(DefaultSsdvEncoder.class); 
         ssdvEncoderController = new LastModifiedSsdvEncoderController(
                         mockPiCamImageSource, mockEncodedImageSource, mockSsdvEncoder);
         // Mock encoded image directory.

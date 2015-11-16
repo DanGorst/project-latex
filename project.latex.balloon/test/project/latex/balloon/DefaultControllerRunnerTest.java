@@ -19,7 +19,7 @@ public class DefaultControllerRunnerTest {
     
     @Before
     public void setUp() {
-        instance = new DefaultControllerRunner();
+        instance = new DefaultControllerRunner(10000);
     }
 
     /**

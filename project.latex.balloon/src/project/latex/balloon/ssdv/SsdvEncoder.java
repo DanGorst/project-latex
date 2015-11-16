@@ -14,5 +14,6 @@ import java.io.File;
  */
 public interface SsdvEncoder {
     
+    // Encodes an image to ssdv format.
     void encode(String callSign, int imageId, File inputImage, String outputImagePath);
 }
