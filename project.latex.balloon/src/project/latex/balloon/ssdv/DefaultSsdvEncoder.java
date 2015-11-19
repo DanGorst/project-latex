@@ -26,10 +26,12 @@ public class DefaultSsdvEncoder implements SsdvEncoder {
     public void encode(String callSign, int imageId, File inputImage, String outputImagePath) {
         Process encodeScript;
         try
-        {
+        {   logger.info(String.format(
+                    "./ssdv -e -c %s -i %d %s %s",
+                    callSign, imageId, inputImage.getPath(), outputImagePath));
             // Run the encode script.
             encodeScript = Runtime.getRuntime().exec(String.format(
-                    "ssdv -e -c %s -i %d %s %s",
+                    "./ssdv -e -c %s -i %d %s %s",
                     callSign, imageId, inputImage.getPath(), outputImagePath));
             // Checks exit status of the script.
             if (encodeScript.waitFor() != 0)

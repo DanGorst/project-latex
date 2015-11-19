@@ -100,7 +100,7 @@
     </bean>
 
     <bean id="encodedImageSource" class="project.latex.balloon.ssdv.DirectorySsdvImageSource">
-      <constructor-arg name="imagesDirectoryPath" value="/home/pi/encoded-image" />
+      <constructor-arg name="imagesDirectoryPath" value="/home/pi/project-latex/project.latex.ballon/dist/encoded-image" />
     </bean>
 
     <bean id="lastModifiedSsdvEncoderController" class="project.latex.balloon.ssdv.LastModifiedSsdvEncoderController">

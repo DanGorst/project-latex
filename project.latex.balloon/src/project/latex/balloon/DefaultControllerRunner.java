@@ -30,13 +30,13 @@ public class DefaultControllerRunner implements ControllerRunner {
         final int byteSize = 8;
         // This provides some allowance for the time that there is no data being sent
         // due to the software being on another thread etc.. gives some margin of error.
-        final double extraSleepMultiplier = 1.1;
+        final double extraSleepMultiplier = 1.05;
         // Assume a max of 250 bytes of data in sensor data sentences.
-        final int sensorDataMaxBytes = 250;
+        final int sensorDataMaxBytes = 100;
         sensorDataRunLoopSleepTime = (int) (((sensorDataMaxBytes*byteSize)/baudRate)* extraSleepMultiplier * 1000);
         // Size of an ssdv image packet.
         final int packetSize = 256;
-        ssdvRunLoopSleepTime = (int) ((packetSize * byteSize)/baudRate * extraSleepMultiplier * 1000);
+        ssdvRunLoopSleepTime = (int) (((packetSize * byteSize)/baudRate) * extraSleepMultiplier * 1000);
     }
     
     @Override

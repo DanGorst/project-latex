@@ -53,7 +53,7 @@ public class SerialSsdvDataWriter implements SsdvDataWriter {
         {
             // Run the encode script.
             imageSendScript = Runtime.getRuntime().exec(
-                    String.format("python /home/pi/ssdvPacketTransmit.py %s %d %d", 
+                    String.format("python scripts/ssdvPacketTransmit.py %s %d %d", 
                             encodedImageFilePath, packetToSend, baudRate));
             // Checks exit status of the script.
             if (imageSendScript.waitFor() != 0)
