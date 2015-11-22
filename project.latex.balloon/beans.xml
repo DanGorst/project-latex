@@ -96,11 +96,11 @@
     <bean id="ssdvEncoder" class="project.latex.balloon.ssdv.DefaultSsdvEncoder"></bean>
 
     <bean id="ssdvPiCamImageSource" class="project.latex.balloon.ssdv.DirectorySsdvImageSource">
-      <constructor-arg name="imagesDirectoryPath" value="/home/pi/cameraImages" />
+      <constructor-arg name="imagesDirectoryPath" value="pi-cam-images" />
     </bean>
 
     <bean id="encodedImageSource" class="project.latex.balloon.ssdv.DirectorySsdvImageSource">
-      <constructor-arg name="imagesDirectoryPath" value="/home/pi/project-latex/project.latex.ballon/dist/encoded-image" />
+        <constructor-arg name="imagesDirectoryPath" value="encoded-image" />
     </bean>
 
     <bean id="lastModifiedSsdvEncoderController" class="project.latex.balloon.ssdv.LastModifiedSsdvEncoderController">
@@ -116,7 +116,7 @@
 
     <!-- Camera sensors -->
     <bean id="piCamImageSource" class="project.latex.balloon.writer.camera.DirectoryImageSource">
-        <constructor-arg name="imagesDirectoryPath" value="/home/pi/cameraImages" />
+        <constructor-arg name="imagesDirectoryPath" value="pi-cam-images" />
     </bean>
     
     <bean id="piCamController" class="project.latex.balloon.sensor.CameraController">

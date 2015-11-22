@@ -6,5 +6,10 @@ ant jar
 
 ipAddress=$1
 
-# Copy the built jar over to the Pi
-scp -r data/encoded-image dist/project.latex.balloon.jar beans.xml email.xml goProOnlyBeans.xml logger.properties telemetryKeys.json dist/lib src/scripts ../3rdParty/ssdv pi@$ipAddress:/home/pi/project-latex/project.latex.balloon/dist
+# Create necessary directories.
+ssh pi@$ipAddress mkdir -p /home/pi/project-latex/dist/encoded-image
+
+# Copy files across
+scp ../runOnPi.sh pi@$ipAddress:/home/pi/project-latex
+scp -r ../data/pi-cam-images dist/project.latex.balloon.jar beans.xml email.xml goProOnlyBeans.xml logger.properties telemetryKeys.json dist/lib src/scripts ../3rdParty/ssdv pi@$ipAddress:/home/pi/project-latex/dist
+
