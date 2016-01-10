@@ -56,12 +56,12 @@
     </bean>
 
     <bean id="internalTemperatureSensorController" class="project.latex.balloon.sensor.TemperatureSensorController">
-        <constructor-arg value="internalTemperature" />
+        <constructor-arg value="temp_internal" />
         <constructor-arg value="4" />
     </bean>
    
     <bean id="externalTemperatureSensorController" class="project.latex.balloon.sensor.TemperatureSensorController">
-        <constructor-arg value="externalTemperature" />
+        <constructor-arg value="temp_external" />
         <constructor-arg value="17" />
     </bean>
 

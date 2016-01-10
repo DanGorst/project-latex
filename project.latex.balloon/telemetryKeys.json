@@ -1,3 +1,3 @@
 {
-    "keys": ["payload_name", "sentence_id", "time", "date", "latitude", "longitude", "altitude", "internalTemperature", "externalTemperature"]
+    "keys": ["payload_name", "sentence_id", "time", "date", "latitude", "longitude", "altitude", "temp_internal", "temp_external"]
 }
