@@ -65,6 +65,10 @@
         <constructor-arg value="17" />
     </bean>
 
+    <bean id="pressureSensorController" class="project.latex.balloon.sensor.PressureSensorController">
+        <constructor-arg value="pressure" />
+    </bean>
+
     <!-- Data writers -->
     <bean id="fileDataWriter" class="project.latex.balloon.writer.FileDataWriter">
         <constructor-arg ref="dataFolderResource" />
@@ -168,6 +172,7 @@
                 <ref bean="gpsSensorController" />
                 <ref bean="internalTemperatureSensorController" />
                 <ref bean="externalTemperatureSensorController" />
+                <ref bean="pressureSensorController" />
             </list>
         </property>
         <property name="dataModelConsumers">

@@ -27,5 +27,5 @@ sensor = BMP085.BMP085()
 #print 'Altitude = {0:0.2f} m'.format(sensor.read_altitude())
 #print 'Sealevel Pressure = {0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
 
-# We only want the pressure in Pascals.
-print '{0:0.2f}'.format(sensor.read_pressure())
+# We only want the pressure in millibars.
+print '{0:0.2f}'.format(sensor.read_pressure()/100)

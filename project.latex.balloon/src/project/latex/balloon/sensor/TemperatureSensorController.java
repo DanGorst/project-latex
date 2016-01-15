@@ -7,12 +7,11 @@ package project.latex.balloon.sensor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import project.latex.balloon.ssdv.SerialSsdvDataWriter;
 
 /**
  *
@@ -41,6 +40,8 @@ public class TemperatureSensorController implements SensorController {
         logger.info(String.format("Getting %s sensor reading", temperatureKey));
         
         Process temperatureSensorScript;
+        InputStream inputStream = null;
+        
         try
         {
             // Run the encode script.
@@ -49,9 +50,10 @@ public class TemperatureSensorController implements SensorController {
             
             // Wait for script to terminate.
             temperatureSensorScript.waitFor();
-            
+                        
             // Get the output from the script.
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(temperatureSensorScript.getInputStream()));
+            inputStream = temperatureSensorScript.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String output = bufferedReader.readLine();
             logger.info(String.format("%s sensor read output: %s", temperatureKey, output)); 
             
@@ -68,7 +70,10 @@ public class TemperatureSensorController implements SensorController {
         catch (IOException | InterruptedException e) 
         {
             throw new SensorReadFailedException("Could not run temperatureSensor.py");
+        } finally {
+            try {
+                inputStream.close();
+            } catch (Exception e) {}
         }
-    }
-    
+    }  
 }
